@@ -11,7 +11,7 @@ const app = express(); // Express 애플리케이션 인스턴스 생성
 // CORS 설정
 app.use(
   cors({
-    origin: "http://localhost:5173", // 허용할 클라이언트 도메인
+    origin: process.env.BASE_URL, // 허용할 클라이언트 도메인
     methods: ["GET, POST, PUT, PATCH, DELETE"], // 허용할 HTTP 메서드
     credentials: true, // 쿠키 및 인증 정보를 포함한 요청 허용
   })
@@ -28,7 +28,7 @@ app.use(compression()); // 클라이언트로 보내는 응답 데이터를 gzip
 app.use(cookieParser()); // 클라이언트에서 보낸 쿠키를 req.cookies 객체에 저장
 
 // 서버 포트 설정
-const PORT = 3000; // 기본 포트 3000번 사용
+const PORT = process.env.PORT || 3000; // 기본 포트 3000번 사용
 
 // 서버 시작
 app.listen(PORT, () => {
