@@ -1,3 +1,4 @@
 import errorHandler from "./errorHanlder";
+import asyncWrapper from "./asyncWrapper";
 
-export { errorHandler };
+export { errorHandler, asyncWrapper };
