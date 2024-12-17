@@ -1,0 +1,26 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "소셜미디어: playground ",
+    "version": "1.0.0",
+    "description": "소셜미디어 PlayGround를 위한 API documentation",
+    "license": {
+      "name": "박나라",
+      "url": "나중에 github 주소를 적을 것"
+    }
+  },
+  "host": "http://localhost:5731",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "인증 페이지"
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost:5731",
+      "description": "로컬 서버"
+    }
+  ]
+}
