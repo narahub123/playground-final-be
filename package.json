@@ -1,0 +1,12 @@
+{
+  "name": "playground-back",
+  "version": "1.0.0",
+  "description": "playground-backend-final",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
