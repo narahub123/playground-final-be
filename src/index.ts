@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser"; // 요청의 쿠키를 파싱하기 �
 import compression from "compression"; // 응답 데이터를 압축하여 전송하기 위한 미들웨어
 import cors from "cors"; // Cross-Origin Resource Sharing (CORS) 설정을 위한 미들웨어
 
-dotenv.config(); // .env 파일에 정의된 환경 변수 로드
+dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
 
 const app = express(); // Express 애플리케이션 인스턴스 생성
 
