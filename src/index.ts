@@ -3,6 +3,7 @@ import dotenv from "dotenv"; // 환경 변수 관리를 위한 dotenv 모듈
 import cookieParser from "cookie-parser"; // 요청의 쿠키를 파싱하기 위한 미들웨어
 import compression from "compression"; // 응답 데이터를 압축하여 전송하기 위한 미들웨어
 import cors from "cors"; // Cross-Origin Resource Sharing (CORS) 설정을 위한 미들웨어
+import { connectDB } from "utils";
 
 dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
 
@@ -26,6 +27,9 @@ app.use(compression()); // 클라이언트로 보내는 응답 데이터를 gzip
 
 // 쿠키 파싱 미들웨어
 app.use(cookieParser()); // 클라이언트에서 보낸 쿠키를 req.cookies 객체에 저장
+
+// MongoDB와 연결
+connectDB();
 
 // 서버 포트 설정
 const PORT = process.env.PORT || 3000; // 기본 포트 3000번 사용
