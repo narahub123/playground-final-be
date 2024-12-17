@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"; // 요청의 쿠키를 파싱하기 �
 import compression from "compression"; // 응답 데이터를 압축하여 전송하기 위한 미들웨어
 import cors from "cors"; // Cross-Origin Resource Sharing (CORS) 설정을 위한 미들웨어
 import { connectDB } from "@utils";
+import { errorHandler } from "@middlewares";
 
 dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
 
@@ -38,3 +39,6 @@ const PORT = process.env.PORT || 3000; // 기본 포트 3000번 사용
 app.listen(PORT, () => {
   console.log(`서버가 포트 ${PORT}에 연결됨`); // 서버가 실행되었음을 알림
 });
+
+// 에러 핸들링
+app.use(errorHandler);
