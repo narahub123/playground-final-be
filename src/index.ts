@@ -3,17 +3,18 @@ import dotenv from "dotenv"; // 환경 변수 관리를 위한 dotenv 모듈
 import cookieParser from "cookie-parser"; // 요청의 쿠키를 파싱하기 위한 미들웨어
 import compression from "compression"; // 응답 데이터를 압축하여 전송하기 위한 미들웨어
 import cors from "cors"; // Cross-Origin Resource Sharing (CORS) 설정을 위한 미들웨어
-import { connectDB } from "@utils";
-import { errorHandler } from "@middlewares";
+import { connectDB } from "@utils"; // 데이터베이스 연결을 위한 유틸리티 함수
+import { errorHandler } from "@middlewares"; // 에러 처리 미들웨어
+import routes from "@routes"; // 라우팅 처리 모듈
 
-dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
+dotenv.config({ path: ".env.development.local" }); // .env.environmental.local 파일에 정의된 환경 변수 로드
 
 const app = express(); // Express 애플리케이션 인스턴스 생성
 
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.BASE_URL, // 허용할 클라이언트 도메인
+    origin: process.env.BASE_URL, // 허용할 클라이언트 도메인 (환경 변수에서 로드)
     methods: ["GET, POST, PUT, PATCH, DELETE"], // 허용할 HTTP 메서드
     credentials: true, // 쿠키 및 인증 정보를 포함한 요청 허용
   })
@@ -29,16 +30,19 @@ app.use(compression()); // 클라이언트로 보내는 응답 데이터를 gzip
 // 쿠키 파싱 미들웨어
 app.use(cookieParser()); // 클라이언트에서 보낸 쿠키를 req.cookies 객체에 저장
 
-// MongoDB와 연결
-connectDB();
+// 데이터베이스 연결
+connectDB(); // 데이터베이스에 연결 (예: MongoDB)
 
 // 서버 포트 설정
-const PORT = process.env.PORT || 3000; // 기본 포트 3000번 사용
+const PORT = process.env.PORT || 3000; // 기본 포트 3000번 사용, 환경 변수에서 포트를 설정할 수 있음
 
 // 서버 시작
 app.listen(PORT, () => {
   console.log(`서버가 포트 ${PORT}에 연결됨`); // 서버가 실행되었음을 알림
 });
 
-// 에러 핸들링
-app.use(errorHandler);
+// 라우트 설정
+app.use("/", routes()); // 기본 경로에서 라우터를 설정
+
+// 에러 처리 미들웨어 설정
+app.use(errorHandler); // 모든 요청 후에 에러를 처리하는 미들웨어
