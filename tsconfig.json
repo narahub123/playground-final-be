@@ -6,7 +6,18 @@
     "rootDir": "./src", // 소스 파일의 루트 디렉터리 경로
     "moduleResolution": "NodeNext", // Node.js ESM 모듈 해석 규칙 사용
     "baseUrl": "src", // 비상대적 모듈의 기준 경로를 'src'로 설정
-    "paths": {}, // 모듈 경로 별칭 설정 (현재 비어 있음)
+    "paths": {
+      "@utils": ["utils/index.ts"],
+      "@routes": ["routes/index.ts"],
+      "@middlewares": ["middlewares/index.ts"],
+      "@services": ["services/index.ts"],
+      "@controllers": ["controllers/index.ts"],
+      "@errors": ["errors/index.ts"],
+      "@models": ["models/index.ts"],
+      "@data": ["data/index.ts"],
+      "@data/*": ["data/*"],
+      "@constants": ["constants/index.ts"]
+    }, // 모듈 경로 별칭 설정 (현재 비어 있음)
     "resolveJsonModule": true, // JSON 파일을 모듈로 가져오기 허용
     "allowJs": true, // JavaScript 파일도 컴파일에 포함
     "checkJs": true, // JavaScript 파일에 대한 타입 검사 활성화
