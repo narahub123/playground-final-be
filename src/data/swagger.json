@@ -23,7 +23,7 @@
       "description": "로컬 서버"
     }
   ],
-  
+
   "components": {
     "schemas": {
       "User": {
@@ -86,6 +86,101 @@
           "birth",
           "gender",
           "location"
+        ]
+      },
+      "Security": {
+        "type": "object",
+        "properties": {
+          "twoFactorAuthentication": {
+            "type": "string",
+            "enum": ["sms", "app", "key", ""],
+            "example": "sms"
+          },
+          "hideLabel": {
+            "type": "boolean",
+            "example": false
+          },
+          "protectRenewPassword": {
+            "type": "boolean",
+            "example": false
+          },
+          "connectedApps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "app1"
+            },
+            "example": ["app1", "app2"]
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "session123"
+            },
+            "example": ["session123", "session456"]
+          },
+          "loginHistory": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "2024-12-18T10:00:00Z"
+            },
+            "example": ["2024-12-18T10:00:00Z", "2024-12-17T15:30:00Z"]
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "device123"
+            },
+            "example": ["device123", "device456"]
+          },
+          "connectedAccounts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "google"
+            },
+            "example": ["google", "facebook"]
+          },
+          "canBeInvited": {
+            "type": "boolean",
+            "example": true
+          },
+          "delegate": {
+            "type": "object",
+            "properties": {
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "group1"
+                },
+                "example": ["group1", "group2"]
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "example": "user1"
+                },
+                "example": ["user1", "user2"]
+              }
+            }
+          }
+        },
+        "required": [
+          "twoFactorAuthentication",
+          "hideLabel",
+          "protectRenewPassword",
+          "connectedApps",
+          "sessions",
+          "loginHistory",
+          "devices",
+          "connectedAccounts",
+          "canBeInvited",
+          "delegate"
         ]
       }
     }
