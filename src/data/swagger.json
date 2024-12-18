@@ -182,6 +182,167 @@
           "canBeInvited",
           "delegate"
         ]
+      },
+      "Privacy": {
+        "type": "object",
+        "properties": {
+          "isPrivate": {
+            "type": "boolean",
+            "example": false
+          },
+          "protectVideo": {
+            "type": "boolean",
+            "example": false
+          },
+          "tagging": {
+            "type": "object",
+            "properties": {
+              "allow": {
+                "type": "boolean",
+                "example": false
+              },
+              "whom": {
+                "type": "string",
+                "enum": ["all", "followers"],
+                "example": "all"
+              }
+            }
+          },
+          "tagSensitiveMedia": {
+            "type": "boolean",
+            "example": false
+          },
+          "addLocationInfo": {
+            "type": "boolean",
+            "example": false
+          },
+          "displaySensitiveMedia": {
+            "type": "boolean",
+            "example": true
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Technology"
+            },
+            "example": ["Technology", "Sports"]
+          },
+          "interests": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Travel"
+            },
+            "example": ["Travel", "Gaming"]
+          },
+          "mutedKeywords": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "spam"
+            },
+            "example": ["spam", "advertisement"]
+          },
+          "mute": {
+            "type": "object",
+            "properties": {
+              "homeFeed": {
+                "type": "boolean",
+                "example": false
+              },
+              "notification": {
+                "type": "boolean",
+                "example": false
+              },
+              "target": {
+                "type": "string",
+                "enum": ["all", "notFollowing"],
+                "example": "all"
+              },
+              "duration": {
+                "type": "string",
+                "enum": ["forever", "24h", "7d", "30d"],
+                "example": "forever"
+              }
+            }
+          },
+          "allowMessages": {
+            "type": "string",
+            "enum": ["all", "authenticated", "none"],
+            "example": "all"
+          },
+          "filterMessages": {
+            "type": "boolean",
+            "example": false
+          },
+          "showRead": {
+            "type": "boolean",
+            "example": false
+          },
+          "findByEmail": {
+            "type": "boolean",
+            "example": true
+          },
+          "findByPhone": {
+            "type": "boolean",
+            "example": true
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "+1234567890"
+            },
+            "example": ["+1234567890", "+0987654321"]
+          },
+          "allowBehavioralAds": {
+            "type": "boolean",
+            "example": true
+          },
+          "audiences": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "sports"
+            },
+            "example": ["sports", "technology"]
+          },
+          "allLocationAds": {
+            "type": "boolean",
+            "example": false
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "Seoul"
+            },
+            "example": ["Seoul", "Busan"]
+          }
+        },
+        "required": [
+          "isPrivate",
+          "protectVideo",
+          "tagging",
+          "tagSensitiveMedia",
+          "addLocationInfo",
+          "displaySensitiveMedia",
+          "topics",
+          "interests",
+          "mutedKeywords",
+          "mute",
+          "allowMessages",
+          "filterMessages",
+          "showRead",
+          "findByEmail",
+          "findByPhone",
+          "contacts",
+          "allowBehavioralAds",
+          "audiences",
+          "allLocationAds",
+          "locations"
+        ]
       }
     }
   }
