@@ -16,7 +16,8 @@
       "@models": ["models/index.ts"],
       "@data": ["data/index.ts"],
       "@data/*": ["data/*"],
-      "@constants": ["constants/index.ts"]
+      "@constants": ["constants/index.ts"],
+      "@types": ["types/index.ts"]
     }, // 모듈 경로 별칭 설정 (현재 비어 있음)
     "resolveJsonModule": true, // JSON 파일을 모듈로 가져오기 허용
     "allowJs": true, // JavaScript 파일도 컴파일에 포함
@@ -29,7 +30,8 @@
     "strict": true, // 모든 엄격한 타입 검사 옵션 활성화
     "noImplicitAny": true, // 암시적인 'any' 타입을 허용하지 않음
     "noUncheckedIndexedAccess": true, // 인덱스 접근 시 존재 여부 확인을 강제
-    "skipLibCheck": true // 라이브러리의 타입 정의 검사를 생략하여 컴파일 속도 향상
+    "skipLibCheck": true, // 라이브러리의 타입 정의 검사를 생략하여 컴파일 속도 향상
+    "typeRoots": ["src/types", "./node_modules/@types"]
   },
   "include": ["src/**/*"], // 컴파일에 포함할 파일 및 디렉터리
   "exclude": ["node_modules", "dist"] // 컴파일에서 제외할 파일 및 디렉터리
