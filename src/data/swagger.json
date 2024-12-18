@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "소셜미디어: playground ",
+    "title": "소셜미디어: playground",
     "version": "1.0.0",
     "description": "소셜미디어 PlayGround를 위한 API documentation",
     "license": {
@@ -22,5 +22,72 @@
       "url": "http://localhost:5731",
       "description": "로컬 서버"
     }
-  ]
+  ],
+  
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "647d2f6e2c9d1c23c4b5e123" },
+          "userId": { "type": "string", "example": "12345" },
+          "username": { "type": "string", "example": "John Doe" },
+          "email": { "type": "string", "example": "john.doe@example.com" },
+          "birth": { "type": "string", "example": "1990-01-01" },
+          "phone": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["123-456-7890"]
+          },
+          "gender": {
+            "type": "string",
+            "enum": ["m", "f", "n", "b"],
+            "example": "m"
+          },
+          "country": { "type": "string", "example": "Korea" },
+          "language": { "type": "string", "example": "en" },
+          "profileImage": {
+            "type": "string",
+            "example": "https://example.com/profile.jpg"
+          },
+          "location": { "type": "string", "example": "Seoul, Korea" },
+          "intro": { "type": "string", "example": "Hello, I am John Doe." },
+          "followings": {
+            "type": "array",
+            "items": { "type": "string", "example": "1234567890abcdef" }
+          },
+          "followers": {
+            "type": "array",
+            "items": { "type": "string", "example": "abcdef1234567890" }
+          },
+          "mutedUsers": {
+            "type": "array",
+            "items": { "type": "string", "example": "abcdef1234567890" }
+          },
+          "blockedUsers": {
+            "type": "array",
+            "items": { "type": "string", "example": "1234567890abcdef" }
+          },
+          "isPrivate": { "type": "boolean", "example": false },
+          "isAuthorized": { "type": "boolean", "example": true },
+          "isAuthenticated": { "type": "boolean", "example": true },
+          "social": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["google", "naver", "kakao"] },
+            "example": ["google"]
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": [
+          "userId",
+          "username",
+          "email",
+          "birth",
+          "gender",
+          "location"
+        ]
+      }
+    }
+  }
 }
