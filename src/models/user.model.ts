@@ -132,7 +132,7 @@ const UserSchema = new mongoose.Schema(
       ],
     },
     // 팔로잉 목록
-    following: {
+    followings: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
       default: [],
     },
@@ -142,7 +142,7 @@ const UserSchema = new mongoose.Schema(
       default: [],
     },
     // 뮤트한 유저 목록
-    mutedUser: {
+    mutedUsers: {
       type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
       default: [],
     },
