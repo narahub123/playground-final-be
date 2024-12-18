@@ -343,6 +343,187 @@
           "allLocationAds",
           "locations"
         ]
+      },
+      "Notifications": {
+        "type": "object",
+        "properties": {
+          "qualityFilter": {
+            "type": "boolean",
+            "example": false
+          },
+          "muteNotifications": {
+            "type": "object",
+            "properties": {
+              "notFollowing": {
+                "type": "boolean",
+                "example": false
+              },
+              "notFollower": {
+                "type": "boolean",
+                "example": false
+              },
+              "newAccount": {
+                "type": "boolean",
+                "example": false
+              },
+              "defaultProfile": {
+                "type": "boolean",
+                "example": false
+              },
+              "emailAuthenticated": {
+                "type": "boolean",
+                "example": false
+              },
+              "phoneAuthenticated": {
+                "type": "boolean",
+                "example": false
+              }
+            }
+          },
+          "pushNotification": {
+            "type": "boolean",
+            "example": false
+          },
+          "pushNotifications": {
+            "type": "object",
+            "properties": {
+              "posts": {
+                "type": "boolean",
+                "example": true
+              },
+              "replies": {
+                "type": "string",
+                "enum": ["custom", "all", "off"],
+                "example": "custom"
+              },
+              "reposts": {
+                "type": "string",
+                "enum": ["custom", "all", "off"],
+                "example": "custom"
+              },
+              "likes": {
+                "type": "string",
+                "enum": ["custom", "all", "off"],
+                "example": "custom"
+              },
+              "photoTags": {
+                "type": "boolean",
+                "example": true
+              },
+              "newFollower": {
+                "type": "boolean",
+                "example": true
+              },
+              "messages": {
+                "type": "boolean",
+                "example": true
+              },
+              "replyMessage": {
+                "type": "string",
+                "enum": ["mine", "all", "off"],
+                "example": "mine"
+              },
+              "joinPplInContacts": {
+                "type": "boolean",
+                "example": true
+              },
+              "topics": {
+                "type": "boolean",
+                "example": true
+              },
+              "newsAndSports": {
+                "type": "boolean",
+                "example": true
+              },
+              "recommend": {
+                "type": "boolean",
+                "example": true
+              },
+              "moments": {
+                "type": "boolean",
+                "example": true
+              },
+              "lives": {
+                "type": "boolean",
+                "example": true
+              },
+              "otherLives": {
+                "type": "boolean",
+                "example": false
+              },
+              "alertAndAgent": {
+                "type": "boolean",
+                "example": true
+              },
+              "professional": {
+                "type": "boolean",
+                "example": true
+              }
+            }
+          },
+          "emailNotification": {
+            "type": "boolean",
+            "example": false
+          },
+          "emailNotifications": {
+            "type": "object",
+            "properties": {
+              "newNotification": {
+                "type": "boolean",
+                "example": true
+              },
+              "messages": {
+                "type": "boolean",
+                "example": false
+              },
+              "postsSentByEmail": {
+                "type": "boolean",
+                "example": true
+              },
+              "popularPosts": {
+                "type": "string",
+                "enum": ["daily", "weekly", "frequently", "off"],
+                "example": "off"
+              },
+              "myStatics": {
+                "type": "boolean",
+                "example": false
+              },
+              "PGUpdates": {
+                "type": "boolean",
+                "example": true
+              },
+              "PGTips": {
+                "type": "boolean",
+                "example": true
+              },
+              "PGLatest": {
+                "type": "boolean",
+                "example": false
+              },
+              "PGPartners": {
+                "type": "boolean",
+                "example": true
+              },
+              "PGSurvey": {
+                "type": "boolean",
+                "example": true
+              },
+              "PGRecommend": {
+                "type": "boolean",
+                "example": false
+              },
+              "PGRecentFollowings": {
+                "type": "boolean",
+                "example": true
+              },
+              "PGBusiness": {
+                "type": "boolean",
+                "example": false
+              }
+            }
+          }
+        }
       }
     }
   }
