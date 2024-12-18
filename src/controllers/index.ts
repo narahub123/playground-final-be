@@ -1,3 +1,7 @@
-import { getUserByUserId } from "./user.controller";
+import {
+  getUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
+} from "./user.controller";
 
-export { getUserByUserId };
+export { getUserByUserId, getUserByEmail, getUserByPhone };

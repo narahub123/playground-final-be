@@ -1,3 +1,7 @@
-import { fetchUserByUserId } from "./user.service";
+import {
+  fetchUserByUserId,
+  fetchUserByEmail,
+  fetchUserByPhone,
+} from "./user.service";
 
-export { fetchUserByUserId };
+export { fetchUserByUserId, fetchUserByEmail, fetchUserByPhone };

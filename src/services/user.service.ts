@@ -24,7 +24,7 @@ const fetchUserByEmail = async (email: string) => {
     const user = await User.findOne({ email });
     if (!user) {
       throw new NotFoundError(
-        `${email} 이메일를 가진 유저를 찾을 수 없습니다.`
+        `이메일 ${email}를 가진 유저를 찾을 수 없습니다.`
       );
     }
     return user;
@@ -37,4 +37,22 @@ const fetchUserByEmail = async (email: string) => {
   }
 };
 
-export { fetchUserByUserId, fetchUserByEmail };
+const fetchUserByPhone = async (phone: string) => {
+  try {
+    const user = await User.findOne({ phone });
+    if (!user) {
+      throw new NotFoundError(
+        `전화번호 ${phone}를 가진 유저를 찾을 수 없습니다.`
+      );
+    }
+    return user;
+  } catch (error: any) {
+    console.error(`[fetchUserByUserId] Error: ${error.message}`, {
+      phone,
+      stack: error.stack,
+    });
+    throw error;
+  }
+};
+
+export { fetchUserByUserId, fetchUserByEmail, fetchUserByPhone };
