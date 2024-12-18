@@ -524,6 +524,54 @@
             }
           }
         }
+      },
+      "Display": {
+        "type": "object",
+        "properties": {
+          "colorContrast": {
+            "type": "boolean",
+            "example": false
+          },
+          "reduceMotion": {
+            "type": "boolean",
+            "example": false
+          },
+          "addImgExpl": {
+            "type": "boolean",
+            "example": false
+          },
+          "fontSize": {
+            "type": "string",
+            "enum": ["xs", "s", "b", "x", "xl"],
+            "example": "b"
+          },
+          "colorTheme": {
+            "type": "string",
+            "enum": [
+              "cornflowerblue",
+              "red",
+              "green",
+              "yellow",
+              "purple",
+              "orange"
+            ],
+            "example": "cornflowerblue"
+          },
+          "bgTheme": {
+            "type": "string",
+            "enum": ["light", "dark", "darker"],
+            "example": "light"
+          },
+          "dataSaver": {
+            "type": "boolean",
+            "example": false
+          },
+          "autoplay": {
+            "type": "string",
+            "enum": ["off", "on"],
+            "example": "off"
+          }
+        }
       }
     }
   }
