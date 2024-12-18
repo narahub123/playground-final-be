@@ -19,4 +19,22 @@ const fetchUserByUserId = async (userId: string) => {
   }
 };
 
-export { fetchUserByUserId };
+const fetchUserByEmail = async (email: string) => {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new NotFoundError(
+        `${email} 이메일를 가진 유저를 찾을 수 없습니다.`
+      );
+    }
+    return user;
+  } catch (error: any) {
+    console.error(`[fetchUserByUserId] Error: ${error.message}`, {
+      email,
+      stack: error.stack,
+    });
+    throw error;
+  }
+};
+
+export { fetchUserByUserId, fetchUserByEmail };
