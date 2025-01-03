@@ -4,6 +4,11 @@ import {
   getUserByPhone,
 } from "./user.controller";
 
-import {} from "./signup.controller";
+import { checkEmailDuplicateInSignup } from "./signup.controller";
 
-export { getUserByUserId, getUserByEmail, getUserByPhone };
+export {
+  getUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
+  checkEmailDuplicateInSignup,
+};

@@ -1,6 +1,35 @@
 import { NotFoundError } from "@errors";
 import { User } from "@models";
 
+/**
+ * 이메일 중복 확인 함수
+ * @param {string} email - 중복 여부를 확인할 이메일 주소
+ * @returns {Promise<boolean>} 이메일이 중복되었으면 `true`, 아니면 `false` 반환
+ *
+ * 이 함수는 주어진 이메일을 기준으로 데이터베이스에서 해당 이메일을 가진 사용자가 존재하는지 확인합니다.
+ * 존재하면 `true`를, 존재하지 않으면 `false`를 반환합니다.
+ *
+ * @throws {Error} 이메일을 조회하는 도중 오류가 발생하면 예외를 던집니다.
+ */
+const checkEmailDuplicate = async (email: string): Promise<boolean> => {
+  try {
+    // 이메일을 기준으로 사용자 검색
+    const user = await User.findOne({ email });
+
+    // 사용자 존재 여부를 Boolean 값으로 반환
+    return Boolean(user);
+  } catch (error: any) {
+    // 오류 발생 시 콘솔에 에러 정보 출력
+    console.error(`[checkEmailDuplicate] Error: ${error.message}`, {
+      email,
+      stack: error.stack,
+    });
+
+    // 에러를 호출자에게 던짐
+    throw error;
+  }
+};
+
 const fetchUserByUserId = async (userId: string) => {
   try {
     const user = await User.findOne({ userId });
@@ -55,4 +84,9 @@ const fetchUserByPhone = async (phone: string) => {
   }
 };
 
-export { fetchUserByUserId, fetchUserByEmail, fetchUserByPhone };
+export {
+  fetchUserByUserId,
+  fetchUserByEmail,
+  fetchUserByPhone,
+  checkEmailDuplicate,
+};
