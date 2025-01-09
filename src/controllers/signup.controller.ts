@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import { checkEmailDuplicate } from "@services";
+import { checkEmailDuplicate, checkUserIdDuplicate } from "@services";
 import { BadRequestError } from "@errors";
 
 /**
@@ -34,4 +34,37 @@ const checkEmailDuplicateInSignup = asyncWrapper(
   }
 );
 
-export { checkEmailDuplicateInSignup };
+/**
+ * 사용자 아이디 중복 여부를 확인하는 API 엔드포인트
+ *
+ * @async
+ * @function checkUserIdDuplicateInSignup
+ * @param {Request} req - 클라이언트의 요청 객체
+ * @param {Response} res - 클라이언트에게 반환할 응답 객체
+ * @throws {BadRequestError} 사용자 아이디가 제공되지 않은 경우
+ * @returns {Promise<void>} 응답으로 중복 여부를 반환하는 Promise
+ *
+ * @description
+ * 이 함수는 클라이언트에서 제공한 사용자 아이디가 이미 등록되어 있는지 확인하고,
+ * 중복 여부를 클라이언트에게 반환합니다. 아이디가 제공되지 않으면 `BadRequestError`를 발생시킵니다.
+ */
+const checkUserIdDuplicateInSignup = asyncWrapper(
+  "checkUserIdDuplicateInSignup",
+  async (req: Request, res: Response) => {
+    // 요청 본문에서 사용자 아이디 추출
+    const { userId } = req.body;
+
+    // 사용자 아이디가 제공되지 않은 경우
+    if (!userId) {
+      throw new BadRequestError("사용자 아이디를 제공해주세요.");
+    }
+
+    // 사용자 아이디 중복 체크
+    const isDuplicate = await checkUserIdDuplicate(userId);
+
+    // 중복 여부를 클라이언트에게 반환
+    res.status(200).json({ isDuplicate });
+  }
+);
+
+export { checkEmailDuplicateInSignup, checkUserIdDuplicateInSignup };
