@@ -220,6 +220,59 @@
           }
         }
       }
+    },
+    "/signup/checkUserIdDuplicate": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "회원 가입 시 사용자 아이디 중복 확인",
+        "description": "사용자가 제공한 사용자 아이디가 이미 등록된 아이디인지 확인합니다.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "사용자 아이디를 포함하는 요청 본문",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string",
+                  "example": "user123",
+                  "description": "사용자 아이디"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "아이디 중복 여부",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isDuplicate": {
+                  "type": "boolean",
+                  "example": false,
+                  "description": "사용자 아이디가 중복되었는지 여부"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "사용자 아이디가 제공되지 않은 경우",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "사용자 아이디를 제공해주세요.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
