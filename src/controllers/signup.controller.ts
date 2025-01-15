@@ -113,6 +113,10 @@ const registerUser = asyncWrapper(
 
     // 사진 업로드: 다중 업로드되어 있기 때문에 [0]을 적용해야 함 주의!!!
     const uploadedProfileImage = await uploadImages(profileImage);
+
+    // 생년월일 합치기
+    const birthCombined =
+      birth.year + birth.month.padStart(2, "0") + birth.date.padStart(2, "0");
   }
 );
 
