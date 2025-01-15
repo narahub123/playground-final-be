@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
 import { checkEmailDuplicate, checkUserIdDuplicate } from "@services";
 import { BadRequestError } from "@errors";
-import { createHashedPassword } from "@utils";
+import { createHashedPassword, uploadImages } from "@utils";
 
 /**
  * 회원 가입 시 이메일 중복 확인 API 핸들러
@@ -111,7 +111,8 @@ const registerUser = asyncWrapper(
     // 비밀번호 해싱하기
     const hashedPassword = await createHashedPassword(password);
 
-    console.log(hashedPassword);
+    // 사진 업로드: 다중 업로드되어 있기 때문에 [0]을 적용해야 함 주의!!!
+    const uploadedProfileImage = await uploadImages(profileImage);
   }
 );
 

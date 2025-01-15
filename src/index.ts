@@ -8,6 +8,13 @@ import swaggerDocument from "@data/swagger.json"; // Swagger 문서 JSON 파일
 import { connectDB } from "@utils"; // 데이터베이스 연결을 위한 유틸리티 함수
 import { errorHandler } from "@middlewares"; // 에러 처리 미들웨어
 import routes from "@routes"; // 라우팅 처리 모듈
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 dotenv.config({ path: ".env.development.local" }); // .env.development.local 파일에 정의된 환경 변수 로드
 
