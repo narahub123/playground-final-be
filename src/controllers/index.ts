@@ -7,6 +7,7 @@ import {
 import {
   checkEmailDuplicateInSignup,
   checkUserIdDuplicateInSignup,
+  registerUser,
 } from "./signup.controller";
 
 export {
@@ -15,4 +16,5 @@ export {
   getUserByPhone,
   checkEmailDuplicateInSignup,
   checkUserIdDuplicateInSignup,
+  registerUser,
 };

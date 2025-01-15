@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
 import { checkEmailDuplicate, checkUserIdDuplicate } from "@services";
 import { BadRequestError } from "@errors";
+import { createHashedPassword } from "@utils";
 
 /**
  * 회원 가입 시 이메일 중복 확인 API 핸들러
@@ -67,4 +68,55 @@ const checkUserIdDuplicateInSignup = asyncWrapper(
   }
 );
 
-export { checkEmailDuplicateInSignup, checkUserIdDuplicateInSignup };
+// 사용자 정보 등록
+const registerUser = asyncWrapper(
+  "registerUser",
+  async (req: Request, res: Response) => {
+    const { user } = req.body;
+
+    const {
+      birth,
+      email,
+      phone,
+      language,
+      notifications,
+      password,
+      profileImage,
+      userId,
+      username,
+    } = user;
+
+    // user에 대한 유효성 검사
+    if (!email && !phone) {
+      throw new BadRequestError("이메일 혹은 휴대폰이 제공되어야 합니다.");
+    } else if (!language) {
+      throw new BadRequestError("언어 설정이 제공되어야 합니다.");
+    } else if (!password) {
+      throw new BadRequestError("비밀번호가 제공되어야 합니다.");
+    } else if (!userId) {
+      throw new BadRequestError("유저 아이디가 제공되어야 합니다.");
+    } else if (!username) {
+      throw new BadRequestError("유저 이름이 제공되어야 합니다.");
+    } else if (!birth.year || !birth.month || !birth.date) {
+      throw new BadRequestError("유저 생년월일이 제공되어야 합니다.");
+    } else if (
+      !notifications.message ||
+      !notifications.comment ||
+      !notifications.following ||
+      !notifications.newPost
+    ) {
+      throw new BadRequestError("유저 알림 설정이 제공되어야 합니다.");
+    }
+
+    // 비밀번호 해싱하기
+    const hashedPassword = await createHashedPassword(password);
+
+    console.log(hashedPassword);
+  }
+);
+
+export {
+  checkEmailDuplicateInSignup,
+  checkUserIdDuplicateInSignup,
+  registerUser,
+};

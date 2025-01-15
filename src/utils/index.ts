@@ -1,3 +1,4 @@
 import connectDB from "./connectDB";
+import createHashedPassword from "./createHashedPassword";
 
-export { connectDB };
+export { connectDB, createHashedPassword };
