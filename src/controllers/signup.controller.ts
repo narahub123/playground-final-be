@@ -9,14 +9,13 @@ import {
   createUserPrivacy,
   createUserSecurity,
   createVerification,
-  fetchUserByUserId,
   sendEmail,
 } from "@services";
-import { BadRequestError, ConflictError } from "@errors";
+import { BadRequestError } from "@errors";
 import {
   createHashedPassword,
   deleteImages,
-  generateAuthNumber,
+  generateAuthCode,
   uploadImages,
 } from "@utils";
 import mongoose from "mongoose";
@@ -105,11 +104,11 @@ const registerUser = asyncWrapper(
       userId,
       username,
       device,
-      address,
+      location,
       ip,
     } = user;
 
-    // user에 대한 유효성 검사
+    // user에 대한 필수 값 확인
     if (!email && !phone) {
       throw new BadRequestError("이메일 혹은 휴대폰이 제공되어야 합니다.");
     } else if (!language) {
@@ -136,10 +135,10 @@ const registerUser = asyncWrapper(
     ) {
       throw new BadRequestError("기기 정보가 제공되어야 합니다.");
     } else if (
-      !address.country ||
-      !address.state ||
-      !address.city ||
-      !address.county
+      !location.country ||
+      !location.state ||
+      !location.city ||
+      !location.county
     ) {
       throw new BadRequestError("주소 정보가 제공되어야 합니다.");
     } else if (!ip) {
@@ -176,7 +175,7 @@ const registerUser = asyncWrapper(
         country, // 생성 여부 결정하기
         language,
         ip,
-        location: address,
+        location,
         profileImage: uploadedProfileImage[0]?.secure_url || "",
       };
 
@@ -194,10 +193,10 @@ const registerUser = asyncWrapper(
       const newNotification = {
         userId,
         pushNotifications: {
-          posts: notifications.newPost,
-          messages: notifications.message,
-          replies: notifications.comment ? "all" : "off",
-          newFollower: notifications.following,
+          posts: notifications.posts,
+          messages: notifications.messages,
+          replies: notifications.replies ? "all" : "off",
+          newFollower: notifications.newFollower,
         },
       };
 
@@ -215,7 +214,7 @@ const registerUser = asyncWrapper(
 
       // 인증 이메일 전송하기
       // 인증 번호 생성하기
-      const authCode = generateAuthNumber();
+      const authCode = generateAuthCode();
 
       const subject = "인증코드";
       const html = `<p>인증코드 ${authCode}</p>`;
