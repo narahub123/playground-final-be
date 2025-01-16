@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const privacySchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
     // 오디언스
     // 게시물 비공개
     isPrivate: { type: Boolean, default: false },
@@ -73,7 +79,7 @@ const privacySchema = new mongoose.Schema(
     // 방문 장소
     locations: { type: [String], default: [] },
   },
-  { versionKey: false }
+  { timestamps: true, versionKey: false }
 );
 
 const Privacy = mongoose.model("Privacy", privacySchema);
