@@ -1,7 +1,16 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import { checkEmailDuplicate, checkUserIdDuplicate } from "@services";
-import { BadRequestError } from "@errors";
+import {
+  checkEmailDuplicate,
+  checkUserIdDuplicate,
+  createUser,
+  createUserDisplay,
+  createUserNotifications,
+  createUserPrivacy,
+  createUserSecurity,
+  fetchUserByUserId,
+} from "@services";
+import { BadRequestError, ConflictError } from "@errors";
 import { createHashedPassword, uploadImages } from "@utils";
 
 /**
@@ -74,6 +83,8 @@ const registerUser = asyncWrapper(
   async (req: Request, res: Response) => {
     const { user } = req.body;
 
+    console.log(user);
+
     const {
       birth,
       email,
@@ -84,6 +95,9 @@ const registerUser = asyncWrapper(
       profileImage,
       userId,
       username,
+      device,
+      address,
+      ip,
     } = user;
 
     // user에 대한 유효성 검사
@@ -100,12 +114,27 @@ const registerUser = asyncWrapper(
     } else if (!birth.year || !birth.month || !birth.date) {
       throw new BadRequestError("유저 생년월일이 제공되어야 합니다.");
     } else if (
-      !notifications.message ||
-      !notifications.comment ||
-      !notifications.following ||
-      !notifications.newPost
+      notifications.message === undefined ||
+      notifications.comment === undefined ||
+      notifications.following === undefined ||
+      notifications.newPost === undefined
     ) {
       throw new BadRequestError("유저 알림 설정이 제공되어야 합니다.");
+    } else if (
+      device.type === undefined ||
+      device.os === undefined ||
+      device.browser === undefined
+    ) {
+      throw new BadRequestError("기기 정보가 제공되어야 합니다.");
+    } else if (
+      !address.country ||
+      !address.state ||
+      !address.city ||
+      !address.county
+    ) {
+      throw new BadRequestError("주소 정보가 제공되어야 합니다.");
+    } else if (!ip) {
+      throw new BadRequestError("IP 정보가 제공되어야 합니다.");
     }
 
     // 비밀번호 해싱하기
@@ -117,6 +146,57 @@ const registerUser = asyncWrapper(
     // 생년월일 합치기
     const birthCombined =
       birth.year + birth.month.padStart(2, "0") + birth.date.padStart(2, "0");
+
+    // 국가
+    const country = language.split("-")[1];
+
+    const newUser = {
+      password: hashedPassword,
+      userId,
+      username,
+      email,
+      birth: birthCombined,
+      phone,
+      // gender, // 어떻게 할 지 아직 안정함
+      country, // 생성 여부 결정하기
+      language,
+      ip,
+      location: address,
+      profileImage: uploadedProfileImage[0],
+    };
+
+    const newSecurity = {
+      userId,
+      devices: [
+        {
+          type: device.type,
+          os: device.os,
+          browser: device.browser,
+        },
+      ],
+    };
+
+    const newNotification = {
+      userId,
+      pushNotifications: {
+        posts: notifications.newPost,
+        messages: notifications.message,
+        replies: notifications.comment ? "all" : "off",
+        newFollower: notifications.following,
+      },
+    };
+
+    await createUser(newUser);
+
+    await createUserSecurity(newSecurity);
+
+    await createUserNotifications(newNotification);
+
+    await createUserDisplay(userId);
+
+    await createUserPrivacy(userId);
+
+    console.log("가입 완료");
   }
 );
 
