@@ -9,6 +9,7 @@ const INTRO_MAX = 150; // 자기 소개 최대
 const EMAIL_SPECIAL_CHARACTERS =
   "\\!\\#\\$\\%\\&\\'*\\+\\/\\=?\\^_\\`\\{\\|\\}\\~";
 const VERIFICATION_EXPIRES = "3m";
+const USERID_SPECIAL_CHARACTERS = "_";
 
 export {
   COUNTRY_DEFAULT,
@@ -21,4 +22,5 @@ export {
   NUMOFBIRTH,
   EMAIL_SPECIAL_CHARACTERS,
   VERIFICATION_EXPIRES,
+  USERID_SPECIAL_CHARACTERS,
 };
