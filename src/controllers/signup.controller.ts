@@ -205,14 +205,11 @@ const registerUser = asyncWrapper(
     const html = `<p>인증코드 ${authNumber}</p>`;
 
     // 인증 이메일 전송하기
-    let emailInfo = await sendEmail(email, subject, html);
-
-    if (!emailInfo) {
-      // 이메일 전송 못한 에러 처리
-    }
+    await sendEmail(email, subject, html);
 
     // 전송이 되었다면 인증 관련 모델에 저장해야 함
     // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
+    
   }
 );
 
