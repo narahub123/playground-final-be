@@ -9,9 +9,10 @@ import {
   createUserPrivacy,
   createUserSecurity,
   fetchUserByUserId,
+  sendEmail,
 } from "@services";
 import { BadRequestError, ConflictError } from "@errors";
-import { createHashedPassword, uploadImages } from "@utils";
+import { createHashedPassword, generateAuthNumber, uploadImages } from "@utils";
 
 /**
  * 회원 가입 시 이메일 중복 확인 API 핸들러
@@ -186,17 +187,32 @@ const registerUser = asyncWrapper(
       },
     };
 
-    await createUser(newUser);
+    // await createUser(newUser);
 
-    await createUserSecurity(newSecurity);
+    // await createUserSecurity(newSecurity);
 
-    await createUserNotifications(newNotification);
+    // await createUserNotifications(newNotification);
 
-    await createUserDisplay(userId);
+    // await createUserDisplay(userId);
 
-    await createUserPrivacy(userId);
+    // await createUserPrivacy(userId);
 
-    console.log("가입 완료");
+    // 인증 이메일 전송하기
+    // 인증 번호 생성하기
+    const authNumber = generateAuthNumber();
+
+    const subject = "인증코드";
+    const html = `<p>인증코드 ${authNumber}</p>`;
+
+    // 인증 이메일 전송하기
+    let emailInfo = await sendEmail(email, subject, html);
+
+    if (!emailInfo) {
+      // 이메일 전송 못한 에러 처리
+    }
+
+    // 전송이 되었다면 인증 관련 모델에 저장해야 함
+    // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
   }
 );
 

@@ -15,6 +15,8 @@ import { createUserSecurity } from "./security.service";
 
 import { createUserPrivacy } from "./privacy.service";
 
+import { sendEmail } from "./email.service";
+
 export {
   fetchUserByUserId,
   fetchUserByEmail,
@@ -34,4 +36,7 @@ export {
 
   // privacy
   createUserPrivacy,
+
+  // email
+  sendEmail,
 };
