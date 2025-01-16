@@ -7,10 +7,14 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
+import mongoose from "mongoose";
 
-const createUserDisplay = async (userId: string) => {
+const createUserDisplay = async (
+  userId: string,
+  options?: { session?: mongoose.ClientSession }
+) => {
   try {
-    const newDisplay = await Display.create({ userId });
+    const newDisplay = await Display.create([{ userId }], options);
 
     return newDisplay;
   } catch (error: any) {

@@ -7,10 +7,17 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
+import mongoose from "mongoose";
 
-const createUserNotifications = async (notifications: any) => {
+const createUserNotifications = async (
+  notifications: any,
+  options?: { session?: mongoose.ClientSession }
+) => {
   try {
-    const newNotifications = await Notifications.create(notifications);
+    const newNotifications = await Notifications.create(
+      [notifications],
+      options
+    );
 
     return newNotifications;
   } catch (error: any) {

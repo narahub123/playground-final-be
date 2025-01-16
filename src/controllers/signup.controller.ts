@@ -13,7 +13,14 @@ import {
   sendEmail,
 } from "@services";
 import { BadRequestError, ConflictError } from "@errors";
-import { createHashedPassword, generateAuthNumber, uploadImages } from "@utils";
+import {
+  createHashedPassword,
+  deleteImages,
+  generateAuthNumber,
+  uploadImages,
+} from "@utils";
+import mongoose from "mongoose";
+import { UploadApiResponse } from "cloudinary";
 
 /**
  * 회원 가입 시 이메일 중복 확인 API 핸들러
@@ -139,78 +146,95 @@ const registerUser = asyncWrapper(
       throw new BadRequestError("IP 정보가 제공되어야 합니다.");
     }
 
-    // 비밀번호 해싱하기
-    const hashedPassword = await createHashedPassword(password);
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    // 사진 업로드: 다중 업로드되어 있기 때문에 [0]을 적용해야 함 주의!!!
-    const uploadedProfileImage = await uploadImages(profileImage);
+    let uploadedProfileImage: UploadApiResponse[] = [];
 
-    // 생년월일 합치기
-    const birthCombined =
-      birth.year + birth.month.padStart(2, "0") + birth.date.padStart(2, "0");
+    try {
+      // 비밀번호 해싱하기
+      const hashedPassword = await createHashedPassword(password);
 
-    // 국가
-    const country = language.split("-")[1];
+      // 사진 업로드: 다중 업로드되어 있기 때문에 [0]을 적용해야 함 주의!!!
+      uploadedProfileImage = await uploadImages(profileImage);
 
-    const newUser = {
-      password: hashedPassword,
-      userId,
-      username,
-      email,
-      birth: birthCombined,
-      phone,
-      // gender, // 어떻게 할 지 아직 안정함
-      country, // 생성 여부 결정하기
-      language,
-      ip,
-      location: address,
-      profileImage: uploadedProfileImage[0],
-    };
+      // 생년월일 합치기
+      const birthCombined =
+        birth.year + birth.month.padStart(2, "0") + birth.date.padStart(2, "0");
 
-    const newSecurity = {
-      userId,
-      devices: [
-        {
-          type: device.type,
-          os: device.os,
-          browser: device.browser,
+      // 국가
+      const country = language.split("-")[1];
+
+      const newUser = {
+        password: hashedPassword,
+        userId,
+        username,
+        email,
+        birth: birthCombined,
+        phone,
+        // gender, // 어떻게 할 지 아직 안정함
+        country, // 생성 여부 결정하기
+        language,
+        ip,
+        location: address,
+        profileImage: uploadedProfileImage[0]?.secure_url || "",
+      };
+
+      const newSecurity = {
+        userId,
+        devices: [
+          {
+            type: device.type,
+            os: device.os,
+            browser: device.browser,
+          },
+        ],
+      };
+
+      const newNotification = {
+        userId,
+        pushNotifications: {
+          posts: notifications.newPost,
+          messages: notifications.message,
+          replies: notifications.comment,
+          newFollower: notifications.following,
         },
-      ],
-    };
+      };
 
-    const newNotification = {
-      userId,
-      pushNotifications: {
-        posts: notifications.newPost,
-        messages: notifications.message,
-        replies: notifications.comment ? "all" : "off",
-        newFollower: notifications.following,
-      },
-    };
+      await createUser(newUser, { session });
 
-    // await createUser(newUser);
+      await createUserSecurity(newSecurity, { session });
 
-    // await createUserSecurity(newSecurity);
+      await createUserNotifications(newNotification, { session });
 
-    // await createUserNotifications(newNotification);
+      await createUserDisplay(userId, { session });
 
-    // await createUserDisplay(userId);
+      await createUserPrivacy(userId, { session });
 
-    // await createUserPrivacy(userId);
+      await session.commitTransaction();
 
-    // 인증 이메일 전송하기
-    // 인증 번호 생성하기
-    const authCode = generateAuthNumber();
+      // 인증 이메일 전송하기
+      // 인증 번호 생성하기
+      const authCode = generateAuthNumber();
 
-    const subject = "인증코드";
-    const html = `<p>인증코드 ${authCode}</p>`;
+      const subject = "인증코드";
+      const html = `<p>인증코드 ${authCode}</p>`;
 
-    // 인증 이메일 전송하기
-    await sendEmail(email, subject, html);
+      // 인증 이메일 전송하기
+      await sendEmail(email, subject, html);
 
-    // 전송이 되었다면 인증 관련 모델에 저장해야 함
-    // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
-    await createVerification({ userId, authCode });
+      // 전송이 되었다면 인증 관련 모델에 저장해야 함
+      // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
+      await createVerification({ userId, authCode });
+    } catch (error) {
+      if (uploadedProfileImage.length > 0) {
+        deleteImages(uploadedProfileImage);
+      }
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 );
 

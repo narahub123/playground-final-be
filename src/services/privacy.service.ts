@@ -7,10 +7,14 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
+import mongoose from "mongoose";
 
-const createUserPrivacy = async (userId: string) => {
+const createUserPrivacy = async (
+  userId: string,
+  options?: { session?: mongoose.ClientSession }
+) => {
   try {
-    const newPrivacy = await Privacy.create({ userId });
+    const newPrivacy = await Privacy.create([{ userId }], options);
 
     return newPrivacy;
   } catch (error: any) {

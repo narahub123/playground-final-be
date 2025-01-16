@@ -7,10 +7,14 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
+import mongoose from "mongoose";
 
-const createUserSecurity = async (security: any) => {
+const createUserSecurity = async (
+  security: any,
+  options?: { session?: mongoose.ClientSession }
+) => {
   try {
-    const newSecurity = await Security.create(security);
+    const newSecurity = await Security.create([security], options);
 
     return newSecurity;
   } catch (error: any) {

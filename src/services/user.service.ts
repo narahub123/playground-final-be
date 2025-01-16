@@ -7,6 +7,7 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
+import mongoose from "mongoose";
 
 /**
  * 이메일 중복 확인 함수
@@ -124,9 +125,12 @@ const fetchUserByPhone = async (phone: string) => {
   }
 };
 
-const createUser = async (user: any) => {
+const createUser = async (
+  user: any,
+  options?: { session?: mongoose.ClientSession }
+) => {
   try {
-    const newUser = await User.create(user);
+    const newUser = await User.create(user, options);
 
     return newUser;
   } catch (error: any) {
