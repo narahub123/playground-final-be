@@ -26,7 +26,12 @@ const createUserDisplay = async (
     // MongoDB 관련 에러 처리
     if (error.code === 11000) {
       // 중복 키 오류
-      throw new MongoDBDuplicateKeyError("이미 존재하는 정보가 존재합니다.");
+      const duplicatedField = Object.keys(error.keyValue)[0];
+      const duplicatedValue = Object.values(error.keyValue)[0];
+
+      throw new MongoDBDuplicateKeyError(
+        `${duplicatedValue}는 ${duplicatedField}에 이미 존재하고 있습니다.`
+      );
     }
 
     if (error.name === "ValidationError") {
