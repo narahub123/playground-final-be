@@ -17,6 +17,8 @@ import { createUserPrivacy } from "./privacy.service";
 
 import { sendEmail } from "./email.service";
 
+import { createVerification } from "./verification.service";
+
 export {
   fetchUserByUserId,
   fetchUserByEmail,
@@ -39,4 +41,7 @@ export {
 
   // email
   sendEmail,
+
+  // verificationCode
+  createVerification,
 };
