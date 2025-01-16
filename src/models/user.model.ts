@@ -75,7 +75,7 @@ const UserSchema = new mongoose.Schema(
     // 성별: 남성 여성 새로운 성별 추가 가능
     gender: {
       type: String,
-      required: true,
+      // required: true,
       enum: ["m", "f", "n", "b"], // 남성, 여성, 중성, 양성
     },
     // 사용자 등급
@@ -108,8 +108,10 @@ const UserSchema = new mongoose.Schema(
     },
     // 가입시 주소
     location: {
-      type: String,
-      required: true,
+      country: { type: String, required: true },
+      state: { type: String, required: true },
+      city: { type: String, required: true },
+      county: { type: String, required: true },
     },
     // 프로필 사진
     profileImage: {
