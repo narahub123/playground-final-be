@@ -223,6 +223,8 @@ const registerUser = asyncWrapper(
       // 전송이 되었다면 인증 관련 모델에 저장해야 함
       // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
       await createVerification({ userId, authCode });
+
+      res.status(201).json({ success: true });
     } catch (error) {
       if (uploadedProfileImage.length > 0) {
         deleteImages(uploadedProfileImage);
