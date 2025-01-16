@@ -8,6 +8,7 @@ const LANGUAGE_DEFAULT = "ko-KR"; // 언어
 const INTRO_MAX = 150; // 자기 소개 최대
 const EMAIL_SPECIAL_CHARACTERS =
   "\\!\\#\\$\\%\\&\\'*\\+\\/\\=?\\^_\\`\\{\\|\\}\\~";
+const VERIFICATION_EXPIRES = "3m";
 
 export {
   COUNTRY_DEFAULT,
@@ -19,4 +20,5 @@ export {
   USERNAME_MIN,
   NUMOFBIRTH,
   EMAIL_SPECIAL_CHARACTERS,
+  VERIFICATION_EXPIRES,
 };
