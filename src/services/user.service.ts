@@ -130,7 +130,7 @@ const createUser = async (
   options?: { session?: mongoose.ClientSession }
 ) => {
   try {
-    const newUser = await User.create(user, options);
+    const newUser = await User.create([user], options);
 
     return newUser;
   } catch (error: any) {
