@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const NotificationsSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
     // 퀄리티 필터
     qualityFilter: { type: Boolean, default: false },
     //뮤트 알림
@@ -20,35 +26,35 @@ const NotificationsSchema = new mongoose.Schema(
       phoneAuthenticated: { type: Boolean, default: false },
     },
     // 푸시 알림 승인 여부
-    pushNotification: { type: Boolean, default: false },
+    pushNotification: { type: Boolean, default: true },
     // 푸시 알림
     pushNotifications: {
       // 게시물
-      posts: { type: Boolean },
+      posts: { type: Boolean, default: false },
       // 답변
       replies: {
         type: String,
-        default: "custom",
+        default: "off",
         enum: ["custom", "all", "off"],
       },
       // 재게시물
       reposts: {
         type: String,
-        default: "custom",
+        default: "off",
         enum: ["custom", "all", "off"],
       },
       // 좋아요
       likes: {
         type: String,
-        default: "custom",
+        default: "off",
         enum: ["custom", "all", "off"],
       },
       // 사진 태그
-      photoTags: { type: Boolean },
+      photoTags: { type: Boolean, default: false },
       // 새로운 팔로워
-      newFollower: { type: Boolean },
+      newFollower: { type: Boolean, default: false },
       // 메시지
-      messages: { type: Boolean },
+      messages: { type: Boolean, default: false },
       // 메시지 답변
       replyMessage: {
         type: String,
@@ -56,26 +62,26 @@ const NotificationsSchema = new mongoose.Schema(
         enum: ["mine", "all", "off"],
       },
       // 연락처 안에 사람이 새로 가입
-      joinPplInContacts: { type: Boolean },
+      joinPplInContacts: { type: Boolean, default: false },
       // 토픽
-      topics: { type: Boolean },
+      topics: { type: Boolean, default: false },
       // 뉴스와 스포츠
-      newsAndSports: { type: Boolean },
+      newsAndSports: { type: Boolean, default: false },
       // 추천
-      recommend: { type: Boolean },
+      recommend: { type: Boolean, default: false },
       // 모멘트
-      moments: { type: Boolean },
+      moments: { type: Boolean, default: false },
       // 실시간 라이브
-      lives: { type: Boolean },
+      lives: { type: Boolean, default: false },
       // 다른 실시간 라이브
-      otherLives: { type: Boolean },
+      otherLives: { type: Boolean, default: false },
       // 알림 및 긴급
-      alertAndAgent: { type: Boolean },
+      alertAndAgent: { type: Boolean, default: false },
       // 프로페셔널
-      professional: { type: Boolean },
+      professional: { type: Boolean, default: false },
     },
     // 이메일 알림 승인 여부
-    emailNotification: { type: Boolean, default: false },
+    emailNotification: { type: Boolean, default: true },
     // 이메일 알림
     emailNotifications: {
       // 새 알림
@@ -110,9 +116,7 @@ const NotificationsSchema = new mongoose.Schema(
       PGBusiness: { type: Boolean, default: false },
     },
   },
-  {
-    versionKey: false,
-  }
+  { timestamps: true, versionKey: false }
 );
 
 const Notifications = mongoose.model("Notifications", NotificationsSchema);
