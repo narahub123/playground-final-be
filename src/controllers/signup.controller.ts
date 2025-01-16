@@ -196,7 +196,7 @@ const registerUser = asyncWrapper(
         pushNotifications: {
           posts: notifications.newPost,
           messages: notifications.message,
-          replies: notifications.comment,
+          replies: notifications.comment ? "all" : "off",
           newFollower: notifications.following,
         },
       };
