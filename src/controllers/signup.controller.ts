@@ -91,8 +91,6 @@ const registerUser = asyncWrapper(
   async (req: Request, res: Response) => {
     const { user } = req.body;
 
-    console.log(user);
-
     const {
       birth,
       email,
@@ -122,10 +120,10 @@ const registerUser = asyncWrapper(
     } else if (!birth.year || !birth.month || !birth.date) {
       throw new BadRequestError("유저 생년월일이 제공되어야 합니다.");
     } else if (
-      notifications.message === undefined ||
-      notifications.comment === undefined ||
-      notifications.following === undefined ||
-      notifications.newPost === undefined
+      notifications.messages === undefined ||
+      notifications.replies === undefined ||
+      notifications.newFollower === undefined ||
+      notifications.posts === undefined
     ) {
       throw new BadRequestError("유저 알림 설정이 제공되어야 합니다.");
     } else if (
