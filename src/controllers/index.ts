@@ -10,6 +10,8 @@ import {
   registerUser,
 } from "./signup.controller";
 
+import { oauthCallback } from "./oauth.controller";
+
 export {
   getUserByUserId,
   getUserByEmail,
@@ -17,4 +19,5 @@ export {
   checkEmailDuplicateInSignup,
   checkUserIdDuplicateInSignup,
   registerUser,
+  oauthCallback,
 };

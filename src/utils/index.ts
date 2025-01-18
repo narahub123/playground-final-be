@@ -3,6 +3,8 @@ import createHashedPassword from "./createHashedPassword";
 import uploadImages from "./uploadImages";
 import generateAuthCode from "./generateAuthCode";
 import deleteImages from "./deleteImages";
+import getOauthAccessToken from "./getOauthAccessToken";
+import getOauthUserInfo from "./getOauthUserInfo";
 
 export {
   connectDB,
@@ -10,4 +12,6 @@ export {
   uploadImages,
   generateAuthCode,
   deleteImages,
+  getOauthAccessToken,
+  getOauthUserInfo,
 };
