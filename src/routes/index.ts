@@ -2,6 +2,7 @@ import express from "express";
 import userRouter from "./user.router";
 import signupRouter from "./signup.router";
 import oauthRouter from "./oauth.router";
+import loginRouter from "./login.router";
 
 // express.Router() 인스턴스를 생성합니다.
 const router = express.Router();
@@ -12,5 +13,6 @@ export default (): express.Router => {
   userRouter(router);
   signupRouter(router);
   oauthRouter(router);
+  loginRouter(router);
   return router; // 라우터 인스턴스를 반환
 };
