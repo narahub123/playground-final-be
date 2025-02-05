@@ -12,7 +12,7 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
-import {} from "./login.controller";
+import { verifyPasswordLogin } from "./login.controller";
 
 export {
   getUserByUserId,
@@ -22,4 +22,5 @@ export {
   checkUserIdDuplicateInSignup,
   registerUser,
   oauthCallback,
+  verifyPasswordLogin,
 };
