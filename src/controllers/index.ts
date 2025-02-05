@@ -12,6 +12,8 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
+import {} from "./login.controller";
+
 export {
   getUserByUserId,
   getUserByEmail,
