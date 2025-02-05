@@ -273,6 +273,101 @@
           }
         }
       }
+    },
+    "/login/verifyPassword": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "로그인 시 비밀번호 검증",
+        "description": "사용자가 제공한 비밀번호와 등록된 비밀번호를 비교하여 로그인 검증을 수행합니다.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "로그인에 필요한 사용자 정보와 비밀번호를 포함하는 요청 본문",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com",
+                  "description": "사용자의 이메일 (선택 사항)"
+                },
+                "phone": {
+                  "type": "string",
+                  "example": "010-1234-5678",
+                  "description": "사용자의 전화번호 (선택 사항)"
+                },
+                "userId": {
+                  "type": "string",
+                  "example": "user123",
+                  "description": "사용자 아이디 (선택 사항)"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123",
+                  "description": "로그인할 때 사용자가 입력한 비밀번호"
+                }
+              },
+              "required": ["password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "비밀번호 검증 성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isValid": {
+                  "type": "boolean",
+                  "example": true,
+                  "description": "비밀번호가 일치하는지 여부"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "필수 정보 미제공 (이메일, 전화번호, 사용자 ID)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "이메일, 휴대전화 번호 혹은 사용자 이름을 제공해주세요.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "조건에 맞는 유저를 찾을 수 없는 경우",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "조건에 맞는 유저를 찾을 수 없습니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "비밀번호가 일치하지 않는 경우",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "비밀번호가 일치하지 않습니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
