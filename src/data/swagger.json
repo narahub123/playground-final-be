@@ -274,6 +274,224 @@
         }
       }
     },
+    "/signup/registerUser": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "회원 가입 시 사용자 정보 등록",
+        "description": "사용자가 제공한 정보를 기반으로 새로운 사용자를 등록하고, 인증 이메일을 전송합니다.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "사용자 정보를 포함하는 요청 본문",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "birth": {
+                      "type": "object",
+                      "properties": {
+                        "year": {
+                          "type": "string",
+                          "example": "1990",
+                          "description": "출생년도"
+                        },
+                        "month": {
+                          "type": "string",
+                          "example": "01",
+                          "description": "출생월"
+                        },
+                        "date": {
+                          "type": "string",
+                          "example": "01",
+                          "description": "출생일"
+                        }
+                      },
+                      "required": ["year", "month", "date"]
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "user@example.com",
+                      "description": "이메일"
+                    },
+                    "phone": {
+                      "type": "string",
+                      "example": "010-1234-5678",
+                      "description": "전화번호"
+                    },
+                    "language": {
+                      "type": "string",
+                      "example": "ko-KR",
+                      "description": "언어 설정"
+                    },
+                    "notifications": {
+                      "type": "object",
+                      "properties": {
+                        "messages": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "메시지 알림 여부"
+                        },
+                        "replies": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "댓글 알림 여부"
+                        },
+                        "newFollower": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "새 팔로워 알림 여부"
+                        },
+                        "posts": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "게시글 알림 여부"
+                        }
+                      },
+                      "required": [
+                        "messages",
+                        "replies",
+                        "newFollower",
+                        "posts"
+                      ]
+                    },
+                    "password": {
+                      "type": "string",
+                      "example": "password123",
+                      "description": "비밀번호"
+                    },
+                    "profileImage": {
+                      "type": "string",
+                      "example": "image_url",
+                      "description": "프로필 이미지 URL"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "example": "user123",
+                      "description": "사용자 아이디"
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "홍길동",
+                      "description": "사용자 이름"
+                    },
+                    "device": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "mobile",
+                          "description": "기기 종류"
+                        },
+                        "os": {
+                          "type": "string",
+                          "example": "android",
+                          "description": "기기 운영체제"
+                        },
+                        "browser": {
+                          "type": "string",
+                          "example": "chrome",
+                          "description": "기기 브라우저"
+                        }
+                      },
+                      "required": ["type", "os", "browser"]
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "country": {
+                          "type": "string",
+                          "example": "KR",
+                          "description": "국가"
+                        },
+                        "state": {
+                          "type": "string",
+                          "example": "Seoul",
+                          "description": "주"
+                        },
+                        "city": {
+                          "type": "string",
+                          "example": "Gangnam",
+                          "description": "도시"
+                        },
+                        "county": {
+                          "type": "string",
+                          "example": "Seocho",
+                          "description": "군"
+                        }
+                      },
+                      "required": ["country", "state", "city", "county"]
+                    },
+                    "ip": {
+                      "type": "string",
+                      "example": "192.168.1.1",
+                      "description": "사용자의 IP 주소"
+                    }
+                  },
+                  "required": [
+                    "email",
+                    "phone",
+                    "language",
+                    "password",
+                    "userId",
+                    "username",
+                    "birth",
+                    "notifications",
+                    "device",
+                    "location",
+                    "ip"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "사용자 등록 성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": true,
+                  "description": "회원 가입 성공 여부"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "필수 정보 미제공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "이메일 혹은 휴대폰이 제공되어야 합니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 오류",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "서버 오류가 발생했습니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/login/verifyPassword": {
       "post": {
         "tags": ["Auth"],
