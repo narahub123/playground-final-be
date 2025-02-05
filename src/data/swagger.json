@@ -492,6 +492,72 @@
         }
       }
     },
+    "/oauth/callback": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "OAuth 인증 콜백 처리",
+        "description": "OAuth 인증을 완료한 후, 인증 코드와 인증 타입을 통해 사용자 정보를 가져오고 기존 유저 여부를 확인합니다.",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "OAuth 인증 코드",
+            "required": true,
+            "type": "string",
+            "example": "authorization_code_example"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "OAuth 인증 타입 (예: 구글, 페이스북 등)",
+            "required": true,
+            "type": "string",
+            "example": "google"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "사용자 정보가 성공적으로 처리되었을 경우",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "OAuth 인증 성공",
+                  "description": "OAuth 인증이 성공적으로 완료되었음을 알리는 메시지"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 요청 (인가 코드나 인증 타입 미제공)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "인가 코드 혹은 인증 타입이 필요합니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "서버 오류",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "유저 정보 취득 실패",
+                  "description": "유저 정보 취득 실패 시 반환되는 메시지"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/login/verifyPassword": {
       "post": {
         "tags": ["Auth"],
