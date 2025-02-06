@@ -752,6 +752,83 @@
           }
         }
       }
+    },
+    "/login/request-verification-code": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "인증 코드 요청",
+        "description": "사용자가 이메일 또는 전화번호를 통해 인증 코드를 요청하는 API입니다. 이메일을 통해 인증 코드를 전송하며, 전화번호는 추후 구현될 예정입니다.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "인증 코드 요청을 위한 사용자 이메일 또는 전화번호 정보",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "user@example.com",
+                  "description": "사용자의 이메일 (선택 사항)"
+                },
+                "phone": {
+                  "type": "string",
+                  "example": "010-1234-5678",
+                  "description": "사용자의 전화번호 (선택 사항)"
+                }
+              },
+              "required": []
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "인증 코드 요청 성공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean",
+                  "example": true,
+                  "description": "인증 코드 요청이 성공했음을 나타내는 값"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "인증코드가 전송되었습니다.",
+                  "description": "성공적인 메시지"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "이메일 혹은 전화번호 미제공",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "이메일 혹은 휴대 전화 번호를 제공해주세요.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "해당 이메일을 가진 유저를 찾을 수 없는 경우",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "해당 이메일을 가진 유저가 없습니다.",
+                  "description": "에러 메시지"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
