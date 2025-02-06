@@ -1,8 +1,4 @@
-import {
-  getUserByUserId,
-  getUserByEmail,
-  getUserByPhone,
-} from "./user.controller";
+import {} from "./users.controller";
 
 import {
   checkEmailDuplicateInSignup,
@@ -15,9 +11,6 @@ import { oauthCallback } from "./oauth.controller";
 import { verifyPasswordLogin } from "./login.controller";
 
 export {
-  getUserByUserId,
-  getUserByEmail,
-  getUserByPhone,
   checkEmailDuplicateInSignup,
   checkUserIdDuplicateInSignup,
   registerUser,
