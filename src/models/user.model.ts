@@ -53,8 +53,8 @@ const UserSchema = new mongoose.Schema(
     },
     // 이메일
     email: {
-      type: String,
-      required: true,
+      type: [String],
+      default: [],
       unique: true,
       match: [emailRegExp, "유효하지 않은 이메일 형식입니다."], // 이메일 유효성 검사
     },
