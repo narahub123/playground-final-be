@@ -10,7 +10,7 @@ import {
 
 interface Verification {
   userId: string;
-  authCode: string;
+  verficationCode: string;
   createdAt?: Date;
 }
 

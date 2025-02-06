@@ -9,7 +9,7 @@ const VerificationSchema = new mongoose.Schema({
     unique: true,
   },
 
-  authCode: {
+  verficationCode: {
     type: String,
     required: true,
   },

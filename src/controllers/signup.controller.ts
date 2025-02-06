@@ -212,17 +212,17 @@ const registerUser = asyncWrapper(
 
       // 인증 이메일 전송하기
       // 인증 번호 생성하기
-      const authCode = generateAuthCode();
+      const verficationCode = generateAuthCode();
 
       const subject = "인증코드";
-      const html = `<p>인증코드 ${authCode}</p>`;
+      const html = `<p>인증코드 ${verficationCode}</p>`;
 
       // 인증 이메일 전송하기
       await sendEmail(email, subject, html);
 
       // 전송이 되었다면 인증 관련 모델에 저장해야 함
       // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
-      await createVerification({ userId, authCode });
+      await createVerification({ userId, verficationCode });
 
       res.status(201).json({ success: true });
     } catch (error) {
