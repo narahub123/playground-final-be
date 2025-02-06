@@ -8,7 +8,11 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
-import { verifyPasswordLogin, getContactsByAccount } from "./login.controller";
+import {
+  verifyPasswordLogin,
+  getContactsByAccount,
+  requestVerificationCodeLogin,
+} from "./login.controller";
 
 export {
   checkEmailDuplicateInSignup,
@@ -18,4 +22,5 @@ export {
   // login
   verifyPasswordLogin,
   getContactsByAccount,
+  requestVerificationCodeLogin,
 };
