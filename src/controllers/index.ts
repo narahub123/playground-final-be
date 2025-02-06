@@ -12,6 +12,7 @@ import {
   verifyPasswordLogin,
   getContactsByAccount,
   requestVerificationCodeLogin,
+  checkVerificationCodeLogin,
 } from "./login.controller";
 
 export {
@@ -23,4 +24,5 @@ export {
   verifyPasswordLogin,
   getContactsByAccount,
   requestVerificationCodeLogin,
+  checkVerificationCodeLogin,
 };
