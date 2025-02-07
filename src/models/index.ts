@@ -4,5 +4,14 @@ import Security from "./security.model";
 import Notifications from "./notifications.model";
 import Display from "./display.model";
 import Verification from "./verification.model";
+import ActiveSession from "./activeSession.model";
 
-export { User, Privacy, Security, Notifications, Display, Verification };
+export {
+  User,
+  Privacy,
+  Security,
+  Notifications,
+  Display,
+  Verification,
+  ActiveSession,
+};
