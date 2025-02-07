@@ -6,6 +6,8 @@ import deleteImages from "./deleteImages";
 import getOauthAccessToken from "./getOauthAccessToken";
 import getOauthUserInfo from "./getOauthUserInfo";
 import comparePassword from "./comparePassword";
+import createRefreshToken from "./createRefreshToken";
+import createAccessToken from "./createAccessToken";
 
 export {
   connectDB,
@@ -16,4 +18,6 @@ export {
   getOauthAccessToken,
   getOauthUserInfo,
   comparePassword,
+  createRefreshToken,
+  createAccessToken,
 };

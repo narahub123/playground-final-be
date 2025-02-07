@@ -11,33 +11,55 @@ import {
   fetchUserByPhone,
   fetchUserByUserId,
 } from "services/user.service";
-import { comparePassword, generateAuthCode } from "@utils";
 import {
+  comparePassword,
+  createAccessToken,
+  createRefreshToken,
+  generateAuthCode,
+} from "@utils";
+import {
+  createActiveSession,
   createVerification,
   deleteVerificationCode,
+  fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
   sendEmail,
 } from "@services";
+import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
 
-// 비밀번호 유효성 검사
-const verifyPasswordLogin = asyncWrapper(
-  "verifyPasswordLogin",
+// 로그인 처리 함수
+const loginWithAccount = asyncWrapper(
+  "loginWithAccount",
   async (req: Request, res: Response) => {
-    const { email, phone, userId, password } = req.body;
+    // 요청 바디에서 사용자 정보 추출
+    const { email, phone, userId, password, device, ip, location } = req.body;
 
-    // 비밀번호가 제공되지 않은 경우 에러 발생
+    // 기존 세션이 존재하는지 확인
+    const existingSession = await fetchActiveSessionWithSessionInfo({
+      userId,
+      device,
+      ip,
+      location,
+    });
+
+    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
+    if (existingSession) {
+      return res.status(200).json({ success: true, message: "로그인 성공" });
+    }
+
+    // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
     if (!password) {
       throw new BadRequestError("확인할 비밀번호를 제공해주세요.");
     }
 
-    // 이메일, 전화번호, 사용자 ID 중 하나도 제공되지 않은 경우 에러 발생
+    // 이메일, 전화번호, 사용자 ID 중 하나도 제공되지 않은 경우 BadRequestError 발생
     if (!email && !phone && !userId) {
       throw new BadRequestError(
         "이메일, 휴대전화 번호 혹은 사용자 이름을 제공해주세요."
       );
     }
 
-    // 이메일, 전화번호, 사용자 ID를 기준으로 사용자를 찾기 위한 메서드 배열 정의
+    // 사용자 정보를 찾기 위한 메서드 배열 정의
     const fetchUserMethods = [
       { key: email, fetch: fetchUserByEmail },
       { key: phone, fetch: fetchUserByPhone },
@@ -46,30 +68,69 @@ const verifyPasswordLogin = asyncWrapper(
 
     let user;
 
-    // 주어진 키를 기준으로 사용자 정보 조회
+    // 주어진 키(이메일, 전화번호, 사용자 ID)로 사용자 정보 조회
     for (const { key, fetch } of fetchUserMethods) {
-      // 키가 존재하면 해당 메서드를 사용해 사용자 정보 조회
       if (key) {
         user = await fetch(key);
-        if (user) break; // 사용자 정보를 찾은 경우 반복문 종료
+        if (user) break; // 사용자를 찾은 경우 반복 종료
       }
     }
 
-    // 사용자 정보를 찾을 수 없는 경우 에러 발생
+    // 사용자를 찾을 수 없으면 NotFoundError 발생
     if (!user) {
       throw new NotFoundError("조건에 맞는 유저를 찾을 수 없습니다.");
     }
 
-    // 제공된 비밀번호가 유효한지 검증
+    // 제공된 비밀번호가 실제 비밀번호와 일치하는지 검증
     const isValid = await comparePassword(password, user.password);
 
-    // 비밀번호가 일치하지 않으면 Unauthorized 에러 발생
+    // 비밀번호가 일치하지 않으면 UnauthorizedError 발생
     if (!isValid) {
       throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");
     }
 
-    // 비밀번호가 일치하는 경우 성공적으로 검증된 결과 반환
-    res.status(200).json(isValid);
+    // 유효한 비밀번호인 경우, refresh token 생성
+    const refreshToken = createRefreshToken(
+      userId,
+      Number(process.env.REFRESHTOKEN_EXPIRES) || REFRESHTOKEN_EXPIRES
+    );
+
+    // 세션 정보를 정의
+    const sessionInfo = {
+      userId,
+      refreshToken,
+      device,
+      ip,
+      location,
+    };
+
+    // refresh token을 active session에 저장
+    const activeSession = await createActiveSession(sessionInfo);
+
+    // 세션 생성 실패 시 CustomAPIError 발생
+    if (!activeSession) {
+      throw new CustomAPIError("현재 세션 생성 실패");
+    }
+
+    // 유효한 세션 정보로 access token 생성
+    const accessToken = createAccessToken(
+      activeSession._id,
+      user.userId,
+      user.userRole,
+      Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES
+    );
+
+    // access token을 쿠키에 저장 (보안 설정 포함)
+    res.cookie("access", accessToken, {
+      httpOnly: true, // 클라이언트에서 JavaScript로 쿠키 접근 차단
+      maxAge:
+        (Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES) * 1000, // 만료 시간 (밀리초 단위)
+      sameSite: "lax", // CSRF 공격 방지 설정
+      secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서만 https 사용
+    });
+
+    // 로그인 성공 응답
+    res.status(200).json({ success: true, message: "로그인 성공" });
   }
 );
 
@@ -222,7 +283,7 @@ const checkVerificationCodeLogin = asyncWrapper(
 );
 
 export {
-  verifyPasswordLogin,
+  loginWithAccount,
   getContactsByAccount,
   requestVerificationCodeLogin,
   checkVerificationCodeLogin,

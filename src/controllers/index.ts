@@ -9,7 +9,7 @@ import {
 import { oauthCallback } from "./oauth.controller";
 
 import {
-  verifyPasswordLogin,
+  loginWithAccount,
   getContactsByAccount,
   requestVerificationCodeLogin,
   checkVerificationCodeLogin,
@@ -21,7 +21,7 @@ export {
   registerUser,
   oauthCallback,
   // login
-  verifyPasswordLogin,
+  loginWithAccount,
   getContactsByAccount,
   requestVerificationCodeLogin,
   checkVerificationCodeLogin,

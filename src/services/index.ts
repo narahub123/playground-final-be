@@ -23,6 +23,11 @@ import {
   deleteVerificationCode,
 } from "./verification.service";
 
+import {
+  createActiveSession,
+  fetchActiveSessionWithSessionInfo,
+} from "./activeSession.service";
+
 export {
   fetchUserByUserId,
   fetchUserByEmail,
@@ -50,4 +55,8 @@ export {
   createVerification,
   fetchVerificationCodeByUserId,
   deleteVerificationCode,
+
+  // active session
+  createActiveSession,
+  fetchActiveSessionWithSessionInfo,
 };
