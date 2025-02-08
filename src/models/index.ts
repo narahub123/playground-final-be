@@ -5,7 +5,7 @@ import Notifications from "./notifications.model";
 import Display from "./display.model";
 import Verification from "./verification.model";
 import ActiveSession from "./active-session.model";
-import LoginAttempt from "./login-attempt.model";
+import LoginFailure from "./login-failure.model";
 import LoginRecord from "./login-record.model";
 
 export {
@@ -16,6 +16,6 @@ export {
   Display,
   Verification,
   ActiveSession,
-  LoginAttempt,
+  LoginFailure,
   LoginRecord,
 };

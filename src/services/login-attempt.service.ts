@@ -1,4 +1,4 @@
-import { LoginAttempt } from "@models";
+import { LoginFailure } from "@models";
 import {
   MongoDBCastError,
   MongoDBDuplicateKeyError,
@@ -7,14 +7,14 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
-import { LoginAttemptType, LoginFailureType } from "@types";
+import { LoginFailureType, LoginFailureType } from "@types";
 
 // 특정 유저의 로그인 실패 기록 가져오기
-const getLoginAttemptByUserId = (userId: string) => {
+const getLoginFailureByUserId = (userId: string) => {
   try {
-    return LoginAttempt.findOne({ userId });
+    return LoginFailure.findOne({ userId });
   } catch (error: any) {
-    console.error(`[getLoginAttemptByUserId] Error: ${error.message}`, {
+    console.error(`[getLoginFailureByUserId] Error: ${error.message}`, {
       userId,
       stack: error.stack,
     });
@@ -60,7 +60,7 @@ const addLoginFailure = async (
   newFailure: LoginFailureType
 ) => {
   try {
-    return await LoginAttempt.updateOne(
+    return await LoginFailure.updateOne(
       { userId },
       { $push: { loginFailures: newFailure } }
     );
@@ -105,11 +105,11 @@ const addLoginFailure = async (
   }
 };
 
-const createLoginAttempt = async (loginAttempt: LoginAttemptType) => {
+const createLoginFailure = async (loginAttempt: LoginFailureType) => {
   try {
-    return await LoginAttempt.create(loginAttempt);
+    return await LoginFailure.create(loginAttempt);
   } catch (error: any) {
-    console.error(`[createLoginAttempt] Error: ${error.message}`, {
+    console.error(`[createLoginFailure] Error: ${error.message}`, {
       loginAttempt,
       stack: error.stack,
     });
@@ -149,4 +149,4 @@ const createLoginAttempt = async (loginAttempt: LoginAttemptType) => {
   }
 };
 
-export { getLoginAttemptByUserId, addLoginFailure, createLoginAttempt };
+export { getLoginFailureByUserId, addLoginFailure, createLoginFailure };

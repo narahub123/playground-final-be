@@ -8,6 +8,6 @@ type LoginFailureType = {
   failureType: "Normal" | "BruteForce";
 };
 
-type LoginAttemptType = LoginFailureType & { userId: string };
+type LoginFailureType = LoginFailureType & { userId: string };
 
-export type { LoginFailureType, LoginAttemptType };
+export type { LoginFailureType, LoginFailureType };

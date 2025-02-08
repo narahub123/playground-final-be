@@ -22,12 +22,12 @@ import {
 import {
   addLoginFailure,
   createActiveSession,
-  createLoginAttempt,
+  createLoginFailure,
   createVerification,
   deleteVerificationCode,
   fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
-  getLoginAttemptByUserId,
+  getLoginFailureByUserId,
   getLoginRecordsByUserId,
   sendEmail,
 } from "@services";
@@ -118,7 +118,7 @@ const loginWithAccount = asyncWrapper(
       };
 
       // 해당 유저의 로그인 실패 기록 가져오기
-      const loginAttempt = await getLoginAttemptByUserId(user.userId);
+      const loginAttempt = await getLoginFailureByUserId(user.userId);
 
       if (loginAttempt) {
         // 로그인 실패 기록 추가
@@ -162,7 +162,7 @@ const loginWithAccount = asyncWrapper(
         // 실패 기록을 DB에 업데이트
         await addLoginFailure(user.userId, newFailure);
       } else {
-        await createLoginAttempt({ userId: user.userId, ...newFailure });
+        await createLoginFailure({ userId: user.userId, ...newFailure });
       }
 
       throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");

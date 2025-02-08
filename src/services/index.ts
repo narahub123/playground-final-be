@@ -30,9 +30,9 @@ import {
 } from "./active-session.service";
 
 import {
-  getLoginAttemptByUserId,
+  getLoginFailureByUserId,
   addLoginFailure,
-  createLoginAttempt,
+  createLoginFailure,
 } from "./login-attempt.service";
 
 import { getLoginRecordsByUserId } from "./login-record.service";
@@ -71,9 +71,9 @@ export {
   fetchActiveSessionWithSessionInfo,
 
   // login-attempt
-  getLoginAttemptByUserId,
+  getLoginFailureByUserId,
   addLoginFailure,
-  createLoginAttempt,
+  createLoginFailure,
 
   // login-record
   getLoginRecordsByUserId,
