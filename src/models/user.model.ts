@@ -174,6 +174,11 @@ const UserSchema = new mongoose.Schema(
       enum: ["google", "naver", "kakao"],
       default: [],
     },
+    // 계정 잠금 여부
+    isLocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
