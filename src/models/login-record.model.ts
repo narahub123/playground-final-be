@@ -37,11 +37,25 @@ const LoginRecordSchema = new mongoose.Schema(
       city: { type: String, required: true },
       county: { type: String, required: false },
     },
-    createdAt: {
+    loggedInAt: {
       type: Date,
       default: Date.now,
       expires: Number(process.env.LOGINRECORD_EXPIRES) || LOGINRECORD_EXPIRES,
     }, // 6개월 후 작동 삭제
+    loggedOut: {
+      type: {
+        time: {
+          type: Date,
+          default: null,
+        },
+        reason: {
+          type: String,
+          enum: ["USER_LOGOUT", "SESSION_EXPIRED", "ADMIN_FORCED_LOGOUT"],
+          default: "USER_LOGOUT",
+        },
+      },
+      default: null,
+    },
   },
   {
     timestamps: true,
