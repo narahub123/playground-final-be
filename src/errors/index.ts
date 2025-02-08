@@ -6,6 +6,7 @@ import {
   NotFoundError, // 404
   ConflictError, // 409
   UnprocessableEntityError, // 422
+  LockedError, // 423
   ServiceUnavailableError, // 503
   GatewayTimeoutError, // 504
 } from "./http-errors";
@@ -25,6 +26,7 @@ export {
   NotFoundError, // 404
   ConflictError, // 409
   UnprocessableEntityError, // 422
+  LockedError, // 423
   ServiceUnavailableError, // 503
   GatewayTimeoutError, // 504
   // mongodb errors

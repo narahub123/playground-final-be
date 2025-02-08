@@ -3,6 +3,7 @@ import { asyncWrapper } from "@middlewares";
 import {
   BadRequestError,
   CustomAPIError,
+  LockedError,
   NotFoundError,
   UnauthorizedError,
 } from "@errors";
@@ -27,7 +28,7 @@ import {
 } from "@services";
 import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
 
-// 로그인 처리 함수
+// 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
   "loginWithAccount",
   async (req: Request, res: Response) => {
@@ -79,6 +80,14 @@ const loginWithAccount = asyncWrapper(
     // 사용자를 찾을 수 없으면 NotFoundError 발생
     if (!user) {
       throw new NotFoundError("조건에 맞는 유저를 찾을 수 없습니다.");
+    }
+
+    // 해당 계정이 잠금 계정인지 여부 확인
+    if (user.isLocked) {
+      throw new LockedError(
+        "해당 계정은 잠겨 있습니다. 관리자에게 문의하세요.",
+        "ACCOUNT_LOCKED"
+      );
     }
 
     // 제공된 비밀번호가 실제 비밀번호와 일치하는지 검증

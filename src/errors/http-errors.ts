@@ -48,6 +48,14 @@ class UnprocessableEntityError extends CustomAPIError {
   }
 }
 
+class LockedError extends CustomAPIError {
+  constructor(message: string, statusText?: string) {
+    super(message);
+    this.statusCode = 423;
+    this.statusText = statusText || "Locked";
+  }
+}
+
 class ServiceUnavailableError extends CustomAPIError {
   constructor(message: string) {
     super(message);
@@ -71,6 +79,7 @@ export {
   NotFoundError, // 404
   ConflictError, // 409
   UnprocessableEntityError, // 422
+  LockedError, // 423
   ServiceUnavailableError, // 503
   GatewayTimeoutError, // 504
 };
