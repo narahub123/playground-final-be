@@ -33,6 +33,7 @@ import {
   getLoginFailureByUserId,
   createLoginFailure,
   updateFailureTypeToBruteForce,
+  deleteLoginFailuresById,
 } from "./login-failure.service";
 
 import { getLoginRecordsByUserId } from "./login-record.service";
@@ -74,6 +75,7 @@ export {
   getLoginFailureByUserId,
   createLoginFailure,
   updateFailureTypeToBruteForce,
+  deleteLoginFailuresById,
 
   // login-record
   getLoginRecordsByUserId,

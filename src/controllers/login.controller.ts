@@ -23,6 +23,7 @@ import {
   createActiveSession,
   createLoginFailure,
   createVerification,
+  deleteLoginFailuresById,
   deleteVerificationCode,
   fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
@@ -271,6 +272,16 @@ const loginWithAccount = asyncWrapper(
     if (!savedRecord) {
       throw new CustomAPIError("로그인 기록 저장에 실패했습니다.");
     }
+
+    // 로그인 실패 기록 삭제하기
+    // 실패 유형이 Normal인 것만 삭제, BruteForce을 유지
+    const loginFailures = await getLoginFailureByUserId(user.userId);
+
+    const normalIds = loginFailures
+      .filter((failure) => failure.failureType === "Normal")
+      .map((failure) => failure._id);
+
+    await deleteLoginFailuresById(normalIds);
 
     // 로그인 성공 응답
     res.status(200).json({ success: true, message: "로그인 성공" });
