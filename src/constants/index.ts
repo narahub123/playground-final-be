@@ -23,6 +23,9 @@ const REFRESHTOKEN_EXPIRES = 60 * 60;
 const ACCESSTOKEN_EXPIRES = 60;
 // 로그인 기록 만료 기간
 const LOGINRECORD_EXPIRES = 60 * 60 * 24 * 30 * 6;
+const BRUTE_FORCE_THRESHOLD = 5; // BruteForce 판별 기준 (최근 특정 시간 내 실패 횟수)
+const ACCOUNT_LOCK_THRESHOLD = 5; // 계정 잠금 기준 (전체 실패 횟수)
+const LOGIN_FAILURE_TIME_WINDOW_MS = 60 * 60 * 1000; // 로그인 실패 시간 범위 (1시간)
 
 export {
   COUNTRY_DEFAULT,
@@ -48,4 +51,7 @@ export {
   REFRESHTOKEN_EXPIRES,
   ACCESSTOKEN_EXPIRES,
   LOGINRECORD_EXPIRES,
+  BRUTE_FORCE_THRESHOLD,
+  ACCOUNT_LOCK_THRESHOLD,
+  LOGIN_FAILURE_TIME_WINDOW_MS,
 };

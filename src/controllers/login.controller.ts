@@ -11,6 +11,7 @@ import {
   fetchUserByEmail,
   fetchUserByPhone,
   fetchUserByUserId,
+  updateIsLocked,
 } from "services/user.service";
 import {
   comparePassword,
@@ -19,14 +20,24 @@ import {
   generateAuthCode,
 } from "@utils";
 import {
+  addLoginFailure,
   createActiveSession,
+  createLoginAttempt,
   createVerification,
   deleteVerificationCode,
   fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
+  getLoginAttemptByUserId,
   sendEmail,
 } from "@services";
-import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
+import {
+  ACCESSTOKEN_EXPIRES,
+  ACCOUNT_LOCK_THRESHOLD,
+  BRUTE_FORCE_THRESHOLD,
+  LOGIN_FAILURE_TIME_WINDOW_MS,
+  REFRESHTOKEN_EXPIRES,
+} from "@constants";
+import { LoginFailureType } from "@types";
 
 // 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
@@ -95,6 +106,63 @@ const loginWithAccount = asyncWrapper(
 
     // 비밀번호가 일치하지 않으면 UnauthorizedError 발생
     if (!isValid) {
+      // 로그인 실패 기록 저장하기
+      const newFailure: LoginFailureType = {
+        device,
+        ip,
+        location,
+        failedAt: new Date(),
+        failureType: "Normal",
+      };
+
+      // 해당 유저의 로그인 실패 기록 가져오기
+      const loginAttempt = await getLoginAttemptByUserId(user.userId);
+
+      if (loginAttempt) {
+        // 로그인 실패 기록 추가
+        loginAttempt.loginFailures.push(newFailure);
+
+        // 최근 특정 시간 내에 실패한 횟수 확인
+        const failureCountInHour = loginAttempt.loginFailures.filter(
+          (failure) =>
+            failure.failedAt.getTime() >
+            Date.now() - LOGIN_FAILURE_TIME_WINDOW_MS
+        ).length;
+
+        // 최근 특정 시간 내에 실패한 횟수가 일정 이상이면 BruteForce로 변경
+        if (failureCountInHour >= BRUTE_FORCE_THRESHOLD) {
+          loginAttempt.loginFailures.forEach((failure) => {
+            failure.failureType = "BruteForce";
+          });
+
+          // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
+          await updateIsLocked(user.userId, true);
+
+          throw new LockedError(
+            "비정상적인 로그인 시도가 감지되어 계정이 잠깁니다. 로그인을 위해서는 관리자에게 문의하세요.",
+            "BRUTE_FORCE_DETECTED"
+          );
+        }
+
+        // 전체 로그인 실패 횟수가 일정 이상이면 계정 잠금 처리
+        const totalFailureCount = loginAttempt.loginFailures.length;
+
+        if (totalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
+          // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
+          await updateIsLocked(user.userId, true);
+
+          throw new LockedError(
+            "로그인 시도 횟수를 초과하여 계정이 잠겼습니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
+            "TOO_MANY_LOGIN_FAILURES"
+          );
+        }
+
+        // 실패 기록을 DB에 업데이트
+        await addLoginFailure(user.userId, newFailure);
+      } else {
+        await createLoginAttempt({ userId: user.userId, ...newFailure });
+      }
+
       throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");
     }
 
