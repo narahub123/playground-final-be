@@ -35,6 +35,8 @@ import {
   createLoginAttempt,
 } from "./login-attempt.service";
 
+import { getLoginRecordsByUserId } from "./login-record.service";
+
 export {
   fetchUserByUserId,
   fetchUserByEmail,
@@ -72,4 +74,7 @@ export {
   getLoginAttemptByUserId,
   addLoginFailure,
   createLoginAttempt,
+
+  // login-record
+  getLoginRecordsByUserId,
 };

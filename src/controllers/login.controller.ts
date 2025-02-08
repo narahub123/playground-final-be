@@ -28,6 +28,7 @@ import {
   fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
   getLoginAttemptByUserId,
+  getLoginRecordsByUserId,
   sendEmail,
 } from "@services";
 import {
@@ -37,7 +38,8 @@ import {
   LOGIN_FAILURE_TIME_WINDOW_MS,
   REFRESHTOKEN_EXPIRES,
 } from "@constants";
-import { LoginFailureType } from "@types";
+import { LoginFailureType, LoginRecordType } from "@types";
+import { createLoginRecord } from "services/login-record.service";
 
 // 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
@@ -205,6 +207,63 @@ const loginWithAccount = asyncWrapper(
       sameSite: "lax", // CSRF 공격 방지 설정
       secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서만 https 사용
     });
+
+    // 로그인 보안 정책
+    const loginRecords = await getLoginRecordsByUserId(user.userId);
+
+    let messages = [];
+
+    if (loginRecords.length > 0) {
+      // 새로운 ip에서 로그인 시도 여부 확인
+      const prevIps = loginRecords.map((record) => record.ip);
+
+      const isNewIp = !prevIps.includes(ip);
+
+      if (isNewIp) {
+        messages.push("새로운 IP에서 로그인 시도");
+      }
+
+      // 새로운 device에서 로그인 시도 여부 확인
+      const prevDevices = loginRecords.map((record) => record.device);
+
+      const isNewDevice = prevDevices.every(
+        (prev) =>
+          prev?.type !== device.type ||
+          prev?.os !== device.os ||
+          prev?.browser !== device.browser
+      );
+
+      if (isNewDevice) {
+        messages.push("새로운 기기에서 로그인 시도");
+      }
+
+      // 새로운 지역에서 로그인 시도 여부 확인
+      const prevLocations = loginRecords.map((record) => record.location);
+
+      const isNewLocation = prevLocations.every(
+        (prev) =>
+          prev?.country !== location.country || prev?.city !== location.city
+      );
+
+      if (isNewLocation) {
+        messages.push("새로운 장소에서 로그인 시도가 되었습니다.");
+      }
+    }
+
+    // 로그인 기록 저장하기
+    const newLoginRecord: LoginRecordType = {
+      userId: user.userId,
+      ip,
+      device,
+      location,
+      createdAt: new Date(),
+    };
+
+    const savedRecord = await createLoginRecord(newLoginRecord);
+
+    if (!savedRecord) {
+      throw new CustomAPIError("로그인 기록 저장에 실패했습니다.");
+    }
 
     // 로그인 성공 응답
     res.status(200).json({ success: true, message: "로그인 성공" });
