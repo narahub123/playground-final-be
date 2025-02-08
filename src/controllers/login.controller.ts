@@ -49,19 +49,7 @@ const loginWithAccount = asyncWrapper(
     // 요청 바디에서 사용자 정보 추출
     const { email, phone, userId, password, device, ip, location } = req.body;
 
-    // 기존 세션이 존재하는지 확인
-    const existingSession = await fetchActiveSessionWithSessionInfo({
-      userId,
-      device,
-      ip,
-      location,
-    });
-
-    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
-    if (existingSession) {
-      return res.status(200).json({ success: true, message: "로그인 성공" });
-    }
-
+    // request body에서 받은 데이터의 유효성 검사
     // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
     if (!password) {
       throw new BadRequestError("확인할 비밀번호를 제공해주세요.");
@@ -71,6 +59,13 @@ const loginWithAccount = asyncWrapper(
     if (!email && !phone && !userId) {
       throw new BadRequestError(
         "이메일, 휴대전화 번호 혹은 사용자 이름을 제공해주세요."
+      );
+    }
+    
+    // 기기, IP, 장소 중 하나라도 제공되지 않은 경우 BadRequestError 발생
+    if (!device || !ip || !location) {
+      throw new BadRequestError(
+        "사용 기기, IP, 장소에 대한 정보를 제공해주세요."
       );
     }
 
@@ -190,6 +185,19 @@ const loginWithAccount = asyncWrapper(
       }
 
       throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");
+    }
+
+    // 기존 세션이 존재하는지 확인
+    const existingSession = await fetchActiveSessionWithSessionInfo({
+      userId: user.userId,
+      device,
+      ip,
+      location,
+    });
+
+    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
+    if (existingSession) {
+      return res.status(200).json({ success: true, message: "로그인 성공" });
     }
 
     // 유효한 비밀번호인 경우, refresh token 생성
