@@ -176,8 +176,19 @@ const UserSchema = new mongoose.Schema(
     },
     // 계정 잠금 여부
     isLocked: {
-      type: Boolean,
-      default: false,
+      status: {
+        type: Boolean,
+        default: false,
+      },
+      reason: {
+        type: String,
+        enum: ["BRUTE_FORCE_DETECTED", "TOO_MANY_LOGIN_FAILURES", "NONE"],
+        default: "NONE",
+      },
+      lockedAt: {
+        type: Date,
+        default: null,
+      },
     },
   },
   {
