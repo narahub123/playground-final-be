@@ -31,9 +31,9 @@ import {
 
 import {
   getLoginFailureByUserId,
-  addLoginFailure,
   createLoginFailure,
-} from "./login-attempt.service";
+  updateFailureTypeToBruteForce,
+} from "./login-failure.service";
 
 import { getLoginRecordsByUserId } from "./login-record.service";
 
@@ -72,8 +72,8 @@ export {
 
   // login-attempt
   getLoginFailureByUserId,
-  addLoginFailure,
   createLoginFailure,
+  updateFailureTypeToBruteForce,
 
   // login-record
   getLoginRecordsByUserId,

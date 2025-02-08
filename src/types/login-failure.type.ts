@@ -1,6 +1,7 @@
 import { DeviceInfoType, LocationType } from "./active-session.type";
 
 type LoginFailureType = {
+  userId: string;
   device: DeviceInfoType;
   ip: string;
   location: LocationType;
@@ -8,6 +9,4 @@ type LoginFailureType = {
   failureType: "Normal" | "BruteForce";
 };
 
-type LoginFailureType = LoginFailureType & { userId: string };
-
-export type { LoginFailureType, LoginFailureType };
+export type { LoginFailureType };

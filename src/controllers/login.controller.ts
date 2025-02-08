@@ -20,7 +20,6 @@ import {
   generateAuthCode,
 } from "@utils";
 import {
-  addLoginFailure,
   createActiveSession,
   createLoginFailure,
   createVerification,
@@ -30,6 +29,7 @@ import {
   getLoginFailureByUserId,
   getLoginRecordsByUserId,
   sendEmail,
+  updateFailureTypeToBruteForce,
 } from "@services";
 import {
   ACCESSTOKEN_EXPIRES,
@@ -110,6 +110,7 @@ const loginWithAccount = asyncWrapper(
     if (!isValid) {
       // 로그인 실패 기록 저장하기
       const newFailure: LoginFailureType = {
+        userId: user.userId,
         device,
         ip,
         location,
@@ -117,25 +118,32 @@ const loginWithAccount = asyncWrapper(
         failureType: "Normal",
       };
 
+      // 로그인 실패 기록 저장하기
+      const savedFailure = await createLoginFailure(newFailure);
+
+      if (!savedFailure) {
+        throw new CustomAPIError("로그인 실패 기록 저장 실패");
+      }
+
       // 해당 유저의 로그인 실패 기록 가져오기
-      const loginAttempt = await getLoginFailureByUserId(user.userId);
+      const loginFailures = await getLoginFailureByUserId(user.userId);
 
-      if (loginAttempt) {
-        // 로그인 실패 기록 추가
-        loginAttempt.loginFailures.push(newFailure);
-
+      if (loginFailures.length > 0) {
         // 최근 특정 시간 내에 실패한 횟수 확인
-        const failureCountInHour = loginAttempt.loginFailures.filter(
+        const failureCountInHour = loginFailures.filter(
           (failure) =>
             failure.failedAt.getTime() >
             Date.now() - LOGIN_FAILURE_TIME_WINDOW_MS
-        ).length;
+        );
 
         // 최근 특정 시간 내에 실패한 횟수가 일정 이상이면 BruteForce로 변경
-        if (failureCountInHour >= BRUTE_FORCE_THRESHOLD) {
-          loginAttempt.loginFailures.forEach((failure) => {
-            failure.failureType = "BruteForce";
-          });
+        if (failureCountInHour.length >= BRUTE_FORCE_THRESHOLD) {
+          const bruteForceIds = failureCountInHour.map(
+            (failure) => failure._id
+          );
+
+          // BruteForce로 변경 (DB 반영)
+          await updateFailureTypeToBruteForce(bruteForceIds);
 
           // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
           await updateIsLocked(user.userId, true);
@@ -147,9 +155,13 @@ const loginWithAccount = asyncWrapper(
         }
 
         // 전체 로그인 실패 횟수가 일정 이상이면 계정 잠금 처리
-        const totalFailureCount = loginAttempt.loginFailures.length;
+        const normalFailureCount = loginFailures.reduce(
+          (count, failure) =>
+            count + (failure.failureType === "Normal" ? 1 : 0),
+          0
+        );
 
-        if (totalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
+        if (normalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
           // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
           await updateIsLocked(user.userId, true);
 
@@ -158,11 +170,6 @@ const loginWithAccount = asyncWrapper(
             "TOO_MANY_LOGIN_FAILURES"
           );
         }
-
-        // 실패 기록을 DB에 업데이트
-        await addLoginFailure(user.userId, newFailure);
-      } else {
-        await createLoginFailure({ userId: user.userId, ...newFailure });
       }
 
       throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");
