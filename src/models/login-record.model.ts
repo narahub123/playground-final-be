@@ -35,7 +35,7 @@ const LoginRecordSchema = new mongoose.Schema(
       country: { type: String, required: true },
       state: { type: String, required: true },
       city: { type: String, required: true },
-      county: { type: String, required: true },
+      county: { type: String, required: false },
     },
     createdAt: {
       type: Date,
