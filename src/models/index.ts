@@ -6,6 +6,7 @@ import Display from "./display.model";
 import Verification from "./verification.model";
 import ActiveSession from "./active-session.model";
 import LoginAttempt from "./login-attempt.model";
+import LoginRecord from "./login-record.model";
 
 export {
   User,
@@ -16,4 +17,5 @@ export {
   Verification,
   ActiveSession,
   LoginAttempt,
+  LoginRecord,
 };

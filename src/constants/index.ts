@@ -21,6 +21,8 @@ const NAVER_REDIRECT_URI = process.env.NAVER_REDIRECT_URI!;
 const BASE_URL = process.env.BASE_URL!;
 const REFRESHTOKEN_EXPIRES = 60 * 60;
 const ACCESSTOKEN_EXPIRES = 60;
+// 로그인 기록 만료 기간
+const LOGINRECORD_EXPIRES = 60 * 60 * 24 * 30 * 6;
 
 export {
   COUNTRY_DEFAULT,
@@ -45,4 +47,5 @@ export {
   BASE_URL,
   REFRESHTOKEN_EXPIRES,
   ACCESSTOKEN_EXPIRES,
+  LOGINRECORD_EXPIRES,
 };
