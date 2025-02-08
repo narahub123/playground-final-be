@@ -26,7 +26,7 @@ import {
 import {
   createActiveSession,
   fetchActiveSessionWithSessionInfo,
-} from "./activeSession.service";
+} from "./active-session.service";
 
 export {
   fetchUserByUserId,
