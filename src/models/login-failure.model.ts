@@ -35,22 +35,18 @@ const LoginFailureSchema = new mongoose.Schema(
       country: { type: String, required: true },
       state: { type: String, required: true },
       city: { type: String, required: true },
-      county: { type: String, required: true },
+      county: { type: String, required: false },
     },
     failedAt: {
       type: Date,
       default: Date.now,
+      expires: Number(process.env.LOGINFAILURE_EXPIRES) || LOGINFAILURE_EXPIRES,
     },
     failureType: {
       type: String,
       enum: ["Normal", "BruteForce"],
       default: "Normal", // 기본값을 'Normal'로 설정
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-      expires: Number(process.env.LOGINFAILURE_EXPIRES) || LOGINFAILURE_EXPIRES,
-    }, // 6개월 후 작동 삭제
   },
   {
     timestamps: true,
