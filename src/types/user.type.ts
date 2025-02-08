@@ -23,3 +23,11 @@ export interface UserType {
   isAutenticated: boolean;
   social: string[];
 }
+
+type IsLockedType = {
+  status: boolean;
+  reason: "BRUTE_FORCE_DETECTED" | "TOO_MANY_LOGIN_FAILURES" | "NONE";
+  lockedAt: Date;
+};
+
+export type { IsLockedType };

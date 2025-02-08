@@ -97,11 +97,19 @@ const loginWithAccount = asyncWrapper(
     }
 
     // 해당 계정이 잠금 계정인지 여부 확인
-    if (user.isLocked) {
-      throw new LockedError(
-        "해당 계정은 잠겨 있습니다. 관리자에게 문의하세요.",
-        "ACCOUNT_LOCKED"
-      );
+    if (user.isLocked?.status) {
+      const { reason } = user.isLocked;
+
+      const errorMessages: Record<string, string> = {
+        BRUTE_FORCE_DETECTED:
+          "비정상적인 로그인 시도가 감지되어 잠긴 계정입니다. 로그인을 위해서는 관리자에게 문의하세요.",
+        TOO_MANY_LOGIN_FAILURES:
+          "로그인 시도 횟수를 초과하여 잠긴 계정입니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
+      };
+
+      if (errorMessages[reason]) {
+        throw new LockedError(errorMessages[reason], reason);
+      }
     }
 
     // 제공된 비밀번호가 실제 비밀번호와 일치하는지 검증
@@ -146,8 +154,12 @@ const loginWithAccount = asyncWrapper(
           // BruteForce로 변경 (DB 반영)
           await updateFailureTypeToBruteForce(bruteForceIds);
 
-          // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
-          await updateIsLocked(user.userId, true);
+          // 계정 잠금 처리 : user 컬렉션에서 isLocked의 status를 true로, reason의 BRUTE_FORCE_DETECTED로 업데이트
+          await updateIsLocked(user.userId, {
+            status: true,
+            reason: "BRUTE_FORCE_DETECTED",
+            lockedAt: new Date(),
+          });
 
           throw new LockedError(
             "비정상적인 로그인 시도가 감지되어 계정이 잠깁니다. 로그인을 위해서는 관리자에게 문의하세요.",
@@ -163,8 +175,12 @@ const loginWithAccount = asyncWrapper(
         );
 
         if (normalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
-          // 계정 잠금 처리 : user 컬렉션에서 isLocked를 true 업데이트
-          await updateIsLocked(user.userId, true);
+          // 계정 잠금 처리 : user 컬렉션에서 isLocked의 status를 true로, reason의 TOO_MANY_LOGIN_FAILURES로 업데이트
+          await updateIsLocked(user.userId, {
+            status: true,
+            reason: "TOO_MANY_LOGIN_FAILURES",
+            lockedAt: new Date(),
+          });
 
           throw new LockedError(
             "로그인 시도 횟수를 초과하여 계정이 잠겼습니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
