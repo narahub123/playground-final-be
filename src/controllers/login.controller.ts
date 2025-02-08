@@ -11,19 +11,19 @@ import {
   fetchUserByEmail,
   fetchUserByPhone,
   fetchUserByUserId,
-  updateIsLocked,
 } from "services/user.service";
 import {
   comparePassword,
-  createAccessToken,
-  createRefreshToken,
+  createSessionAndTokens,
+  deleteLoginFailures,
+  findUserByIdentifier,
   generateAuthCode,
+  saveLoginFailure,
+  lockAccount,
+  saveLoginRecord,
 } from "@utils";
 import {
-  createActiveSession,
-  createLoginFailure,
   createVerification,
-  deleteLoginFailuresById,
   deleteVerificationCode,
   fetchActiveSessionWithSessionInfo,
   fetchVerificationCodeByUserId,
@@ -33,14 +33,13 @@ import {
   updateFailureTypeToBruteForce,
 } from "@services";
 import {
-  ACCESSTOKEN_EXPIRES,
   ACCOUNT_LOCK_THRESHOLD,
   BRUTE_FORCE_THRESHOLD,
   LOGIN_FAILURE_TIME_WINDOW_MS,
   REFRESHTOKEN_EXPIRES,
 } from "@constants";
-import { LoginFailureType, LoginRecordType } from "@types";
-import { createLoginRecord } from "services/login-record.service";
+import { checkNewLoginAttempt } from "utils/loginUtils";
+import { LoginFailure, LoginRecord } from "@types";
 
 // 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
@@ -61,7 +60,7 @@ const loginWithAccount = asyncWrapper(
         "이메일, 휴대전화 번호 혹은 사용자 이름을 제공해주세요."
       );
     }
-    
+
     // 기기, IP, 장소 중 하나라도 제공되지 않은 경우 BadRequestError 발생
     if (!device || !ip || !location) {
       throw new BadRequestError(
@@ -69,22 +68,7 @@ const loginWithAccount = asyncWrapper(
       );
     }
 
-    // 사용자 정보를 찾기 위한 메서드 배열 정의
-    const fetchUserMethods = [
-      { key: email, fetch: fetchUserByEmail },
-      { key: phone, fetch: fetchUserByPhone },
-      { key: userId, fetch: fetchUserByUserId },
-    ];
-
-    let user;
-
-    // 주어진 키(이메일, 전화번호, 사용자 ID)로 사용자 정보 조회
-    for (const { key, fetch } of fetchUserMethods) {
-      if (key) {
-        user = await fetch(key);
-        if (user) break; // 사용자를 찾은 경우 반복 종료
-      }
-    }
+    const user = await findUserByIdentifier(email, phone, userId);
 
     // 사용자를 찾을 수 없으면 NotFoundError 발생
     if (!user) {
@@ -113,21 +97,7 @@ const loginWithAccount = asyncWrapper(
     // 비밀번호가 일치하지 않으면 UnauthorizedError 발생
     if (!isValid) {
       // 로그인 실패 기록 저장하기
-      const newFailure: LoginFailureType = {
-        userId: user.userId,
-        device,
-        ip,
-        location,
-        failedAt: new Date(),
-        failureType: "Normal",
-      };
-
-      // 로그인 실패 기록 저장하기
-      const savedFailure = await createLoginFailure(newFailure);
-
-      if (!savedFailure) {
-        throw new CustomAPIError("로그인 실패 기록 저장 실패");
-      }
+      await saveLoginFailure(user.userId, device, ip, location);
 
       // 해당 유저의 로그인 실패 기록 가져오기
       const loginFailures = await getLoginFailureByUserId(user.userId);
@@ -150,11 +120,7 @@ const loginWithAccount = asyncWrapper(
           await updateFailureTypeToBruteForce(bruteForceIds);
 
           // 계정 잠금 처리 : user 컬렉션에서 isLocked의 status를 true로, reason의 BRUTE_FORCE_DETECTED로 업데이트
-          await updateIsLocked(user.userId, {
-            status: true,
-            reason: "BRUTE_FORCE_DETECTED",
-            lockedAt: new Date(),
-          });
+          await lockAccount(user.userId, "BRUTE_FORCE_DETECTED");
 
           throw new LockedError(
             "비정상적인 로그인 시도가 감지되어 계정이 잠깁니다. 로그인을 위해서는 관리자에게 문의하세요.",
@@ -171,11 +137,7 @@ const loginWithAccount = asyncWrapper(
 
         if (normalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
           // 계정 잠금 처리 : user 컬렉션에서 isLocked의 status를 true로, reason의 TOO_MANY_LOGIN_FAILURES로 업데이트
-          await updateIsLocked(user.userId, {
-            status: true,
-            reason: "TOO_MANY_LOGIN_FAILURES",
-            lockedAt: new Date(),
-          });
+          await lockAccount(user.userId, "TOO_MANY_LOGIN_FAILURES");
 
           throw new LockedError(
             "로그인 시도 횟수를 초과하여 계정이 잠겼습니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
@@ -200,112 +162,46 @@ const loginWithAccount = asyncWrapper(
       return res.status(200).json({ success: true, message: "로그인 성공" });
     }
 
-    // 유효한 비밀번호인 경우, refresh token 생성
-    const refreshToken = createRefreshToken(
-      userId,
-      Number(process.env.REFRESHTOKEN_EXPIRES) || REFRESHTOKEN_EXPIRES
-    );
-
-    // 세션 정보를 정의
-    const sessionInfo = {
-      userId,
-      refreshToken,
-      device,
-      ip,
-      location,
-    };
-
-    // refresh token을 active session에 저장
-    const activeSession = await createActiveSession(sessionInfo);
-
-    // 세션 생성 실패 시 CustomAPIError 발생
-    if (!activeSession) {
-      throw new CustomAPIError("현재 세션 생성 실패");
-    }
-
-    // 유효한 세션 정보로 access token 생성
-    const accessToken = createAccessToken(
-      activeSession._id,
+    // 세션 생성과 토큰 발급
+    const { refreshToken, accessToken } = await createSessionAndTokens(
       user.userId,
       user.userRole,
-      Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES
+      device,
+      ip,
+      location
     );
 
-    // access token을 쿠키에 저장 (보안 설정 포함)
-    res.cookie("access", accessToken, {
+    // access token을 헤더에 저장
+    res.setHeader("Authorization", `Bearer ${accessToken}`);
+
+    // refresh token을 쿠키에 저장 (보안 설정 포함)
+    res.cookie("refresh", refreshToken, {
       httpOnly: true, // 클라이언트에서 JavaScript로 쿠키 접근 차단
       maxAge:
-        (Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES) * 1000, // 만료 시간 (밀리초 단위)
+        (Number(process.env.REFRESHTOKEN_EXPIRES) || REFRESHTOKEN_EXPIRES) *
+        1000, // 만료 시간 (밀리초 단위)
       sameSite: "lax", // CSRF 공격 방지 설정
       secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서만 https 사용
     });
 
-    // 로그인 보안 정책
-    const loginRecords = await getLoginRecordsByUserId(user.userId);
+    const loginRecords = await getLoginRecordsByUserId(userId);
 
-    let messages = [];
-
-    if (loginRecords.length > 0) {
-      // 새로운 ip에서 로그인 시도 여부 확인
-      const prevIps = loginRecords.map((record) => record.ip);
-
-      const isNewIp = !prevIps.includes(ip);
-
-      if (isNewIp) {
-        messages.push("새로운 IP에서 로그인 시도");
-      }
-
-      // 새로운 device에서 로그인 시도 여부 확인
-      const prevDevices = loginRecords.map((record) => record.device);
-
-      const isNewDevice = prevDevices.every(
-        (prev) =>
-          prev?.type !== device.type ||
-          prev?.os !== device.os ||
-          prev?.browser !== device.browser
-      );
-
-      if (isNewDevice) {
-        messages.push("새로운 기기에서 로그인 시도");
-      }
-
-      // 새로운 지역에서 로그인 시도 여부 확인
-      const prevLocations = loginRecords.map((record) => record.location);
-
-      const isNewLocation = prevLocations.every(
-        (prev) =>
-          prev?.country !== location.country || prev?.city !== location.city
-      );
-
-      if (isNewLocation) {
-        messages.push("새로운 장소에서 로그인 시도가 되었습니다.");
-      }
-    }
+    // 새로운 로그인 시도 확인
+    const messages = await checkNewLoginAttempt(
+      loginRecords as LoginRecord[],
+      device,
+      ip,
+      location
+    );
 
     // 로그인 기록 저장하기
-    const newLoginRecord: LoginRecordType = {
-      userId: user.userId,
-      ip,
-      device,
-      location,
-      createdAt: new Date(),
-    };
+    await saveLoginRecord(user.userId, device, ip, location);
 
-    const savedRecord = await createLoginRecord(newLoginRecord);
-
-    if (!savedRecord) {
-      throw new CustomAPIError("로그인 기록 저장에 실패했습니다.");
-    }
+    // 실패 유형이 Normal인 것만 삭제, BruteForce을 유지
+    const loginFailures = await getLoginFailureByUserId(userId);
 
     // 로그인 실패 기록 삭제하기
-    // 실패 유형이 Normal인 것만 삭제, BruteForce을 유지
-    const loginFailures = await getLoginFailureByUserId(user.userId);
-
-    const normalIds = loginFailures
-      .filter((failure) => failure.failureType === "Normal")
-      .map((failure) => failure._id);
-
-    await deleteLoginFailuresById(normalIds);
+    await deleteLoginFailures(loginFailures as LoginFailure[]);
 
     // 로그인 성공 응답
     res.status(200).json({ success: true, message: "로그인 성공" });

@@ -7,7 +7,7 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
-import { LoginRecordType } from "@types";
+import { LoginRecordInput } from "@types";
 
 const getLoginRecordsByUserId = async (userId: string) => {
   try {
@@ -57,7 +57,7 @@ const getLoginRecordsByUserId = async (userId: string) => {
   }
 };
 
-const createLoginRecord = async (loginRecord: LoginRecordType) => {
+const createLoginRecord = async (loginRecord: LoginRecordInput) => {
   try {
     return await LoginRecord.create(loginRecord);
   } catch (error: any) {

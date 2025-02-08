@@ -1,8 +1,12 @@
-import { UserType, IsLockedType } from "./user.type";
+import { UserType, IsLockedType, IsLockedReasonType } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { DeviceInfoType, LocationType } from "./active-session.type";
-import { LoginFailureType } from "./login-failure.type";
-import { LoginRecordType } from "./login-record.type";
+import {
+  LoginFailureInput,
+  LoginFailure,
+  LoginFailureType,
+} from "./login-failure.type";
+import { LoginRecordInput, LoginRecord } from "./login-record.type";
 
 export {
   // user
@@ -18,8 +22,11 @@ export {
   LocationType,
 
   // login-failure
+  LoginFailureInput,
+  LoginFailure,
   LoginFailureType,
 
   // login-record
-  LoginRecordType,
+  LoginRecordInput,
+  LoginRecord,
 };

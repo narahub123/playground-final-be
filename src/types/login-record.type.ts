@@ -1,6 +1,11 @@
 import { DeviceInfoType, LocationType } from "./active-session.type";
 
-type LoginRecordType = {
+type LoggedOutType = {
+  time: Date | null;
+  reason: "USER_LOGOUT" | "SESSION_EXPIRED" | "ADMIN_FORCED_LOGOUT";
+};
+
+type LoginRecordInput = {
   userId: string;
   ip: string;
   device: DeviceInfoType;
@@ -8,4 +13,15 @@ type LoginRecordType = {
   createdAt: Date;
 };
 
-export type { LoginRecordType };
+interface LoginRecord {
+  userId: string; // User 모델의 ID 참조
+  device: DeviceInfoType;
+  ip: string;
+  location: LocationType;
+  loggedInAt: Date;
+  loggedOut: LoggedOutType | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type { LoginRecordInput, LoginRecord };

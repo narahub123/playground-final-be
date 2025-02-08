@@ -7,7 +7,7 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
-import { LoginFailureType } from "@types";
+import { LoginFailureInput } from "@types";
 import { Types } from "mongoose";
 
 // 특정 유저의 로그인 실패 기록 가져오기
@@ -55,7 +55,7 @@ const getLoginFailureByUserId = async (userId: string) => {
   }
 };
 
-const createLoginFailure = async (loginAttempt: LoginFailureType) => {
+const createLoginFailure = async (loginAttempt: LoginFailureInput) => {
   try {
     return await LoginFailure.create(loginAttempt);
   } catch (error: any) {

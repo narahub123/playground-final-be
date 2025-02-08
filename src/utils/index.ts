@@ -8,6 +8,14 @@ import getOauthUserInfo from "./getOauthUserInfo";
 import comparePassword from "./comparePassword";
 import createRefreshToken from "./createRefreshToken";
 import createAccessToken from "./createAccessToken";
+import {
+  findUserByIdentifier,
+  saveLoginFailure,
+  lockAccount,
+  createSessionAndTokens,
+  saveLoginRecord,
+  deleteLoginFailures,
+} from "./loginUtils";
 
 export {
   connectDB,
@@ -20,4 +28,11 @@ export {
   comparePassword,
   createRefreshToken,
   createAccessToken,
+  // loginUtils
+  findUserByIdentifier,
+  saveLoginFailure,
+  lockAccount,
+  createSessionAndTokens,
+  saveLoginRecord,
+  deleteLoginFailures,
 };
