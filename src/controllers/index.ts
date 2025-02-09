@@ -2,6 +2,7 @@ import {
   checkEmailAvailability,
   checkPhoneAvailability,
   checkUserIdAvailability,
+  getContactsBeforeLogin,
 } from "./users.controller";
 
 import { signupUser, loginUser } from "./auth.controller";
@@ -27,6 +28,7 @@ export {
   checkUserIdAvailability,
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
+  getContactsBeforeLogin,
   // auth
   loginUser,
   signupUser,
