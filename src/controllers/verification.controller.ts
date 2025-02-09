@@ -11,6 +11,8 @@ import {
   createVerification,
   deleteVerificationCode,
   getUserByEmail,
+  getUserByPhone,
+  getUserByUserId,
   getVerificationCodeByUserId,
   sendEmail,
 } from "@services";
@@ -68,4 +70,60 @@ const requestLoginVerificationCode = asyncWrapper(
   }
 );
 
-export { requestLoginVerificationCode };
+// 인증 코드 확인 핸들러
+const checkLoginVerificationCode = asyncWrapper(
+  "checkLoginVerificationCode",
+  async (req: Request, res: Response) => {
+    const { email, phone, userId, verificationCode } = req.body;
+
+    // 필수 입력값 검증
+    if (!email && !phone && !userId)
+      throw new BadRequestError(
+        "이메일, 휴대 전화 번호 혹은 사용자 아이디를 제공해주세요."
+      );
+    if (!verificationCode)
+      throw new BadRequestError("인증 코드를 작성해주세요.");
+
+    // 사용자 조회를 위한 검색 방식 정의
+    const fetchUserMethods = [
+      { key: email, fetch: getUserByEmail },
+      { key: phone, fetch: getUserByPhone },
+      { key: userId, fetch: getUserByUserId },
+    ];
+
+    // 사용자 조회 및 인증 코드 확인
+    for (const { key, fetch } of fetchUserMethods) {
+      if (key) {
+        const user = await fetch(key);
+        if (user) {
+          const sentCode = await getVerificationCodeByUserId(user.userId);
+
+          // 인증 코드 만료 확인
+          if (!sentCode) {
+            throw new CustomAPIError(
+              "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.",
+              410,
+              "GONE"
+            );
+          }
+
+          // 인증 코드 일치 여부 확인
+          if (verificationCode === sentCode?.verificationCode) {
+            return res
+              .status(200)
+              .json({ success: true, message: "인증 코드가 확인되었습니다." });
+          } else {
+            throw new UnauthorizedError(
+              "입력하신 정보가 잘못되었습니다. 다시 시도해주세요."
+            );
+          }
+        }
+      }
+    }
+
+    // 사용자를 찾지 못한 경우 예외 발생
+    throw new NotFoundError("조건에 맞는 인증 코드를 찾을 수 없습니다.");
+  }
+);
+
+export { requestLoginVerificationCode, checkLoginVerificationCode };

@@ -1,6 +1,10 @@
 import { Router } from "express";
-import { requestLoginVerificationCode } from "@controllers";
+import {
+  checkLoginVerificationCode,
+  requestLoginVerificationCode,
+} from "@controllers";
 
 export default (router: Router) => {
   router.post("/verification/request", requestLoginVerificationCode);
+  router.post("/verification/verify", checkLoginVerificationCode);
 };
