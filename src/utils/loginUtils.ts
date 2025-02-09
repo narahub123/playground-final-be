@@ -5,9 +5,9 @@ import {
   createLoginFailure,
   deleteLoginFailuresById,
   fetchActiveSessionWithSessionInfo,
-  fetchUserByEmail,
-  fetchUserByPhone,
-  fetchUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
+  getUserByUserId,
   getLoginFailureByUserId,
   updateLockStatus,
 } from "@services";
@@ -35,9 +35,9 @@ const findUserByIdentifier = async (
 
   // 사용자를 찾기 위한 메서드 배열 정의
   const fetchUserMethods = [
-    { key: email, fetch: fetchUserByEmail },
-    { key: phone, fetch: fetchUserByPhone },
-    { key: userId, fetch: fetchUserByUserId },
+    { key: email, fetch: getUserByEmail },
+    { key: phone, fetch: getUserByPhone },
+    { key: userId, fetch: getUserByUserId },
   ];
 
   // 주어진 키(이메일, 전화번호, 사용자 ID)에 대해 유저 정보를 조회

@@ -1,7 +1,7 @@
 import {
-  fetchUserByUserId,
-  fetchUserByEmail,
-  fetchUserByPhone,
+  getUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
   checkEmailDuplication,
   checkUserIdDuplication,
   createUser,
@@ -39,9 +39,9 @@ import {
 import { getLoginRecordsByUserId } from "./login-record.service";
 
 export {
-  fetchUserByUserId,
-  fetchUserByEmail,
-  fetchUserByPhone,
+  getUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
   checkEmailDuplication, // 이메일 중복 검사
   checkUserIdDuplication, // 사용자 아이디 중복 검사
   createUser, // 회원 가입

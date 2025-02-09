@@ -72,7 +72,7 @@ const checkUserIdDuplication = async (userId: string) => {
   }
 };
 
-const fetchUserByUserId = async (userId: string) => {
+const getUserByUserId = async (userId: string) => {
   try {
     const user = await User.findOne({ userId });
     if (!user) {
@@ -82,7 +82,7 @@ const fetchUserByUserId = async (userId: string) => {
     }
     return user;
   } catch (error: any) {
-    console.error(`[fetchUserByUserId] Error: ${error.message}`, {
+    console.error(`[getUserByUserId] Error: ${error.message}`, {
       userId,
       stack: error.stack,
     });
@@ -90,7 +90,7 @@ const fetchUserByUserId = async (userId: string) => {
   }
 };
 
-const fetchUserByEmail = async (email: string) => {
+const getUserByEmail = async (email: string) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -100,7 +100,7 @@ const fetchUserByEmail = async (email: string) => {
     }
     return user;
   } catch (error: any) {
-    console.error(`[fetchUserByUserId] Error: ${error.message}`, {
+    console.error(`[getUserByEmail  ] Error: ${error.message}`, {
       email,
       stack: error.stack,
     });
@@ -108,7 +108,7 @@ const fetchUserByEmail = async (email: string) => {
   }
 };
 
-const fetchUserByPhone = async (phone: string) => {
+const getUserByPhone = async (phone: string) => {
   try {
     const user = await User.findOne({ phone });
     if (!user) {
@@ -118,7 +118,7 @@ const fetchUserByPhone = async (phone: string) => {
     }
     return user;
   } catch (error: any) {
-    console.error(`[fetchUserByUserId] Error: ${error.message}`, {
+    console.error(`[getUserByPhone] Error: ${error.message}`, {
       phone,
       stack: error.stack,
     });
@@ -221,9 +221,9 @@ const updateLockStatus = async (userId: string, lockStatus: ILockStatus) => {
 };
 
 export {
-  fetchUserByUserId,
-  fetchUserByEmail,
-  fetchUserByPhone,
+  getUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
   checkEmailDuplication,
   checkUserIdDuplication,
   createUser,

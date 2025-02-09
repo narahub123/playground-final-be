@@ -8,9 +8,9 @@ import {
   UnauthorizedError,
 } from "@errors";
 import {
-  fetchUserByEmail,
-  fetchUserByPhone,
-  fetchUserByUserId,
+  getUserByEmail,
+  getUserByPhone,
+  getUserByUserId,
 } from "services/user.service";
 import {
   comparePassword,
@@ -223,9 +223,9 @@ const getContactsByAccount = asyncWrapper(
 
     // 이메일, 전화번호, 사용자 ID를 기준으로 사용자를 찾기 위한 메서드 배열 정의
     const fetchUserMethods = [
-      { key: email, fetch: fetchUserByEmail }, // 이메일로 사용자 조회
-      { key: phone, fetch: fetchUserByPhone }, // 전화번호로 사용자 조회
-      { key: userId, fetch: fetchUserByUserId }, // 사용자 ID로 사용자 조회
+      { key: email, fetch: getUserByEmail }, // 이메일로 사용자 조회
+      { key: phone, fetch: getUserByPhone }, // 전화번호로 사용자 조회
+      { key: userId, fetch: getUserByUserId }, // 사용자 ID로 사용자 조회
     ];
 
     // 주어진 키(email, phone, userId)를 기준으로 사용자 정보 조회
@@ -262,7 +262,7 @@ const requestVerificationCodeLogin = asyncWrapper(
     if (email) {
       // 이메일로 인증 코드 전송
       // 이메일을 통해 사용자 정보를 조회
-      const user = await fetchUserByEmail(email);
+      const user = await getUserByEmail(email);
 
       // 이메일에 해당하는 유저가 없는 경우
       if (!user) throw new NotFoundError("해당 이메일을 가진 유저가 없습니다.");
@@ -316,9 +316,9 @@ const checkVerificationCodeLogin = asyncWrapper(
 
     // 사용자 조회를 위한 검색 방식 정의
     const fetchUserMethods = [
-      { key: email, fetch: fetchUserByEmail },
-      { key: phone, fetch: fetchUserByPhone },
-      { key: userId, fetch: fetchUserByUserId },
+      { key: email, fetch: getUserByEmail },
+      { key: phone, fetch: getUserByPhone },
+      { key: userId, fetch: getUserByUserId },
     ];
 
     // 사용자 조회 및 인증 코드 확인
