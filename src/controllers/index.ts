@@ -1,4 +1,7 @@
-import { checkEmailAvailability } from "./users.controller";
+import {
+  checkEmailAvailability,
+  checkPhoneAvailability,
+} from "./users.controller";
 
 import {
   checkEmailDuplicationInSignup,
@@ -19,6 +22,7 @@ export {
   // user
   checkEmailAvailability,
   checkEmailDuplicationInSignup,
+  checkPhoneAvailability,
   checkUserIdDuplicationInSignup,
   signupUser,
   oauthCallback,

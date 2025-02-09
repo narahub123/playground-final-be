@@ -39,6 +39,25 @@ const checkEmailDuplication = async (email: string): Promise<boolean> => {
   }
 };
 
+const checkPhoneDuplication = async (phone: string) => {
+  try {
+    // 사용자 아이디를 기준으로 사용자 검색
+    const user = await User.findOne({ phone });
+
+    // 사용자 존재 여부를 Boolean 값으로 반환
+    return Boolean(user);
+  } catch (error: any) {
+    // 오류 발생 시 콘솔에 에러 정보 출력
+    console.error(`[checkPhoneDuplication] Error: ${error.message}`, {
+      phone,
+      stack: error.stack,
+    });
+
+    // 에러를 호출자에게 던짐
+    throw error;
+  }
+};
+
 /**
  * 주어진 사용자 아이디에 대해 중복 여부를 확인하는 함수
  *
@@ -225,6 +244,7 @@ export {
   getUserByEmail,
   getUserByPhone,
   checkEmailDuplication,
+  checkPhoneDuplication,
   checkUserIdDuplication,
   createUser,
   updateLockStatus,

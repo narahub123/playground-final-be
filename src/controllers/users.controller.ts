@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { BadRequestError } from "@errors";
 import { asyncWrapper } from "@middlewares";
-import { checkEmailDuplication } from "@services";
+import { checkEmailDuplication, checkPhoneDuplication } from "@services";
 
 const checkEmailAvailability = asyncWrapper(
   "checkEmailDuplicationInSignup",
@@ -22,4 +22,23 @@ const checkEmailAvailability = asyncWrapper(
   }
 );
 
-export { checkEmailAvailability };
+const checkPhoneAvailability = asyncWrapper(
+  "checkEmailDuplicationInSignup",
+  async (req: Request, res: Response) => {
+    // 요청 본문에서 이메일을 추출합니다.
+    const { phone } = req.body;
+
+    // 휴대 전화 번호가 제공되지 않았을 경우 BadRequestError를 던집니다.
+    if (!phone) {
+      throw new BadRequestError("휴대 전화 번호를 제공해주세요.");
+    }
+
+    // 이메일 중복 체크
+    const isDuplicate = await checkPhoneDuplication(phone);
+
+    // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
+    res.status(200).json({ isDuplicate });
+  }
+);
+
+export { checkEmailAvailability, checkPhoneAvailability };
