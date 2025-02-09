@@ -107,13 +107,33 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: true,
       match: [ipRegExp, "유효하지 않은 IP 주소 형식입니다."], // IP 주소 유효성 검사
     },
-    // 가입시 주소
+    // 위치 정보 필드 정의
     location: {
-      country: { type: String, required: true },
-      state: { type: String, required: true },
-      city: { type: String, required: true },
-      county: { type: String, required: true },
+      // 국가 (필수 항목)
+      country: {
+        type: String, // 국가 이름은 문자열로 저장
+        required: true, // 이 필드는 필수 항목
+      },
+
+      // 도, 주(State) (필수 항목)
+      state: {
+        type: String, // 주 이름은 문자열로 저장
+        required: true, // 이 필드는 필수 항목
+      },
+
+      // 도시 (필수 항목)
+      city: {
+        type: String, // 도시 이름은 문자열로 저장
+        required: true, // 이 필드는 필수 항목
+      },
+
+      // 군/구 (선택 항목)
+      county: {
+        type: String, // 군/구 이름은 문자열로 저장
+        required: false, // 이 필드는 선택 항목
+      },
     },
+
     // 프로필 사진
     profileImage: {
       type: String,

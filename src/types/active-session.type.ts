@@ -14,11 +14,4 @@ type DeviceInfoType = {
   browser: BrowserType;
 };
 
-type LocationType = {
-  country: string;
-  state: string;
-  city: string;
-  county?: string;
-};
-
-export type { DeviceInfoType, LocationType };
+export type { DeviceInfoType };

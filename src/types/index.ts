@@ -1,6 +1,6 @@
-import { IUser, ILockStatus, LockReasonType } from "./user.type";
+import { IUser, ILockStatus, LockReasonType, ILocation } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
-import { DeviceInfoType, LocationType } from "./active-session.type";
+import { DeviceInfoType } from "./active-session.type";
 import {
   LoginFailureInput,
   LoginFailure,
@@ -11,6 +11,7 @@ import { LoginRecordInput, LoginRecord } from "./login-record.type";
 export {
   // user
   IUser,
+  ILocation,
   ILockStatus,
   LockReasonType,
 
@@ -20,7 +21,6 @@ export {
 
   // active-session
   DeviceInfoType,
-  LocationType,
 
   // login-failure
   LoginFailureInput,

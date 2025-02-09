@@ -13,7 +13,7 @@ import {
 } from "@services";
 import {
   DeviceInfoType,
-  LocationType,
+  ILocation,
   LoginFailure,
   LoginFailureInput,
   LoginRecord,
@@ -59,7 +59,7 @@ const saveLoginFailure = async (
   userId: string,
   device: DeviceInfoType,
   ip: string,
-  location: LocationType
+  location: ILocation
 ) => {
   const newFailure: LoginFailureInput = {
     userId,
@@ -87,7 +87,7 @@ const createSessionAndTokens = async (
   userRole: string,
   device: DeviceInfoType,
   ip: string,
-  location: LocationType
+  location: ILocation
 ) => {
   // refresh token 생성
   const refreshToken = createRefreshToken(
@@ -128,7 +128,7 @@ const checkNewLoginAttempt = async (
   loginRecords: LoginRecord[],
   device: DeviceInfoType,
   ip: string,
-  location: LocationType
+  location: ILocation
 ) => {
   let messages = [];
 
@@ -172,7 +172,7 @@ const saveLoginRecord = async (
   userId: string,
   device: DeviceInfoType,
   ip: string,
-  location: LocationType
+  location: ILocation
 ) => {
   const newLoginRecord: LoginRecordInput = {
     userId,

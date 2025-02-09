@@ -1,19 +1,36 @@
 import { Document } from "mongoose";
-type IsLockedReasonType =
-  | "BRUTE_FORCE_DETECTED"
-  | "TOO_MANY_LOGIN_FAILURES"
-  | "NONE";
 
-type IsLockedType = {
-  status: boolean;
-  reason: IsLockedReasonType;
-  lockedAt: Date;
-};
-
+/**
+ * 위치 정보를 나타내는 인터페이스
+ * @interface ILocation
+ */
 interface ILocation {
+  /**
+   * 국가 정보
+   * @type {string}
+   * @required
+   */
   country: string;
+
+  /**
+   * 주(state) 정보
+   * @type {string}
+   * @required
+   */
   state: string;
+
+  /**
+   * 도시 정보
+   * @type {string}
+   * @required
+   */
   city: string;
+
+  /**
+   * 군/구 정보 (선택 사항)
+   * @type {string | undefined}
+   * @optional
+   */
   county?: string;
 }
 
@@ -27,17 +44,30 @@ interface ILocation {
 type LockReasonType = "BRUTE_FORCE_DETECTED" | "TOO_MANY_LOGIN_FAILURES";
 
 /**
+ * 계정 잠금 상태 정보를 나타내는 인터페이스
  * @interface ILockStatus
- * @description
- * 이 인터페이스는 사용자의 계정 잠금 상태를 나타냅니다.
- * - `isLocked`: 계정이 잠금 상태인지 여부
- * - `lockReason`: 계정 잠금 사유. 잠금되지 않은 경우 `null`일 수 있음
- * - `lockedAt`: 계정이 잠금된 시각. 잠금되지 않은 경우 `null`일 수 있음
  */
 interface ILockStatus {
+  /**
+   * 계정 잠금 상태
+   * @type {boolean}
+   * @required
+   */
   isLocked: boolean;
-  lockReason: LockReasonType | null;
-  lockedAt: Date | null;
+
+  /**
+   * 잠금 사유
+   * @type {"BRUTE_FORCE_DETECTED" | "TOO_MANY_LOGIN_FAILURES" | null}
+   * @required
+   */
+  lockReason: "BRUTE_FORCE_DETECTED" | "TOO_MANY_LOGIN_FAILURES" | null;
+
+  /**
+   * 잠금 시간
+   * @type {Date | null}
+   * @required
+   */
+  lockTimestamp: Date | null;
 }
 
 // User 모델에 대한 타입 정의
@@ -68,10 +98,4 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
 }
 
-export type {
-  IsLockedType,
-  IsLockedReasonType,
-  IUser,
-  LockReasonType,
-  ILockStatus,
-};
+export type { IUser, LockReasonType, ILockStatus, ILocation };
