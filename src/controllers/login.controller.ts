@@ -250,8 +250,8 @@ const getContactsByAccount = asyncWrapper(
 );
 
 // 인증 코드 요청 핸들러
-const requestVerificationCodeLogin = asyncWrapper(
-  "requestVerificationCodeLogin",
+const requestLoginVerificationCode = asyncWrapper(
+  "requestLoginVerificationCode",
   async (req: Request, res: Response) => {
     const { email, phone } = req.body;
 
@@ -301,8 +301,8 @@ const requestVerificationCodeLogin = asyncWrapper(
   }
 );
 
-const checkVerificationCodeLogin = asyncWrapper(
-  "checkVerificationCodeLogin",
+const checkLoginVerificationCode = asyncWrapper(
+  "checkLoginVerificationCode",
   async (req: Request, res: Response) => {
     const { email, phone, userId, verificationCode } = req.body;
 
@@ -359,6 +359,6 @@ const checkVerificationCodeLogin = asyncWrapper(
 export {
   loginWithAccount,
   getContactsByAccount,
-  requestVerificationCodeLogin,
-  checkVerificationCodeLogin,
+  requestLoginVerificationCode,
+  checkLoginVerificationCode,
 };

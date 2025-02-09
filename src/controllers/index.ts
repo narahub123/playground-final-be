@@ -11,8 +11,8 @@ import { oauthCallback } from "./oauth.controller";
 import {
   loginWithAccount,
   getContactsByAccount,
-  requestVerificationCodeLogin,
-  checkVerificationCodeLogin,
+  requestLoginVerificationCode,
+  checkLoginVerificationCode,
 } from "./login.controller";
 
 export {
@@ -23,6 +23,6 @@ export {
   // login
   loginWithAccount,
   getContactsByAccount,
-  requestVerificationCodeLogin,
-  checkVerificationCodeLogin,
+  requestLoginVerificationCode,
+  checkLoginVerificationCode,
 };
