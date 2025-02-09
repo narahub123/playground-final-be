@@ -7,6 +7,7 @@ import {
 
 import { signupUser, loginUser } from "./auth.controller";
 
+import { requestLoginVerificationCode } from "./verification.controller";
 import {
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
@@ -17,7 +18,6 @@ import { oauthCallback } from "./oauth.controller";
 import {
   loginWithAccount,
   getContactsByAccount,
-  requestLoginVerificationCode,
   checkLoginVerificationCode,
 } from "./login.controller";
 
@@ -36,6 +36,8 @@ export {
   // login
   loginWithAccount,
   getContactsByAccount,
+
+  // verification
   requestLoginVerificationCode,
   checkLoginVerificationCode,
 };
