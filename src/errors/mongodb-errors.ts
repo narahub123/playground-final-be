@@ -7,37 +7,47 @@ import {
 } from "./http-errors";
 
 class MongoDBDuplicateKeyError extends ConflictError {
-  constructor(message?: string) {
-    super(message || "Duplicate key error: 중복된 키가 존재합니다.");
-    this.statusText = "Duplicate key conflict";
+  constructor(
+    message: string = "MongoDB Duplicate key error: 중복된 키가 존재합니다.",
+    errorCode: string = "DUPLICATE_KEY"
+  ) {
+    super(message, errorCode);
   }
 }
 
 class MongoDBValidationError extends UnprocessableEntityError {
-  constructor(message?: string) {
-    super(message || "MongoDB 스키마 유효성 검사 실패");
-    this.statusText = "MongoDB Validation Error";
+  constructor(
+    message: string = "MongoDB 스키마 유효성 검사 실패",
+    errorCode: string = "MONGODB_VALIDATION_ERROR"
+  ) {
+    super(message, errorCode);
   }
 }
 
 class MongoDBCastError extends BadRequestError {
-  constructor(message?: string) {
-    super(message || "MongoDB 데이터 타입 변환 실패");
-    this.statusText = "MongoDB Cast Error";
+  constructor(
+    message: string = "MongoDB 데이터 타입 변환 실패",
+    errorCode: string = "MONGODB_CAST_ERROR"
+  ) {
+    super(message, errorCode);
   }
 }
 
 class MongoDBNetworkError extends ServiceUnavailableError {
-  constructor(message?: string) {
-    super(message || "MongoDB 서버 연결 실패");
-    this.statusText = "MongoDB 서버 연결 실패";
+  constructor(
+    message: string = "MongoDB 서버 연결 실패",
+    errorCode: string = "MONGODB_NETWORK_ERROR"
+  ) {
+    super(message, errorCode);
   }
 }
 
 class MongoDBTimeoutError extends GatewayTimeoutError {
-  constructor(message?: string) {
-    super(message || "MongoDB 요청 시간 초과");
-    this.statusText = "MongoDB Timeout Error";
+  constructor(
+    message: string = "MongoDB 요청 시간 초과",
+    errorCode: string = "MONGODB_TIMEOUT_ERROR"
+  ) {
+    super(message, errorCode);
   }
 }
 
