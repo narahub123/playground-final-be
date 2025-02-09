@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
-import { DeviceInfoType } from "./active-session.type";
+import { IDevice } from "./active-session.type";
 import { ILocation } from "./user.type";
 
 type LoginFailureType = "Normal" | "BruteForce";
 
 type LoginFailureInput = {
   userId: string;
-  device: DeviceInfoType;
+  device: IDevice;
   ip: string;
   location: ILocation;
   failedAt: Date;
@@ -16,7 +16,7 @@ type LoginFailureInput = {
 interface LoginFailure {
   _id: Types.ObjectId;
   userId: string; // User 모델의 ID 참조
-  device: DeviceInfoType;
+  device: IDevice;
   ip: string;
   location: ILocation;
   failedAt: Date;

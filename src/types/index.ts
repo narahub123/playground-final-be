@@ -8,7 +8,7 @@ import {
   SocialType,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
-import { DeviceInfoType } from "./active-session.type";
+import { IActiveSession, IDevice } from "./active-session.type";
 import {
   LoginFailureInput,
   LoginFailure,
@@ -31,7 +31,8 @@ export {
   UserData,
 
   // active-session
-  DeviceInfoType,
+  IActiveSession,
+  IDevice,
 
   // login-failure
   LoginFailureInput,

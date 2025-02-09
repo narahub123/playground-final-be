@@ -7,12 +7,12 @@ import {
   MongoDBValidationError,
   NotFoundError,
 } from "@errors";
-import { DeviceInfoType, ILocation } from "@types";
+import { IDevice, ILocation } from "@types";
 
 const createActiveSession = async (sessionInfo: {
   userId: string;
   refreshToken: string;
-  device: DeviceInfoType;
+  device: IDevice;
   ip: string;
   location: ILocation;
 }) => {
@@ -61,7 +61,7 @@ const createActiveSession = async (sessionInfo: {
 
 const fetchActiveSessionWithSessionInfo = async (sessionInfo: {
   userId: string;
-  device: DeviceInfoType;
+  device: IDevice;
   ip: string;
   location: ILocation;
 }) => {

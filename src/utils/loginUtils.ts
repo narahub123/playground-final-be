@@ -12,7 +12,7 @@ import {
   updateIsLocked,
 } from "@services";
 import {
-  DeviceInfoType,
+  IDevice,
   ILocation,
   LoginFailure,
   LoginFailureInput,
@@ -57,7 +57,7 @@ const findUserByIdentifier = async (
 // 로그인 실패 기록 저장
 const saveLoginFailure = async (
   userId: string,
-  device: DeviceInfoType,
+  device: IDevice,
   ip: string,
   location: ILocation
 ) => {
@@ -85,7 +85,7 @@ const lockAccount = async (userId: string, reason: IsLockedReasonType) => {
 const createSessionAndTokens = async (
   userId: string,
   userRole: string,
-  device: DeviceInfoType,
+  device: IDevice,
   ip: string,
   location: ILocation
 ) => {
@@ -126,7 +126,7 @@ const createSessionAndTokens = async (
 // 새로운 로그인 시도 확인 (기존 기록과 비교)
 const checkNewLoginAttempt = async (
   loginRecords: LoginRecord[],
-  device: DeviceInfoType,
+  device: IDevice,
   ip: string,
   location: ILocation
 ) => {
@@ -170,7 +170,7 @@ const checkNewLoginAttempt = async (
 // 로그인 기록 저장 (로그인 성공 시)
 const saveLoginRecord = async (
   userId: string,
-  device: DeviceInfoType,
+  device: IDevice,
   ip: string,
   location: ILocation
 ) => {

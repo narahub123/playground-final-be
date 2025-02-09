@@ -1,4 +1,4 @@
-import { DeviceInfoType } from "./active-session.type";
+import { IDevice } from "./active-session.type";
 import { ILocation } from "./user.type";
 
 type LoggedOutType = {
@@ -9,14 +9,14 @@ type LoggedOutType = {
 type LoginRecordInput = {
   userId: string;
   ip: string;
-  device: DeviceInfoType;
+  device: IDevice;
   location: ILocation;
   createdAt: Date;
 };
 
 interface LoginRecord {
   userId: string; // User 모델의 ID 참조
-  device: DeviceInfoType;
+  device: IDevice;
   ip: string;
   location: ILocation;
   loggedInAt: Date;
