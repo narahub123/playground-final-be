@@ -11,7 +11,7 @@ import {
 } from "@services";
 
 const checkEmailAvailability = asyncWrapper(
-  "checkEmailDuplicationInSignup",
+  "checkEmailAvailability",
   async (req: Request, res: Response) => {
     // 요청 본문에서 이메일을 추출합니다.
     const { email } = req.body;
