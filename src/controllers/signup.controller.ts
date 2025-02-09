@@ -86,8 +86,8 @@ const checkUserIdDuplicationInSignup = asyncWrapper(
 );
 
 // 사용자 정보 등록
-const registerUser = asyncWrapper(
-  "registerUser",
+const signupUser = asyncWrapper(
+  "signupUser",
   async (req: Request, res: Response) => {
     const { user } = req.body;
 
@@ -240,5 +240,5 @@ const registerUser = asyncWrapper(
 export {
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
-  registerUser,
+  signupUser,
 };

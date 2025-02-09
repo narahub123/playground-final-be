@@ -3,7 +3,7 @@ import {} from "./users.controller";
 import {
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
-  registerUser,
+  signupUser,
 } from "./signup.controller";
 
 import { oauthCallback } from "./oauth.controller";
@@ -18,7 +18,7 @@ import {
 export {
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
-  registerUser,
+  signupUser,
   oauthCallback,
   // login
   loginWithAccount,

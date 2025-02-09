@@ -274,7 +274,7 @@
         }
       }
     },
-    "/signup/registerUser": {
+    "/signup/signupUser": {
       "post": {
         "tags": ["Auth"],
         "summary": "회원 가입 시 사용자 정보 등록",
