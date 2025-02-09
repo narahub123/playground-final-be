@@ -20,7 +20,7 @@ import { sendEmail } from "./email.service";
 
 import {
   createVerification,
-  fetchVerificationCodeByUserId,
+  getVerificationCodeByUserId,
   deleteVerificationCode,
 } from "./verification.service";
 
@@ -64,7 +64,7 @@ export {
 
   // verificationCode
   createVerification,
-  fetchVerificationCodeByUserId,
+  getVerificationCodeByUserId,
   deleteVerificationCode,
 
   // active-session

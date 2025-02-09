@@ -63,7 +63,7 @@ const createVerification = async (verification: Verification) => {
 };
 
 // 사용자 아이디를 통해 인증 코드 정보를 가져오는 함수
-const fetchVerificationCodeByUserId = async (userId: string) => {
+const getVerificationCodeByUserId = async (userId: string) => {
   try {
     // 주어진 userId로 인증 코드 정보를 찾음
     return Verification.findOne({ userId });
@@ -167,6 +167,6 @@ const deleteVerificationCode = async (id: mongoose.Types.ObjectId) => {
 
 export {
   createVerification,
-  fetchVerificationCodeByUserId,
+  getVerificationCodeByUserId,
   deleteVerificationCode,
 };

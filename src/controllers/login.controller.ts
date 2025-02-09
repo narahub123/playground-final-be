@@ -26,7 +26,7 @@ import {
   createVerification,
   deleteVerificationCode,
   getActiveSessionByInfo,
-  fetchVerificationCodeByUserId,
+  getVerificationCodeByUserId,
   getLoginFailureByUserId,
   getLoginRecordsByUserId,
   sendEmail,
@@ -268,7 +268,7 @@ const requestVerificationCodeLogin = asyncWrapper(
       if (!user) throw new NotFoundError("해당 이메일을 가진 유저가 없습니다.");
 
       // 이미 전송된 인증 코드가 있는지 확인
-      const sentVerificationCode = await fetchVerificationCodeByUserId(
+      const sentVerificationCode = await getVerificationCodeByUserId(
         user.userId
       );
 
@@ -326,7 +326,7 @@ const checkVerificationCodeLogin = asyncWrapper(
       if (key) {
         const user = await fetch(key);
         if (user) {
-          const sentCode = await fetchVerificationCodeByUserId(user.userId);
+          const sentCode = await getVerificationCodeByUserId(user.userId);
 
           // 인증 코드 만료 확인
           if (!sentCode) {
