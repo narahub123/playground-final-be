@@ -19,11 +19,8 @@ import {
   LoginRecord,
   LoginRecordInput,
 } from "@types";
-import {
-  createLoginRecord,
-  getLoginRecordsByUserId,
-} from "services/login-record.service";
-import { IsLockedReasonType } from "types/user.type";
+import { createLoginRecord } from "services/login-record.service";
+import { LockReasonType } from "types/user.type";
 import createRefreshToken from "./createRefreshToken";
 import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
 import createAccessToken from "./createAccessToken";
@@ -77,7 +74,7 @@ const saveLoginFailure = async (
 };
 
 // 계정 잠금 처리 (비정상적인 로그인 시도 시)
-const lockAccount = async (userId: string, reason: IsLockedReasonType) => {
+const lockAccount = async (userId: string, reason: LockReasonType) => {
   await updateIsLocked(userId, { status: true, reason, lockedAt: new Date() });
 };
 

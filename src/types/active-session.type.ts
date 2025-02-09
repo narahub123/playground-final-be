@@ -69,7 +69,7 @@ interface IActiveSession extends Document {
   device: IDevice;
   ip: string;
   location: ILocation;
-  createdAt: Date;
+  sessionCreatedAt: Date;
 }
 
 export type { IActiveSession, IDevice };

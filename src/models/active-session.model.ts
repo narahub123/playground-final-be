@@ -42,7 +42,7 @@ const ActiveSessionSchema = new mongoose.Schema(
       city: { type: String, required: true },
       county: { type: String, required: false },
     },
-    createdAt: {
+    sessionCreatedAt: {
       type: Date,
       default: Date.now,
       index: {
