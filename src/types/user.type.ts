@@ -53,6 +53,15 @@ interface ILocation {
 }
 
 /**
+ * 소셜 로그인 제공자를 나타내는 타입입니다.
+ *
+ * - `"google"`: 구글 소셜 로그인
+ * - `"naver"`: 네이버 소셜 로그인
+ * - `"kakao"`: 카카오 소셜 로그인
+ */
+type SocialType = "google" | "naver" | "kakao";
+
+/**
  * @typedef {"BRUTE_FORCE_DETECTED" | "TOO_MANY_LOGIN_FAILURES"} LockReasonType
  * @description
  * 이 타입은 계정 잠금의 원인을 나타냅니다.
@@ -112,7 +121,7 @@ interface IUser extends Document {
   isPrivate: boolean;
   isAuthorized: boolean;
   isAuthenticated: boolean;
-  social: ("google" | "naver" | "kakao")[];
+  social: SocialType[];
   lockStatus: ILockStatus;
 }
 
@@ -123,4 +132,5 @@ export type {
   ILocation,
   GenderType,
   UserRoleType,
+  SocialType,
 };

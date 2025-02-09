@@ -5,6 +5,7 @@ import {
   ILocation,
   GenderType,
   UserRoleType,
+  SocialType,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { DeviceInfoType } from "./active-session.type";
@@ -22,6 +23,8 @@ export {
   ILockStatus,
   LockReasonType,
   GenderType,
+  UserRoleType,
+  SocialType,
 
   // oauth
   OauthType,
