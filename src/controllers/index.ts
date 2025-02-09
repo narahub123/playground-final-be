@@ -4,7 +4,7 @@ import {
   checkUserIdAvailability,
 } from "./users.controller";
 
-import { signupUser } from "./auth.controller";
+import { signupUser, loginUser } from "./auth.controller";
 
 import {
   checkEmailDuplicationInSignup,
@@ -27,6 +27,8 @@ export {
   checkUserIdAvailability,
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
+  // auth
+  loginUser,
   signupUser,
   oauthCallback,
   // login
