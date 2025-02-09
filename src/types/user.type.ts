@@ -11,6 +11,14 @@ import { Document } from "mongoose";
 type GenderType = "m" | "f" | "n" | "b";
 
 /**
+ * 사용자의 역할을 나타내는 타입입니다.
+ *
+ * - `"ADMIN"`: 관리자로 권한이 있는 사용자
+ * - `"USER"`: 일반 사용자
+ */
+type UserRoleType = "ADMIN" | "USER";
+
+/**
  * 위치 정보를 나타내는 인터페이스
  * @interface ILocation
  */
@@ -89,7 +97,7 @@ interface IUser extends Document {
   birth: string;
   phone: string[];
   gender: GenderType;
-  userRole: "ADMIN" | "USER";
+  userRole: UserRoleType;
   country: string;
   language: string;
   ip: string;
@@ -108,4 +116,11 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
 }
 
-export type { IUser, LockReasonType, ILockStatus, ILocation, GenderType };
+export type {
+  IUser,
+  LockReasonType,
+  ILockStatus,
+  ILocation,
+  GenderType,
+  UserRoleType,
+};

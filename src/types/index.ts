@@ -4,6 +4,7 @@ import {
   LockReasonType,
   ILocation,
   GenderType,
+  UserRoleType,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { DeviceInfoType } from "./active-session.type";
