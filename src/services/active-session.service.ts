@@ -59,7 +59,7 @@ const createActiveSession = async (sessionInfo: {
   }
 };
 
-const fetchActiveSessionWithSessionInfo = async (sessionInfo: {
+const getActiveSessionByInfo = async (sessionInfo: {
   userId: string;
   device: IDevice;
   ip: string;
@@ -78,4 +78,4 @@ const fetchActiveSessionWithSessionInfo = async (sessionInfo: {
   });
 };
 
-export { createActiveSession, fetchActiveSessionWithSessionInfo };
+export { createActiveSession, getActiveSessionByInfo };

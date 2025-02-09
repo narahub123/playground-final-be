@@ -25,7 +25,7 @@ import {
 import {
   createVerification,
   deleteVerificationCode,
-  fetchActiveSessionWithSessionInfo,
+  getActiveSessionByInfo,
   fetchVerificationCodeByUserId,
   getLoginFailureByUserId,
   getLoginRecordsByUserId,
@@ -150,7 +150,7 @@ const loginWithAccount = asyncWrapper(
     }
 
     // 기존 세션이 존재하는지 확인
-    const existingSession = await fetchActiveSessionWithSessionInfo({
+    const existingSession = await getActiveSessionByInfo({
       userId: user.userId,
       device,
       ip,

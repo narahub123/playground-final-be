@@ -26,7 +26,7 @@ import {
 
 import {
   createActiveSession,
-  fetchActiveSessionWithSessionInfo,
+  getActiveSessionByInfo,
 } from "./active-session.service";
 
 import {
@@ -69,7 +69,7 @@ export {
 
   // active-session
   createActiveSession,
-  fetchActiveSessionWithSessionInfo,
+  getActiveSessionByInfo,
 
   // login-attempt
   getLoginFailureByUserId,

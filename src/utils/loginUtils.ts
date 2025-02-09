@@ -4,7 +4,7 @@ import {
   createActiveSession,
   createLoginFailure,
   deleteLoginFailuresById,
-  fetchActiveSessionWithSessionInfo,
+  getActiveSessionByInfo,
   getUserByEmail,
   getUserByPhone,
   getUserByUserId,
