@@ -5,7 +5,7 @@ import {
   checkEmailDuplicate,
   checkUserIdDuplicate,
   createUser,
-  updateIsLocked,
+  updateLockStatus,
 } from "./user.service";
 
 import { createUserDisplay } from "./display.service";
@@ -45,7 +45,7 @@ export {
   checkEmailDuplicate, // 이메일 중복 검사
   checkUserIdDuplicate, // 사용자 아이디 중복 검사
   createUser, // 회원 가입
-  updateIsLocked, // 계정 잠금 업데이트
+  updateLockStatus, // 계정 잠금 업데이트
 
   // display
   createUserDisplay,

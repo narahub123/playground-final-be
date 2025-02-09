@@ -9,7 +9,7 @@ import {
   fetchUserByPhone,
   fetchUserByUserId,
   getLoginFailureByUserId,
-  updateIsLocked,
+  updateLockStatus,
 } from "@services";
 import {
   IDevice,
@@ -75,7 +75,11 @@ const saveLoginFailure = async (
 
 // 계정 잠금 처리 (비정상적인 로그인 시도 시)
 const lockAccount = async (userId: string, reason: LockReasonType) => {
-  await updateIsLocked(userId, { status: true, reason, lockedAt: new Date() });
+  await updateLockStatus(userId, {
+    isLocked: true,
+    lockReason: reason,
+    lockedAt: new Date(),
+  });
 };
 
 // 세션 생성 및 토큰 발급 (로그인 성공 시)

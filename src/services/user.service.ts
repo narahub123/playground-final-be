@@ -8,7 +8,7 @@ import {
   NotFoundError,
 } from "@errors";
 import mongoose from "mongoose";
-import { IsLockedType } from "@types";
+import { ILockStatus } from "@types";
 
 /**
  * 이메일 중복 확인 함수
@@ -176,11 +176,11 @@ const createUser = async (
 };
 
 // 계정 잠금 업데이트
-const updateIsLocked = async (userId: string, isLocked: IsLockedType) => {
+const updateLockStatus = async (userId: string, lockStatus: ILockStatus) => {
   try {
-    return await User.updateOne({ userId }, { $set: { isLocked } });
+    return await User.updateOne({ userId }, { $set: { lockStatus } });
   } catch (error: any) {
-    console.error(`[updateIsLocked] Error: ${error.message}`, {
+    console.error(`[updateLockStatus] Error: ${error.message}`, {
       userId,
       stack: error.stack,
     });
@@ -227,5 +227,5 @@ export {
   checkEmailDuplicate,
   checkUserIdDuplicate,
   createUser,
-  updateIsLocked,
+  updateLockStatus,
 };
