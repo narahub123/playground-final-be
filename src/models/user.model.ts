@@ -16,8 +16,9 @@ import {
   USERNAME_MAX,
   USERNAME_MIN,
 } from "@constants";
+import { IUser } from "@types";
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema<IUser>(
   {
     // 비밀번호 : 프론트로 전달 안함
     password: {
@@ -135,22 +136,22 @@ const UserSchema = new mongoose.Schema(
     },
     // 팔로잉 목록
     followings: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: String, ref: "User" }],
       default: [],
     },
     // 팔로워 목록
     followers: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: String, ref: "User" }],
       default: [],
     },
     // 뮤트한 유저 목록
     mutedUsers: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: String, ref: "User" }],
       default: [],
     },
     // 블록한 유저 목록
     blockedUsers: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+      type: [{ type: String, ref: "User" }],
       default: [],
     },
     // 게시물 공개 여부
@@ -174,20 +175,34 @@ const UserSchema = new mongoose.Schema(
       enum: ["google", "naver", "kakao"],
       default: [],
     },
-    // 계정 잠금 여부
-    isLocked: {
-      status: {
-        type: Boolean,
-        default: false,
+
+    // 계정 잠금 여부에 대한 필드
+    lockStatus: {
+      // 계정 잠금 상태 (기본값은 false, 즉 잠금되지 않은 상태)
+      isLocked: {
+        type: Boolean, // 불리언 타입으로 잠금 여부를 나타냄
+        default: false, // 기본값은 false (잠금되지 않은 상태)
       },
-      reason: {
-        type: String,
-        enum: ["BRUTE_FORCE_DETECTED", "TOO_MANY_LOGIN_FAILURES", "NONE"],
-        default: "NONE",
+
+      // 계정 잠금 사유 (잠금된 경우에만 값이 존재)
+      lockReason: {
+        type: String, // 잠금 사유는 문자열로 저장
+        enum: ["BRUTE_FORCE_DETECTED", "TOO_MANY_LOGIN_FAILURES"], // 허용되는 값은 "BRUTE_FORCE_DETECTED" 또는 "TOO_MANY_LOGIN_FAILURES"
+        required: function (this: any): boolean {
+          // 계정이 잠금 상태일 때만 lockReason이 필수
+          return this.lockStatus.isLocked;
+        },
+        default: null, // 기본값은 null, 잠금되지 않은 경우에는 null로 설정
       },
+
+      // 계정이 잠금된 시간 (잠금되지 않은 경우에는 null)
       lockedAt: {
-        type: Date,
-        default: null,
+        type: Date, // 잠금 시각을 Date 타입으로 저장
+        required: function (this: any): boolean {
+          // 계정이 잠금 상태일 때만 lockedAt이 필수
+          return this.lockStatus.isLocked;
+        },
+        default: null, // 기본값은 null, 잠금되지 않은 경우에는 null로 설정
       },
     },
   },

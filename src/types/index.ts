@@ -1,4 +1,4 @@
-import { UserType, IsLockedType, IsLockedReasonType } from "./user.type";
+import { IUser, ILockStatus, LockReasonType } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { DeviceInfoType, LocationType } from "./active-session.type";
 import {
@@ -10,8 +10,9 @@ import { LoginRecordInput, LoginRecord } from "./login-record.type";
 
 export {
   // user
-  UserType,
-  IsLockedType,
+  IUser,
+  ILockStatus,
+  LockReasonType,
 
   // oauth
   OauthType,
