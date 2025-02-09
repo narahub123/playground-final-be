@@ -22,6 +22,18 @@ class DuplicateDetection {
 
     return false;
   }
+
+  async checkPhoneDuplication(phone: string) {
+    const isDuplicate = await userRepository.getUserByPhone(phone);
+
+    if (isDuplicate)
+      throw new ConflictError(
+        "이미 등록된 사용자 아이디입니다.",
+        "PHONE_DUPLICATION"
+      );
+
+    return false;
+  }
 }
 
 export default new DuplicateDetection();

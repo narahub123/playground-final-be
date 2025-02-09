@@ -22,6 +22,16 @@ class UserRepository {
       return false;
     }
   }
+  async getUserByPhone(phone: string): Promise<boolean> {
+    try {
+      const user = await User.findOne({ phone });
+
+      return Boolean(user);
+    } catch (error: any) {
+      mongoDBErrorHandler("getUserByPhone", error, { phone });
+      return false;
+    }
+  }
 }
 
 export default new UserRepository();
