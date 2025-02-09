@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
-  checkEmailDuplication,
   checkPhoneDuplication,
   checkUserIdDuplication,
+  DuplicateDetection,
   getUserByEmail,
   getUserByPhone,
   getUserByUserId,
@@ -22,10 +22,10 @@ const checkEmailAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await checkEmailDuplication(email);
+    const isDuplicate = await DuplicateDetection.checkEmailDuplication(email);
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res.status(200).json({ isDuplicate });
+    res.status(200).json({ success: true, data: { isDuplicate } });
   }
 );
 

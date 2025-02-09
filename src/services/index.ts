@@ -39,6 +39,8 @@ import {
 
 import { getLoginRecordsByUserId } from "./login-record.service";
 
+import DuplicateDetection from "./duplicate-detection.service";
+
 export {
   getUserByUserId,
   getUserByEmail,
@@ -81,4 +83,7 @@ export {
 
   // login-record
   getLoginRecordsByUserId,
+
+  // duplicate-detection
+  DuplicateDetection,
 };

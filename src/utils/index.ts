@@ -8,6 +8,7 @@ import getOauthUserInfo from "./getOauthUserInfo";
 import comparePassword from "./comparePassword";
 import createRefreshToken from "./createRefreshToken";
 import createAccessToken from "./createAccessToken";
+import mongoDBErrorHandler from "./mongoDBErrorHandler";
 import {
   findUserByIdentifier,
   saveLoginFailure,
@@ -35,4 +36,5 @@ export {
   createSessionAndTokens,
   saveLoginRecord,
   deleteLoginFailures,
+  mongoDBErrorHandler,
 };

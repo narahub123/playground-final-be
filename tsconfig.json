@@ -10,6 +10,7 @@
       "@utils": ["utils/index.ts"],
       "@routes": ["routes/index.ts"],
       "@middlewares": ["middlewares/index.ts"],
+      "@repositories": ["repositories/index.ts"],
       "@services": ["services/index.ts"],
       "@controllers": ["controllers/index.ts"],
       "@errors": ["errors/index.ts"],
