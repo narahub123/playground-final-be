@@ -1,74 +1,56 @@
 import CustomAPIError from "./custom-error.js";
 
 class BadRequestError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 400;
-    this.statusText = "Bad Request";
+  constructor(message: string, errorCode: string = "BAD_REQUEST") {
+    super(message, 400, "Bad Request", errorCode);
   }
 }
 
 class UnauthorizedError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 401;
-    this.statusText = "Unauthorized";
+  constructor(message: string, errorCode: string = "UNAUTHORIZED") {
+    super(message, 401, "Unauthorized", errorCode);
   }
 }
 
 class ForbiddenError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 403;
-    this.statusText = "Forbidden";
+  constructor(message: string, errorCode: string = "FORBIDDEN") {
+    super(message, 403, "Forbidden", errorCode);
   }
 }
 
 class NotFoundError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 404;
-    this.statusText = "Not Found";
+  constructor(message: string, errorCode: string = "NOT_FOUND") {
+    super(message, 404, "Not Found", errorCode);
   }
 }
 
 class ConflictError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 409;
-    this.statusText = "Conflict";
+  constructor(message: string, errorCode: string = "CONFLICT") {
+    super(message, 409, "Conflict", errorCode);
   }
 }
 
 class UnprocessableEntityError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 422;
-    this.statusText = "Unprocessable Entity";
+  constructor(message: string, errorCode: string = "UNPROCESSABLE_ENTITY") {
+    super(message, 422, "Unprocessable Entity", errorCode);
   }
 }
 
 class LockedError extends CustomAPIError {
-  constructor(message: string, statusText?: string) {
-    super(message);
-    this.statusCode = 423;
-    this.statusText = statusText || "Locked";
+  constructor(message: string, errorCode: string = "LOCKED") {
+    super(message, 423, "Locked", errorCode);
   }
 }
 
 class ServiceUnavailableError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 503;
-    this.statusText = "Service Unavailable";
+  constructor(message: string, errorCode: string = "SERVICE_UNAVAILABLE") {
+    super(message, 503, "Service Unavailable", errorCode);
   }
 }
 
 class GatewayTimeoutError extends CustomAPIError {
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 504;
-    this.statusText = "Gateway Time Out";
+  constructor(message: string, errorCode: string = "GATEWAY_TIMEOUT") {
+    super(message, 504, "Gateway Time Out", errorCode);
   }
 }
 
