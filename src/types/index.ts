@@ -1,4 +1,10 @@
-import { IUser, ILockStatus, LockReasonType, ILocation } from "./user.type";
+import {
+  IUser,
+  ILockStatus,
+  LockReasonType,
+  ILocation,
+  GenderType,
+} from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { DeviceInfoType } from "./active-session.type";
 import {
@@ -14,6 +20,7 @@ export {
   ILocation,
   ILockStatus,
   LockReasonType,
+  GenderType,
 
   // oauth
   OauthType,

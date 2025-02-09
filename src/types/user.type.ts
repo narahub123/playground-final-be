@@ -1,6 +1,16 @@
 import { Document } from "mongoose";
 
 /**
+ * 성별을 나타내는 타입입니다.
+ *
+ * - `"m"`: 남성
+ * - `"f"`: 여성
+ * - `"n"`: 중성
+ * - `"b"`: 양성
+ */
+type GenderType = "m" | "f" | "n" | "b";
+
+/**
  * 위치 정보를 나타내는 인터페이스
  * @interface ILocation
  */
@@ -78,7 +88,7 @@ interface IUser extends Document {
   email: string[];
   birth: string;
   phone: string[];
-  gender: "m" | "f" | "n" | "b" | null;
+  gender: GenderType;
   userRole: "ADMIN" | "USER";
   country: string;
   language: string;
@@ -98,4 +108,4 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
 }
 
-export type { IUser, LockReasonType, ILockStatus, ILocation };
+export type { IUser, LockReasonType, ILockStatus, ILocation, GenderType };

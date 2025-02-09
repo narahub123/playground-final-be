@@ -73,10 +73,10 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: [],
       match: [phoneRegExp, "유효하지 않은 전화번호 형식입니다."],
     },
-    // 성별: 남성 여성 새로운 성별 추가 가능
+    // 성별: 남성 여성 중성 양성
     gender: {
       type: String,
-      // required: true,
+      required: true,
       enum: ["m", "f", "n", "b"], // 남성, 여성, 중성, 양성
     },
     // 사용자 등급
