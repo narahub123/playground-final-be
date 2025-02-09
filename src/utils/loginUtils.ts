@@ -16,8 +16,8 @@ import {
   ILocation,
   LoginFailure,
   LoginFailureInput,
-  LoginRecord,
-  LoginRecordInput,
+  ILoginRecordInput,
+  ILoginRecord,
 } from "@types";
 import { createLoginRecord } from "services/login-record.service";
 import { LockReasonType } from "types/user.type";
@@ -122,7 +122,7 @@ const createSessionAndTokens = async (
 
 // 새로운 로그인 시도 확인 (기존 기록과 비교)
 const checkNewLoginAttempt = async (
-  loginRecords: LoginRecord[],
+  loginRecords: ILoginRecord[],
   device: IDevice,
   ip: string,
   location: ILocation
@@ -171,12 +171,11 @@ const saveLoginRecord = async (
   ip: string,
   location: ILocation
 ) => {
-  const newLoginRecord: LoginRecordInput = {
+  const newLoginRecord: ILoginRecordInput = {
     userId,
     ip,
     device,
     location,
-    createdAt: new Date(),
   };
 
   // 로그인 기록을 저장

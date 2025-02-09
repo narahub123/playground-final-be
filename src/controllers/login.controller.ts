@@ -39,7 +39,7 @@ import {
   REFRESHTOKEN_EXPIRES,
 } from "@constants";
 import { checkNewLoginAttempt } from "utils/loginUtils";
-import { LoginFailure, LoginRecord } from "@types";
+import { LoginFailure, ILoginRecord } from "@types";
 
 // 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
@@ -188,7 +188,7 @@ const loginWithAccount = asyncWrapper(
 
     // 새로운 로그인 시도 확인
     const messages = await checkNewLoginAttempt(
-      loginRecords as LoginRecord[],
+      loginRecords as ILoginRecord[],
       device,
       ip,
       location

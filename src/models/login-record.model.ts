@@ -1,8 +1,9 @@
 import { LOGINRECORD_EXPIRES } from "@constants";
 import { ipRegExp } from "@data";
+import { ILoginRecord } from "@types";
 import mongoose from "mongoose";
 
-const LoginRecordSchema = new mongoose.Schema(
+const LoginRecordSchema = new mongoose.Schema<ILoginRecord>(
   {
     userId: {
       type: String,
@@ -42,9 +43,9 @@ const LoginRecordSchema = new mongoose.Schema(
       default: Date.now,
       expires: Number(process.env.LOGINRECORD_EXPIRES) || LOGINRECORD_EXPIRES,
     }, // 6개월 후 작동 삭제
-    loggedOut: {
+    logoutInfo: {
       type: {
-        time: {
+        loggedOutAt: {
           type: Date,
           default: null,
         },

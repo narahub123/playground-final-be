@@ -14,7 +14,7 @@ import {
   LoginFailure,
   LoginFailureType,
 } from "./login-failure.type";
-import { LoginRecordInput, LoginRecord } from "./login-record.type";
+import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
 
 export {
   // user
@@ -40,6 +40,6 @@ export {
   LoginFailureType,
 
   // login-record
-  LoginRecordInput,
-  LoginRecord,
+  ILoginRecordInput,
+  ILoginRecord,
 };
