@@ -20,7 +20,7 @@ import { ILockStatus } from "@types";
  *
  * @throws {Error} 이메일을 조회하는 도중 오류가 발생하면 예외를 던집니다.
  */
-const checkEmailDuplicate = async (email: string): Promise<boolean> => {
+const checkEmailDuplication = async (email: string): Promise<boolean> => {
   try {
     // 이메일을 기준으로 사용자 검색
     const user = await User.findOne({ email });
@@ -29,7 +29,7 @@ const checkEmailDuplicate = async (email: string): Promise<boolean> => {
     return Boolean(user);
   } catch (error: any) {
     // 오류 발생 시 콘솔에 에러 정보 출력
-    console.error(`[checkEmailDuplicate] Error: ${error.message}`, {
+    console.error(`[checkEmailDuplication] Error: ${error.message}`, {
       email,
       stack: error.stack,
     });
@@ -43,7 +43,7 @@ const checkEmailDuplicate = async (email: string): Promise<boolean> => {
  * 주어진 사용자 아이디에 대해 중복 여부를 확인하는 함수
  *
  * @async
- * @function checkUserIdDuplicate
+ * @function checkUserIdDuplication
  * @param {string} userId - 중복 여부를 확인할 사용자 아이디
  * @throws {Error} 데이터베이스 조회 중 오류가 발생하면 발생
  * @returns {Promise<boolean>} 사용자 아이디의 중복 여부 (true: 중복, false: 중복 아님)
@@ -53,7 +53,7 @@ const checkEmailDuplicate = async (email: string): Promise<boolean> => {
  * 해당 아이디가 이미 존재하는지 여부를 반환합니다.
  * 만약 조회 중에 오류가 발생하면, 에러를 콘솔에 출력하고 호출자에게 전달합니다.
  */
-const checkUserIdDuplicate = async (userId: string) => {
+const checkUserIdDuplication = async (userId: string) => {
   try {
     // 사용자 아이디를 기준으로 사용자 검색
     const user = await User.findOne({ userId });
@@ -62,7 +62,7 @@ const checkUserIdDuplicate = async (userId: string) => {
     return Boolean(user);
   } catch (error: any) {
     // 오류 발생 시 콘솔에 에러 정보 출력
-    console.error(`[checkUserIdDuplicate] Error: ${error.message}`, {
+    console.error(`[checkUserIdDuplication] Error: ${error.message}`, {
       userId,
       stack: error.stack,
     });
@@ -224,8 +224,8 @@ export {
   fetchUserByUserId,
   fetchUserByEmail,
   fetchUserByPhone,
-  checkEmailDuplicate,
-  checkUserIdDuplicate,
+  checkEmailDuplication,
+  checkUserIdDuplication,
   createUser,
   updateLockStatus,
 };

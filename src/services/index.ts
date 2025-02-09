@@ -2,8 +2,8 @@ import {
   fetchUserByUserId,
   fetchUserByEmail,
   fetchUserByPhone,
-  checkEmailDuplicate,
-  checkUserIdDuplicate,
+  checkEmailDuplication,
+  checkUserIdDuplication,
   createUser,
   updateLockStatus,
 } from "./user.service";
@@ -42,8 +42,8 @@ export {
   fetchUserByUserId,
   fetchUserByEmail,
   fetchUserByPhone,
-  checkEmailDuplicate, // 이메일 중복 검사
-  checkUserIdDuplicate, // 사용자 아이디 중복 검사
+  checkEmailDuplication, // 이메일 중복 검사
+  checkUserIdDuplication, // 사용자 아이디 중복 검사
   createUser, // 회원 가입
   updateLockStatus, // 계정 잠금 업데이트
 

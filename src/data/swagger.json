@@ -168,7 +168,7 @@
         }
       }
     },
-    "/signup/checkEmailDuplicate": {
+    "/signup/checkEmailDuplication": {
       "post": {
         "tags": ["Auth"],
         "summary": "회원 가입 시 이메일 중복 확인",
@@ -221,7 +221,7 @@
         }
       }
     },
-    "/signup/checkUserIdDuplicate": {
+    "/signup/checkUserIdDuplication": {
       "post": {
         "tags": ["Auth"],
         "summary": "회원 가입 시 사용자 아이디 중복 확인",
