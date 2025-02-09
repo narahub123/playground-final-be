@@ -60,10 +60,10 @@ const checkUserIdAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await checkUserIdDuplication(userId);
+    const isDuplicate = await DuplicateDetection.checkUserIdDuplication(userId);
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res.status(200).json({ isDuplicate });
+    res.status(200).json({ success: true, data: { isDuplicate } });
   }
 );
 

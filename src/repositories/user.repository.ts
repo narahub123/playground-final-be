@@ -12,6 +12,16 @@ class UserRepository {
       return false;
     }
   }
+  async getUserByUserId(userId: string): Promise<boolean> {
+    try {
+      const user = await User.findOne({ userId });
+
+      return Boolean(user);
+    } catch (error: any) {
+      mongoDBErrorHandler("getUserByUserId", error, { userId });
+      return false;
+    }
+  }
 }
 
 export default new UserRepository();
