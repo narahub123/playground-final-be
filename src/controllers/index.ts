@@ -4,10 +4,11 @@ import {
   checkUserIdAvailability,
 } from "./users.controller";
 
+import { signupUser } from "./auth.controller";
+
 import {
   checkEmailDuplicationInSignup,
   checkUserIdDuplicationInSignup,
-  signupUser,
 } from "./signup.controller";
 
 import { oauthCallback } from "./oauth.controller";
