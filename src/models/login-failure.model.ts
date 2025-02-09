@@ -1,8 +1,9 @@
 import { LOGINFAILURE_EXPIRES } from "@constants";
 import { ipRegExp } from "@data";
+import { ILoginFailure } from "@types";
 import mongoose from "mongoose";
 
-const LoginFailureSchema = new mongoose.Schema(
+const LoginFailureSchema = new mongoose.Schema<ILoginFailure>(
   {
     userId: {
       type: String,

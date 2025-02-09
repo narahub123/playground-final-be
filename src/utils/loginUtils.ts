@@ -14,8 +14,8 @@ import {
 import {
   IDevice,
   ILocation,
-  LoginFailure,
-  LoginFailureInput,
+  ILoginFailure,
+  ILoginFailureInput,
   ILoginRecordInput,
   ILoginRecord,
 } from "@types";
@@ -58,7 +58,7 @@ const saveLoginFailure = async (
   ip: string,
   location: ILocation
 ) => {
-  const newFailure: LoginFailureInput = {
+  const newFailure: ILoginFailureInput = {
     userId,
     device,
     ip,
@@ -187,7 +187,7 @@ const saveLoginRecord = async (
 };
 
 // 로그인 실패 기록 삭제 (기록 중 'Normal' 실패 타입만 삭제)
-const deleteLoginFailures = async (loginFailures: LoginFailure[]) => {
+const deleteLoginFailures = async (loginFailures: ILoginFailure[]) => {
   // 'Normal' 실패 타입의 기록 ID 추출
   const normalIds = loginFailures
     .filter((failure) => failure.failureType === "Normal")

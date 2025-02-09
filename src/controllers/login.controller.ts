@@ -39,7 +39,7 @@ import {
   REFRESHTOKEN_EXPIRES,
 } from "@constants";
 import { checkNewLoginAttempt } from "utils/loginUtils";
-import { LoginFailure, ILoginRecord } from "@types";
+import { ILoginFailure, ILoginRecord } from "@types";
 
 // 로그인 처리 핸들러
 const loginWithAccount = asyncWrapper(
@@ -201,7 +201,7 @@ const loginWithAccount = asyncWrapper(
     const loginFailures = await getLoginFailureByUserId(userId);
 
     // 로그인 실패 기록 삭제하기
-    await deleteLoginFailures(loginFailures as LoginFailure[]);
+    await deleteLoginFailures(loginFailures as ILoginFailure[]);
 
     // 로그인 성공 응답
     res.status(200).json({ success: true, message: "로그인 성공" });

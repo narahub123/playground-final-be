@@ -10,8 +10,8 @@ import {
 import { OauthType, UserData } from "./oauth.type";
 import { IActiveSession, IDevice } from "./active-session.type";
 import {
-  LoginFailureInput,
-  LoginFailure,
+  ILoginFailureInput,
+  ILoginFailure,
   LoginFailureType,
 } from "./login-failure.type";
 import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
@@ -35,8 +35,8 @@ export {
   IDevice,
 
   // login-failure
-  LoginFailureInput,
-  LoginFailure,
+  ILoginFailureInput,
+  ILoginFailure,
   LoginFailureType,
 
   // login-record
