@@ -12,30 +12,19 @@ import {
   checkLoginVerificationCode,
 } from "./verification.controller";
 
-import {
-  checkEmailDuplicationInSignup,
-  checkUserIdDuplicationInSignup,
-} from "./signup.controller";
-
 import { oauthCallback } from "./oauth.controller";
-
-import { loginWithAccount, getContactsByAccount } from "./login.controller";
 
 export {
   // user
   checkEmailAvailability,
   checkPhoneAvailability,
   checkUserIdAvailability,
-  checkEmailDuplicationInSignup,
-  checkUserIdDuplicationInSignup,
   getContactsBeforeLogin,
+
   // auth
   loginUser,
   signupUser,
   oauthCallback,
-  // login
-  loginWithAccount,
-  getContactsByAccount,
 
   // verification
   requestLoginVerificationCode,
