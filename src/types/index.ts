@@ -24,6 +24,16 @@ import {
   ISecurityInput,
 } from "./security.type";
 
+import {
+  IMuteSettings,
+  IPrivacy,
+  ITaggingSettings,
+  MessageAllowSettingsType,
+  MuteDurationType,
+  MuteTargetType,
+  TagTargetType,
+} from "./privacy.type";
+
 export {
   // user
   IUser,
@@ -61,4 +71,13 @@ export {
   TwoFactorAuthenticationType,
   ISecurity,
   ISecurityInput,
+
+  // privacy
+  IMuteSettings,
+  IPrivacy,
+  ITaggingSettings,
+  MessageAllowSettingsType,
+  MuteDurationType,
+  MuteTargetType,
+  TagTargetType,
 };
