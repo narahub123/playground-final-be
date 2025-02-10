@@ -19,11 +19,7 @@ import { createUserPrivacy } from "./privacy.service";
 
 import { sendEmail } from "./email.service";
 
-import {
-  createVerification,
-  getVerificationCodeByUserId,
-  deleteVerificationCode,
-} from "./verification.service";
+import verficationService from "./verification.service";
 
 import {
   createActiveSession,
@@ -68,9 +64,7 @@ export {
   sendEmail,
 
   // verificationCode
-  createVerification,
-  getVerificationCodeByUserId,
-  deleteVerificationCode,
+  verficationService,
 
   // active-session
   createActiveSession,

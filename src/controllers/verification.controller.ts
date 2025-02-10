@@ -3,20 +3,16 @@ import { asyncWrapper } from "@middlewares";
 import {
   BadRequestError,
   CustomAPIError,
-  LockedError,
   NotFoundError,
   UnauthorizedError,
 } from "@errors";
 import {
-  createVerification,
-  deleteVerificationCode,
   getUserByEmail,
   getUserByPhone,
   getUserByUserId,
-  getVerificationCodeByUserId,
-  sendEmail,
+  verficationService,
 } from "@services";
-import { generateAuthCode } from "@utils";
+import verificationService from "services/verification.service";
 
 // 인증 코드 요청 핸들러
 const requestLoginVerificationCode = asyncWrapper(
@@ -36,28 +32,11 @@ const requestLoginVerificationCode = asyncWrapper(
       // 이메일에 해당하는 유저가 없는 경우
       if (!user) throw new NotFoundError("해당 이메일을 가진 유저가 없습니다.");
 
-      // 이미 전송된 인증 코드가 있는지 확인
-      const sentVerificationCode = await getVerificationCodeByUserId(
-        user.userId
-      );
+      // 해당 사용자에 대한 인증 코드 존재 유무를 확인하고 있다면 삭제
+      await verificationService.deleteExistingVerificationCode(user.userId);
 
-      if (sentVerificationCode) {
-        // 기존 인증 코드가 있다면 삭제
-        await deleteVerificationCode(sentVerificationCode._id);
-      }
-
-      // 새로운 인증 코드 생성
-      const verificationCode = generateAuthCode();
-
-      // 인증 코드 이메일 제목 및 내용 설정
-      const subject = "인증코드";
-      const html = `<p>인증코드 ${verificationCode}</p>`;
-
-      // 인증 코드 이메일 전송
-      await sendEmail(email, subject, html);
-
-      // 인증 코드와 사용자 정보를 인증 관련 모델에 저장
-      await createVerification({ userId: user.userId, verificationCode });
+      // 새로운 인증 코드 생성하고 이메이로 전송하기
+      await verficationService.sendVerificationCode(email, user.userId);
     } else {
       // 휴대폰 인증 코드 전송 부분 (아직 구현되지 않음)
       // SMS 전송 로직은 추후 구현 필요

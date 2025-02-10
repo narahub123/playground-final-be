@@ -1,3 +1,4 @@
 import userRepository from "./user.repository";
+import verificationRepository from "./verification.repository";
 
-export { userRepository };
+export { userRepository, verificationRepository };
