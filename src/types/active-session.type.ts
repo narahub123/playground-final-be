@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { ILocation } from "./user.type";
 
 /**
@@ -64,6 +64,7 @@ type IDevice = {
  * - `createdAt`: 세션 생성 시간
  */
 interface IActiveSession extends Document {
+  _id: Types.ObjectId;
   userId: string;
   refreshToken: string;
   device: IDevice;

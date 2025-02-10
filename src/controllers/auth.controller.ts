@@ -1,55 +1,27 @@
 import { Request, Response } from "express";
-import {
-  BadRequestError,
-  LockedError,
-  NotFoundError,
-  UnauthorizedError,
-} from "@errors";
+import { BadRequestError, CustomAPIError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
+  verifyAccountLock,
   combineBirth,
-  comparePassword,
   createHashedPassword,
-  createSessionAndTokens,
   deleteImages,
   extractCountryFromLanguage,
-  findUserByIdentifier,
-  lockAccount,
-  saveLoginFailure,
   uploadImages,
 } from "@utils";
 import {
-  createUser,
-  createUserDisplay,
-  createUserNotifications,
-  createUserPrivacy,
-  createUserSecurity,
-  getActiveSessionByInfo,
-  getLoginFailureByUserId,
-  getLoginRecordsByUserId,
-  updateFailureTypeToBruteForce,
-  UserService,
+  activeSessionService,
+  authService,
+  loginFailureService,
+  userService,
 } from "@services";
 import { UploadApiResponse } from "cloudinary";
 import mongoose from "mongoose";
-import {
-  ACCOUNT_LOCK_THRESHOLD,
-  BRUTE_FORCE_THRESHOLD,
-  LOGIN_FAILURE_TIME_WINDOW_MS,
-  REFRESHTOKEN_EXPIRES,
-} from "@constants";
-import {
-  checkNewLoginAttempt,
-  deleteLoginFailures,
-  saveLoginRecord,
-} from "utils/loginUtils";
-import {
-  ILoginFailure,
-  ILoginRecord,
-  INotificationInput,
-  IUserInput,
-} from "@types";
+import { REFRESHTOKEN_EXPIRES } from "@constants";
+import { INotificationInput, IUserInput } from "@types";
 import verificationService from "services/verification.service";
+import loginRecordService from "services/login-record.service";
+import { loginRecordRepository } from "@repositories";
 
 // 사용자 정보 등록
 const signupUser = asyncWrapper(
@@ -153,7 +125,7 @@ const signupUser = asyncWrapper(
         },
       };
 
-      await UserService.initializeUser(
+      await userService.initializeUser(
         newUser,
         newNotification,
         userId,
@@ -185,7 +157,6 @@ const loginUser = asyncWrapper(
     // 요청 바디에서 사용자 정보 추출
     const { email, phone, userId, password, device, ip, location } = req.body;
 
-    // request body에서 받은 데이터의 유효성 검사
     // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
     if (!password) {
       throw new BadRequestError("확인할 비밀번호를 제공해주세요.");
@@ -205,108 +176,68 @@ const loginUser = asyncWrapper(
       );
     }
 
-    const user = await findUserByIdentifier(email, phone, userId);
-
-    // 사용자를 찾을 수 없으면 NotFoundError 발생
-    if (!user) {
-      throw new NotFoundError("조건에 맞는 유저를 찾을 수 없습니다.");
-    }
+    // 사용자 정보 조회
+    const user = await userService.findUserByIdentifier(email, phone, userId);
 
     // 해당 계정이 잠금 계정인지 여부 확인
-    if (user.lockStatus?.isLocked) {
-      const { lockReason } = user.lockStatus;
+    verifyAccountLock(user.lockStatus);
 
-      const errorMessages: Record<string, string> = {
-        BRUTE_FORCE_DETECTED:
-          "비정상적인 로그인 시도가 감지되어 잠긴 계정입니다. 로그인을 위해서는 관리자에게 문의하세요.",
-        TOO_MANY_LOGIN_FAILURES:
-          "로그인 시도 횟수를 초과하여 잠긴 계정입니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
-      };
+    // 비밀번호 검증 및 로그인 실패 처리
+    await authService.validatePasswordAndHandleLoginFailure(
+      password,
+      user.password,
+      user.userId,
+      device,
+      ip,
+      location
+    );
 
-      if (lockReason && errorMessages[lockReason]) {
-        throw new LockedError(errorMessages[lockReason], lockReason);
-      }
+    // 기존 세션 확인
+    const isExistingSession =
+      await activeSessionService.checkExistingActiveSession({
+        userId: user.userId,
+        device,
+        ip,
+        location,
+      });
+
+    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
+    if (isExistingSession) {
+      return res.status(200).json({ success: true, message: "로그인 성공" });
     }
 
-    // 제공된 비밀번호가 실제 비밀번호와 일치하는지 검증
-    const isValid = await comparePassword(password, user.password);
+    // 새로운 세션 생성 및 토큰 발급
+    const { refreshToken, accessToken } =
+      await activeSessionService.createSessionAndIssueTokens({
+        userId: user.userId,
+        device,
+        ip,
+        location,
+        userRole: user.userRole,
+      });
 
-    // 비밀번호가 일치하지 않으면 UnauthorizedError 발생
-    if (!isValid) {
-      // 로그인 실패 기록 저장하기
-      await saveLoginFailure(user.userId, device, ip, location);
-
-      // 해당 유저의 로그인 실패 기록 가져오기
-      const loginFailures = await getLoginFailureByUserId(user.userId);
-
-      if (loginFailures.length > 0) {
-        // 최근 특정 시간 내에 실패한 횟수 확인
-        const failureCountInHour = loginFailures.filter(
-          (failure) =>
-            failure.failedAt.getTime() >
-            Date.now() - LOGIN_FAILURE_TIME_WINDOW_MS
-        );
-
-        // 최근 특정 시간 내에 실패한 횟수가 일정 이상이면 BruteForce로 변경
-        if (failureCountInHour.length >= BRUTE_FORCE_THRESHOLD) {
-          const bruteForceIds = failureCountInHour.map(
-            (failure) => failure._id
-          );
-
-          // BruteForce로 변경 (DB 반영)
-          await updateFailureTypeToBruteForce(bruteForceIds);
-
-          // 계정 잠금 처리 : user 컬렉션에서 lockStatus의 status를 true로, reason의 BRUTE_FORCE_DETECTED로 업데이트
-          await lockAccount(user.userId, "BRUTE_FORCE_DETECTED");
-
-          throw new LockedError(
-            "비정상적인 로그인 시도가 감지되어 계정이 잠깁니다. 로그인을 위해서는 관리자에게 문의하세요.",
-            "BRUTE_FORCE_DETECTED"
-          );
-        }
-
-        // 전체 로그인 실패 횟수가 일정 이상이면 계정 잠금 처리
-        const normalFailureCount = loginFailures.reduce(
-          (count, failure) =>
-            count + (failure.failureType === "Normal" ? 1 : 0),
-          0
-        );
-
-        if (normalFailureCount >= ACCOUNT_LOCK_THRESHOLD) {
-          // 계정 잠금 처리 : user 컬렉션에서 lockStatus의 status를 true로, reason의 TOO_MANY_LOGIN_FAILURES로 업데이트
-          await lockAccount(user.userId, "TOO_MANY_LOGIN_FAILURES");
-
-          throw new LockedError(
-            "로그인 시도 횟수를 초과하여 계정이 잠겼습니다. 비밀번호 찾기 또는 관리자에게 문의하세요.",
-            "TOO_MANY_LOGIN_FAILURES"
-          );
-        }
-      }
-
-      throw new UnauthorizedError("비밀번호가 일치하지 않습니다.");
-    }
-
-    // 기존 세션이 존재하는지 확인
-    const existingSession = await getActiveSessionByInfo({
+    // 새로운 로그인 시도 확인
+    const newLoginAttempt = await loginRecordService.detectNewLoginAttempt({
       userId: user.userId,
       device,
       ip,
       location,
     });
 
-    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
-    if (existingSession) {
-      return res.status(200).json({ success: true, message: "로그인 성공" });
-    }
-
-    // 세션 생성과 토큰 발급
-    const { refreshToken, accessToken } = await createSessionAndTokens(
-      user.userId,
-      user.userRole,
+    // 로그인 기록을 저장
+    const savedRecord = await loginRecordRepository.createLoginRecord({
+      userId: user.userId,
       device,
       ip,
-      location
-    );
+      location,
+    });
+
+    if (!savedRecord) {
+      throw new CustomAPIError("로그인 기록 저장에 실패했습니다.");
+    }
+
+    // 로그인 성공 시 Normal 로그인 실패 삭제
+    await loginFailureService.clearNormalLoginFailures(user.userId);
 
     // access token을 헤더에 저장
     res.setHeader("Authorization", `Bearer ${accessToken}`);
@@ -321,27 +252,27 @@ const loginUser = asyncWrapper(
       secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서만 https 사용
     });
 
-    const loginRecords = await getLoginRecordsByUserId(userId);
+    // 새로운 로그인 시도가 있는지 여부 확인
+    const hasNewLoginAttempt = Object.values(newLoginAttempt).includes(true);
 
-    // 새로운 로그인 시도 확인
-    const messages = await checkNewLoginAttempt(
-      loginRecords as ILoginRecord[],
-      device,
-      ip,
-      location
-    );
-
-    // 로그인 기록 저장하기
-    await saveLoginRecord(user.userId, device, ip, location);
-
-    // 실패 유형이 Normal인 것만 삭제, BruteForce을 유지
-    const loginFailures = await getLoginFailureByUserId(userId);
-
-    // 로그인 실패 기록 삭제하기
-    await deleteLoginFailures(loginFailures as ILoginFailure[]);
+    // 새로운 로그인 시도가 있으면 true인 키들만 배열로 반환
+    const newLoginAttemptDetails = hasNewLoginAttempt
+      ? Object.entries(newLoginAttempt)
+          .filter(([key, value]) => value === true)
+          .map(([key]) => key)
+      : [];
 
     // 로그인 성공 응답
-    res.status(200).json({ success: true, message: "로그인 성공" });
+    res.status(200).json({
+      success: true,
+      message: "로그인 성공",
+      meta: {
+        newLoginAttempt: {
+          status: hasNewLoginAttempt,
+          details: newLoginAttemptDetails,
+        },
+      },
+    });
   }
 );
 

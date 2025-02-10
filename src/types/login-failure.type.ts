@@ -24,12 +24,6 @@ interface ILoginFailureInput {
 
   /** 사용자 위치 정보 */
   location: ILocation;
-
-  /** 로그인 실패 시간 */
-  failedAt: Date;
-
-  /** 로그인 실패 유형 */
-  failureType: LoginFailureType;
 }
 
 /**

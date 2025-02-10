@@ -81,7 +81,7 @@ const getContactsBeforeLogin = asyncWrapper(
         "이메일, 휴대 전화 번호 혹은 사용자 아이디를 제공해주세요."
       );
 
-    const user = await UserService.findUserByIndentifier(email, phone, userId);
+    const user = await UserService.findUserByIdentifier(email, phone, userId);
 
     res.status(200).json({
       success: true,

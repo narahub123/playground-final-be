@@ -1,14 +1,3 @@
-import {
-  getUserByUserId,
-  getUserByEmail,
-  getUserByPhone,
-  checkEmailDuplication,
-  checkPhoneDuplication,
-  checkUserIdDuplication,
-  createUser,
-  updateLockStatus,
-} from "./user-finder.service";
-
 import { createUserDisplay } from "./display.service";
 
 import { createUserNotifications } from "./notification.service";
@@ -21,33 +10,14 @@ import { sendEmail } from "./email.service";
 
 import verficationService from "./verification.service";
 
-import {
-  createActiveSession,
-  getActiveSessionByInfo,
-} from "./active-session.service";
-
-import {
-  getLoginFailureByUserId,
-  createLoginFailure,
-  updateFailureTypeToBruteForce,
-  deleteLoginFailuresById,
-} from "./login-failure.service";
-
-import { getLoginRecordsByUserId } from "./login-record.service";
-
 import DuplicateDetection from "./duplicate-detection.service";
-import UserService from "./user.service";
+import userService from "./user.service";
+import loginFailureService from "./login-failure.service";
+import authService from "./auth.service";
+import activeSessionService from "./active-session.service";
+import loginRecordService from "./login-record.service";
 
 export {
-  getUserByUserId,
-  getUserByEmail,
-  getUserByPhone,
-  checkEmailDuplication, // 이메일 중복 검사
-  checkPhoneDuplication, // 휴대 전화 중복 검사
-  checkUserIdDuplication, // 사용자 아이디 중복 검사
-  createUser, // 회원 가입
-  updateLockStatus, // 계정 잠금 업데이트
-
   // display
   createUserDisplay,
 
@@ -66,22 +36,21 @@ export {
   // verificationCode
   verficationService,
 
-  // active-session
-  createActiveSession,
-  getActiveSessionByInfo,
-
-  // login-attempt
-  getLoginFailureByUserId,
-  createLoginFailure,
-  updateFailureTypeToBruteForce,
-  deleteLoginFailuresById,
-
-  // login-record
-  getLoginRecordsByUserId,
-
   // duplicate-detection
   DuplicateDetection,
 
-  // user-lookup
-  UserService,
+  // user
+  userService,
+
+  // loginFailure
+  loginFailureService,
+
+  // auth
+  authService,
+
+  // active-session
+  activeSessionService,
+
+  // login-record
+  loginRecordService,
 };

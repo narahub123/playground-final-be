@@ -94,7 +94,7 @@ interface ILockStatus {
    * @type {Date | null}
    * @required
    */
-  lockTimestamp: Date | null;
+  lockedAt: Date | null;
 }
 
 // User 모델에 대한 타입 정의

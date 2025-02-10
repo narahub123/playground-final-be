@@ -24,6 +24,7 @@ import { LockReasonType } from "types/user.type";
 import createRefreshToken from "./createRefreshToken";
 import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
 import createAccessToken from "./createAccessToken";
+import { loginFailureRepository } from "@repositories";
 
 // 이메일, 전화번호, 사용자 아이디를 기반으로 유저 정보 조회
 const findUserByIdentifier = async (
@@ -63,12 +64,12 @@ const saveLoginFailure = async (
     device,
     ip,
     location,
-    failedAt: new Date(),
-    failureType: "Normal",
   };
 
   // 로그인 실패 기록을 저장
-  const savedFailure = await createLoginFailure(newFailure);
+  const savedFailure = await loginFailureRepository.createLoginFailure(
+    newFailure
+  );
 
   if (!savedFailure) throw new CustomAPIError("로그인 실패 기록 저장 실패");
 };

@@ -4,6 +4,9 @@ import securityRepository from "./security.repository";
 import notificationRepository from "./notification.repository";
 import displayRepository from "./display.repository";
 import privacyRepository from "./privacy.repository";
+import loginFailureRepository from "./login-failure.repository";
+import activeSessionRepository from "./active-session.repository";
+import loginRecordRepository from "./login-record.repository";
 
 export {
   userRepository,
@@ -12,4 +15,7 @@ export {
   notificationRepository,
   displayRepository,
   privacyRepository,
+  loginFailureRepository,
+  activeSessionRepository,
+  loginRecordRepository,
 };

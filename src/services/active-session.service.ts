@@ -1,81 +1,95 @@
-import { ActiveSession } from "@models";
-import {
-  MongoDBCastError,
-  MongoDBDuplicateKeyError,
-  MongoDBNetworkError,
-  MongoDBTimeoutError,
-  MongoDBValidationError,
-  NotFoundError,
-} from "@errors";
-import { IDevice, ILocation } from "@types";
+import { CustomAPIError } from "@errors";
+import { IDevice, ILocation, UserRoleType } from "@types";
+import { activeSessionRepository } from "@repositories";
+import { createAccessToken, createRefreshToken } from "@utils";
+import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
 
-const createActiveSession = async (sessionInfo: {
-  userId: string;
-  refreshToken: string;
-  device: IDevice;
-  ip: string;
-  location: ILocation;
-}) => {
-  try {
-    return ActiveSession.create(sessionInfo);
-  } catch (error: any) {
-    console.error(`[createActiveSession] Error: ${error.message}`, {
-      sessionInfo,
-      stack: error.stack,
-    });
+class ActiveSessionService {
+  /**
+   * 주어진 세션 정보로 활성 세션이 존재하는지 확인합니다.
+   *
+   * @param sessionInfo - 세션 정보를 포함한 객체. 사용자의 ID, 디바이스 정보, IP 주소, 위치 정보가 포함됩니다.
+   * @returns 활성 세션이 존재하면 `true`, 존재하지 않으면 `false`를 반환합니다.
+   */
+  async checkExistingActiveSession(sessionInfo: {
+    userId: string; // 사용자의 고유 ID
+    device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
+    ip: string; // 사용자의 IP 주소
+    location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
+  }): Promise<boolean> {
+    // 반환 값: 활성 세션 존재 여부를 나타내는 boolean 값
+    // 세션 정보를 기반으로 활성 세션 조회
+    const existingSession =
+      await activeSessionRepository.getActiveSessionByInfo(sessionInfo);
 
-    // MongoDB 관련 에러 처리
-    if (error.code === 11000) {
-      // 중복 키 오류
-      const duplicatedField = Object.keys(error.keyValue)[0];
-      const duplicatedValue = Object.values(error.keyValue)[0];
+    // 세션이 존재하면 true, 없으면 false 반환
+    return !!existingSession;
+  }
 
-      throw new MongoDBDuplicateKeyError(
-        `${duplicatedValue}는 ${duplicatedField}에 이미 존재하고 있습니다.`
+  /**
+   * 새로운 활성 세션을 생성하고, 리프레시 토큰 및 액세스 토큰을 발급합니다.
+   *
+   * @param info - 세션 생성 및 토큰 발급에 필요한 정보 객체
+   * @param info.userId - 사용자의 고유 ID
+   * @param info.device - 사용자의 디바이스 정보 (타입, 운영체제, 브라우저)
+   * @param info.ip - 사용자의 IP 주소
+   * @param info.location - 사용자의 위치 정보 (국가, 주, 도시, 카운티)
+   * @param info.userRole - 사용자의 역할 (예: 'admin', 'user' 등)
+   *
+   * @returns 생성된 리프레시 토큰과 액세스 토큰을 포함하는 객체를 반환합니다.
+   * @throws CustomAPIError - active session 생성 실패 시 오류를 던집니다.
+   */
+  async createSessionAndIssueTokens(info: {
+    userId: string; // 사용자의 고유 ID
+    device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
+    ip: string; // 사용자의 IP 주소
+    location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
+    userRole: UserRoleType; // 사용자의 역할 (예: 'admin', 'user' 등)
+  }): Promise<{ refreshToken: string; accessToken: string }> {
+    // 반환 값: 리프레시 토큰과 액세스 토큰 객체
+    const { userId, device, ip, location, userRole } = info;
+
+    // refresh 토큰 생성
+    const refreshToken = createRefreshToken(
+      userId,
+      Number(process.env.REFRESHTOKEN_EXPIRES) || REFRESHTOKEN_EXPIRES
+    );
+
+    // 세션 정보 객체 생성
+    const sessionInfo = {
+      userId,
+      refreshToken,
+      device,
+      ip,
+      location,
+    };
+
+    // active session 생성
+    const activeSession = await activeSessionRepository.createActiveSession(
+      sessionInfo
+    );
+
+    // active session 생성 실패 시 에러 발생
+    if (!activeSession) {
+      throw new CustomAPIError(
+        "active session 생성 실패",
+        500,
+        "Internal Error",
+        "ACTIVE_SESSION_FAILED"
       );
     }
 
-    if (error.name === "ValidationError") {
-      // MongoDB 스키마 유효성 검사 실패
-      throw new MongoDBValidationError("사용자 데이터 유효성 검증 실패");
-    }
+    // access 토큰 생성
+    const accessToken = createAccessToken(
+      activeSession._id,
+      userId,
+      userRole,
+      Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES
+    );
 
-    if (error.name === "CastError") {
-      // 데이터 타입 변환 오류
-      throw new MongoDBCastError("잘못된 데이터 형식입니다.");
-    }
-
-    if (error.name === "MongoNetworkError") {
-      // 네트워크 오류
-      throw new MongoDBNetworkError("MongoDB 서버 연결 실패");
-    }
-
-    if (error.name === "MongoTimeoutError") {
-      // 요청 시간 초과 오류
-      throw new MongoDBTimeoutError("MongoDB 요청 시간 초과");
-    }
-
-    throw error;
+    // 리프레시 토큰과 액세스 토큰을 반환
+    return { refreshToken, accessToken };
   }
-};
+}
 
-const getActiveSessionByInfo = async (sessionInfo: {
-  userId: string;
-  device: IDevice;
-  ip: string;
-  location: ILocation;
-}) => {
-  return await ActiveSession.findOne({
-    userId: sessionInfo.userId,
-    "device.type": sessionInfo.device.type,
-    "device.os": sessionInfo.device.os,
-    "device.browser": sessionInfo.device.browser,
-    ip: sessionInfo.ip,
-    "location.country": sessionInfo.location.country,
-    "location.state": sessionInfo.location.state,
-    "location.city": sessionInfo.location.city,
-    "location.county": sessionInfo.location.county,
-  });
-};
-
-export { createActiveSession, getActiveSessionByInfo };
+export default new ActiveSessionService();

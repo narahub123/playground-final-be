@@ -11,6 +11,7 @@ import createAccessToken from "./createAccessToken";
 import mongoDBErrorHandler from "./mongoDBErrorHandler";
 import combineBirth from "./combineBirth";
 import extractCountryFromLanguage from "./extractCountryFromLanguage";
+import verifyAccountLock from "./verifyAccountLock";
 
 import {
   findUserByIdentifier,
@@ -42,4 +43,5 @@ export {
   saveLoginRecord,
   deleteLoginFailures,
   mongoDBErrorHandler,
+  verifyAccountLock,
 };
