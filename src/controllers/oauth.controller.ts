@@ -4,7 +4,7 @@ import { getOauthAccessToken, getOauthUserInfo } from "@utils";
 import { OauthType, UserData } from "@types";
 import { BASE_URL } from "@constants";
 import { BadRequestError } from "@errors";
-import { checkEmailDuplication } from "@services";
+import { userService } from "@services";
 
 const oauthCallback = asyncWrapper(
   "oauthCallback",
@@ -28,7 +28,7 @@ const oauthCallback = asyncWrapper(
       }
 
       // 기존 유저 여부 확인하기
-      const user = await checkEmailDuplication(userData.email);
+      const user = await userService.findUserByIdentifier(userData.email);
 
       // 기존 유저 정보가 존재한다면 로그인 과정으로
       if (user) {

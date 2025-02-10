@@ -1,7 +1,7 @@
 import { userRepository } from "@repositories";
 import { ConflictError } from "@errors";
 
-class DuplicateDetection {
+class DuplicateDetectionService {
   async checkEmailDuplication(email: string) {
     const user = await userRepository.getUserByEmail(email);
 
@@ -36,4 +36,4 @@ class DuplicateDetection {
   }
 }
 
-export default new DuplicateDetection();
+export default new DuplicateDetectionService();

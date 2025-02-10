@@ -1,15 +1,7 @@
 import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "@errors";
 import { asyncWrapper } from "@middlewares";
-import {
-  checkPhoneDuplication,
-  checkUserIdDuplication,
-  DuplicateDetection,
-  getUserByEmail,
-  getUserByPhone,
-  getUserByUserId,
-  UserService,
-} from "@services";
+import { duplicateDetectionService, userService } from "@services";
 
 const checkEmailAvailability = asyncWrapper(
   "checkEmailAvailability",
@@ -23,7 +15,9 @@ const checkEmailAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await DuplicateDetection.checkEmailDuplication(email);
+    const isDuplicate = await duplicateDetectionService.checkEmailDuplication(
+      email
+    );
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
     res.status(200).json({ success: true, data: { isDuplicate } });
@@ -42,7 +36,9 @@ const checkPhoneAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await DuplicateDetection.checkPhoneDuplication(phone);
+    const isDuplicate = await duplicateDetectionService.checkPhoneDuplication(
+      phone
+    );
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
     res.status(200).json({ success: true, data: { isDuplicate } });
@@ -61,7 +57,9 @@ const checkUserIdAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await DuplicateDetection.checkUserIdDuplication(userId);
+    const isDuplicate = await duplicateDetectionService.checkUserIdDuplication(
+      userId
+    );
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
     res.status(200).json({ success: true, data: { isDuplicate } });
@@ -81,7 +79,7 @@ const getContactsBeforeLogin = asyncWrapper(
         "이메일, 휴대 전화 번호 혹은 사용자 아이디를 제공해주세요."
       );
 
-    const user = await UserService.findUserByIdentifier(email, phone, userId);
+    const user = await userService.findUserByIdentifier(email, phone, userId);
 
     res.status(200).json({
       success: true,

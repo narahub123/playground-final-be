@@ -1,20 +1,10 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import {
-  BadRequestError,
-  CustomAPIError,
-  NotFoundError,
-  UnauthorizedError,
-} from "@errors";
-import {
-  getUserByEmail,
-  getUserByPhone,
-  getUserByUserId,
-  verficationService,
-} from "@services";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "@errors";
+import { userService, verficationService } from "@services";
 import verificationService from "services/verification.service";
 import { findUserByIdentifier } from "@utils";
-import { verificationRepository } from "@repositories";
+import { userRepository } from "@repositories";
 
 // 인증 코드 요청 핸들러
 const requestLoginVerificationCode = asyncWrapper(
@@ -29,7 +19,7 @@ const requestLoginVerificationCode = asyncWrapper(
     if (email) {
       // 이메일로 인증 코드 전송
       // 이메일을 통해 사용자 정보를 조회
-      const user = await getUserByEmail(email);
+      const user = await userService.findUserByIdentifier(email);
 
       // 이메일에 해당하는 유저가 없는 경우
       if (!user) throw new NotFoundError("해당 이메일을 가진 유저가 없습니다.");
