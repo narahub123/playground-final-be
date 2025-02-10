@@ -6,6 +6,7 @@ import {
   GenderType,
   UserRoleType,
   SocialType,
+  IUserInput,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { IActiveSession, IDevice } from "./active-session.type";
@@ -26,6 +27,7 @@ export {
   GenderType,
   UserRoleType,
   SocialType,
+  IUserInput,
 
   // oauth
   OauthType,

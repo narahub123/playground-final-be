@@ -94,7 +94,7 @@ interface ILockStatus {
    * @type {Date | null}
    * @required
    */
-  lockedAt: Date | null;
+  lockTimestamp: Date | null;
 }
 
 // User 모델에 대한 타입 정의
@@ -125,6 +125,21 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
 }
 
+interface IUserInput {
+  password: string;
+  userId: string;
+  username: string;
+  birth: string;
+  gender: GenderType;
+  email?: string;
+  phone?: string;
+  country: string;
+  language: string;
+  ip: string;
+  location: ILocation;
+  profileImage: string;
+}
+
 export type {
   IUser,
   LockReasonType,
@@ -133,4 +148,5 @@ export type {
   GenderType,
   UserRoleType,
   SocialType,
+  IUserInput,
 };
