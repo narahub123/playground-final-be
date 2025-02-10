@@ -3,18 +3,18 @@ import { ConflictError } from "@errors";
 
 class DuplicateDetection {
   async checkEmailDuplication(email: string) {
-    const isDuplicate = await userRepository.getUserByEmail(email);
+    const user = await userRepository.getUserByEmail(email);
 
-    if (isDuplicate)
+    if (user)
       throw new ConflictError("이미 등록된 이메일입니다.", "EMAIL_DUPLICATION");
 
     return false;
   }
 
   async checkUserIdDuplication(userId: string) {
-    const isDuplicate = await userRepository.getUserByUserId(userId);
+    const user = await userRepository.getUserByUserId(userId);
 
-    if (isDuplicate)
+    if (user)
       throw new ConflictError(
         "이미 등록된 사용자 아이디입니다.",
         "USERID_DUPLICATION"
@@ -24,9 +24,9 @@ class DuplicateDetection {
   }
 
   async checkPhoneDuplication(phone: string) {
-    const isDuplicate = await userRepository.getUserByPhone(phone);
+    const user = await userRepository.getUserByPhone(phone);
 
-    if (isDuplicate)
+    if (user)
       throw new ConflictError(
         "이미 등록된 사용자 아이디입니다.",
         "PHONE_DUPLICATION"
