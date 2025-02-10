@@ -1,7 +1,8 @@
 import { VERIFICATION_EXPIRES } from "@constants";
+import { IVerification } from "@types";
 import mongoose from "mongoose";
 
-const VerificationSchema = new mongoose.Schema({
+const VerificationSchema = new mongoose.Schema<IVerification>({
   userId: {
     type: String,
     ref: "User",

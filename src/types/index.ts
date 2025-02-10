@@ -15,6 +15,7 @@ import {
   LoginFailureType,
 } from "./login-failure.type";
 import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
+import { IVerification } from "./verification.type";
 
 export {
   // user
@@ -42,4 +43,7 @@ export {
   // login-record
   ILoginRecordInput,
   ILoginRecord,
+
+  // verification
+  IVerification,
 };
