@@ -30,6 +30,12 @@ class ConflictError extends CustomAPIError {
   }
 }
 
+class GoneError extends CustomAPIError {
+  constructor(message: string, errorCode: string = "GONE") {
+    super(message, 410, "Gone", errorCode);
+  }
+}
+
 class UnprocessableEntityError extends CustomAPIError {
   constructor(message: string, errorCode: string = "UNPROCESSABLE_ENTITY") {
     super(message, 422, "Unprocessable Entity", errorCode);
@@ -60,6 +66,7 @@ export {
   ForbiddenError, // 403
   NotFoundError, // 404
   ConflictError, // 409
+  GoneError, // 410
   UnprocessableEntityError, // 422
   LockedError, // 423
   ServiceUnavailableError, // 503

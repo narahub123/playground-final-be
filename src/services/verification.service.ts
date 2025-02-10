@@ -2,6 +2,7 @@ import { verificationRepository } from "@repositories";
 import { generateAuthCode } from "@utils";
 import { sendEmail } from "./email.service";
 import { verficationService } from "@services";
+import { GoneError } from "@errors";
 
 class VerificationService {
   async deleteExistingVerificationCode(userId: string) {
@@ -30,6 +31,26 @@ class VerificationService {
       userId,
       verificationCode,
     });
+  }
+
+  async verifyVerificationCode(
+    userId: string,
+    verificationCode: string
+  ): Promise<boolean> {
+    // 인증코드 가져오기
+    const verification = await verificationRepository.getVerificationByUserId(
+      userId
+    );
+
+    // 인증 코드 만료 확인
+    if (!verification) {
+      throw new GoneError(
+        "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.",
+        "VERIFICATION_CODE_EXPIRED"
+      );
+    }
+
+    return verificationCode === verification.verificationCode;
   }
 }
 

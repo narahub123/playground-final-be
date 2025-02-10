@@ -13,6 +13,8 @@ import {
   verficationService,
 } from "@services";
 import verificationService from "services/verification.service";
+import { findUserByIdentifier } from "@utils";
+import { verificationRepository } from "@repositories";
 
 // 인증 코드 요청 핸들러
 const requestLoginVerificationCode = asyncWrapper(
@@ -63,45 +65,29 @@ const checkLoginVerificationCode = asyncWrapper(
     if (!verificationCode)
       throw new BadRequestError("인증 코드를 작성해주세요.");
 
-    // 사용자 조회를 위한 검색 방식 정의
-    const fetchUserMethods = [
-      { key: email, fetch: getUserByEmail },
-      { key: phone, fetch: getUserByPhone },
-      { key: userId, fetch: getUserByUserId },
-    ];
+    const user = await findUserByIdentifier(email, phone, userId);
 
-    // 사용자 조회 및 인증 코드 확인
-    for (const { key, fetch } of fetchUserMethods) {
-      if (key) {
-        const user = await fetch(key);
-        if (user) {
-          const sentCode = await getVerificationCodeByUserId(user.userId);
-
-          // 인증 코드 만료 확인
-          if (!sentCode) {
-            throw new CustomAPIError(
-              "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.",
-              410,
-              "GONE"
-            );
-          }
-
-          // 인증 코드 일치 여부 확인
-          if (verificationCode === sentCode?.verificationCode) {
-            return res
-              .status(200)
-              .json({ success: true, message: "인증 코드가 확인되었습니다." });
-          } else {
-            throw new UnauthorizedError(
-              "입력하신 정보가 잘못되었습니다. 다시 시도해주세요."
-            );
-          }
-        }
-      }
+    if (!user) {
+      throw new NotFoundError("조건에 맞는 유저가 없습니다.");
     }
 
-    // 사용자를 찾지 못한 경우 예외 발생
-    throw new NotFoundError("조건에 맞는 인증 코드를 찾을 수 없습니다.");
+    // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
+    const isVerified = await verficationService.verifyVerificationCode(
+      user.userId,
+      verificationCode
+    );
+
+    // 인증 코드 일치 여부 확인
+    if (isVerified) {
+      return res
+        .status(200)
+        .json({ success: true, message: "인증 코드가 확인되었습니다." });
+    } else {
+      throw new UnauthorizedError(
+        "입력하신 정보가 잘못되었습니다. 다시 시도해주세요.",
+        "VERIFICATION_CODE_MISMATCH"
+      );
+    }
   }
 );
 

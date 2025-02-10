@@ -5,6 +5,7 @@ import {
   ForbiddenError, // 403
   NotFoundError, // 404
   ConflictError, // 409
+  GoneError, // 410
   UnprocessableEntityError, // 422
   LockedError, // 423
   ServiceUnavailableError, // 503
@@ -25,6 +26,7 @@ export {
   ForbiddenError, // 403
   NotFoundError, // 404
   ConflictError, // 409
+  GoneError, // 410
   UnprocessableEntityError, // 422
   LockedError, // 423
   ServiceUnavailableError, // 503
