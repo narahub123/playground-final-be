@@ -69,6 +69,16 @@ interface INotification {
   updatedAt: Date;
 }
 
+interface INotificationInput {
+  userId: string;
+  pushNotificationSettings: {
+    posts: boolean;
+    messagesEnabled: boolean;
+    replies: RepliesType;
+    newFollowersEnabled: boolean;
+  };
+}
+
 export type {
   RepliesType,
   RepostsType,
@@ -80,4 +90,5 @@ export type {
   IEmailNotificationSettings,
   IEmailSpecialNotifications,
   INotification,
+  INotificationInput,
 };

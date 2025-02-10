@@ -4,7 +4,15 @@ import {
   getUserByPhone,
   getUserByUserId,
 } from "./user-finder.service";
-import { IUser } from "@types";
+import { INotificationInput, IUser, IUserInput } from "@types";
+import {
+  displayRepository,
+  notificationRepository,
+  privacyRepository,
+  securityRepository,
+  userRepository,
+} from "@repositories";
+import mongoose from "mongoose";
 
 class UserService {
   async findUserByIndentifier(
@@ -27,6 +35,21 @@ class UserService {
     }
 
     return user;
+  }
+
+  async initializeUser(
+    newUser: IUserInput,
+    newNotification: INotificationInput,
+    userId: string,
+    session: mongoose.ClientSession
+  ) {
+    await userRepository.createUser(newUser, { session });
+    await securityRepository.createSecurity(userId, { session });
+    await notificationRepository.createNotification(newNotification, {
+      session,
+    });
+    await displayRepository.createDisplay(userId, { session });
+    await privacyRepository.createPrivacy(userId, { session });
   }
 }
 

@@ -44,6 +44,7 @@ import {
   IEmailNotificationSettings,
   IEmailSpecialNotifications,
   INotification,
+  INotificationInput,
 } from "./notification.type";
 
 import {
@@ -110,6 +111,7 @@ export {
   IEmailNotificationSettings,
   IEmailSpecialNotifications,
   INotification,
+  INotificationInput,
 
   // display
   BgThemeType,

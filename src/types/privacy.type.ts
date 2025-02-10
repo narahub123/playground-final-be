@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 type TagTargetType = "all" | "followers";
 
 interface ITaggingSettings {
@@ -19,6 +21,7 @@ interface IMuteSettings {
 }
 
 interface IPrivacy extends Document {
+  _id: Types.ObjectId;
   userId: string;
   isPostPrivate: boolean;
   isVideoProtected: boolean;
@@ -40,6 +43,8 @@ interface IPrivacy extends Document {
   adAudiences: string[];
   isLocationBasedAdsEnabled: boolean;
   visitedLocations: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type {

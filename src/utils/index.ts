@@ -9,6 +9,9 @@ import comparePassword from "./comparePassword";
 import createRefreshToken from "./createRefreshToken";
 import createAccessToken from "./createAccessToken";
 import mongoDBErrorHandler from "./mongoDBErrorHandler";
+import combineBirth from "./combineBirth";
+import extractCountryFromLanguage from "./extractCountryFromLanguage";
+
 import {
   findUserByIdentifier,
   saveLoginFailure,
@@ -29,6 +32,8 @@ export {
   comparePassword,
   createRefreshToken,
   createAccessToken,
+  combineBirth,
+  extractCountryFromLanguage,
   // loginUtils
   findUserByIdentifier,
   saveLoginFailure,

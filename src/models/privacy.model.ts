@@ -1,6 +1,7 @@
+import { IPrivacy } from "@types";
 import mongoose from "mongoose";
 
-const privacySchema = new mongoose.Schema(
+const privacySchema = new mongoose.Schema<IPrivacy>(
   {
     userId: {
       type: String,

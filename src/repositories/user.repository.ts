@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 import { User } from "@models";
-import { IUser } from "@types";
+import { IUser, IUserInput } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 
 class UserRepository {
@@ -28,6 +29,18 @@ class UserRepository {
       return user || undefined;
     } catch (error: any) {
       mongoDBErrorHandler("getUserByPhone", error, { phone });
+    }
+  }
+  async createUser(
+    user: IUserInput,
+    options?: { session: mongoose.ClientSession }
+  ): Promise<IUser | undefined> {
+    try {
+      const newUser = await User.create([user], options);
+
+      return newUser[0] || undefined;
+    } catch (error) {
+      mongoDBErrorHandler("createUser", error, { user });
     }
   }
 }

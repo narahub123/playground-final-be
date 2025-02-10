@@ -7,12 +7,13 @@ import {
 } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
+  combineBirth,
   comparePassword,
   createHashedPassword,
   createSessionAndTokens,
   deleteImages,
+  extractCountryFromLanguage,
   findUserByIdentifier,
-  generateAuthCode,
   lockAccount,
   saveLoginFailure,
   uploadImages,
@@ -23,12 +24,11 @@ import {
   createUserNotifications,
   createUserPrivacy,
   createUserSecurity,
-  createVerification,
   getActiveSessionByInfo,
   getLoginFailureByUserId,
   getLoginRecordsByUserId,
-  sendEmail,
   updateFailureTypeToBruteForce,
+  UserService,
 } from "@services";
 import { UploadApiResponse } from "cloudinary";
 import mongoose from "mongoose";
@@ -43,7 +43,13 @@ import {
   deleteLoginFailures,
   saveLoginRecord,
 } from "utils/loginUtils";
-import { ILoginFailure, ILoginRecord } from "@types";
+import {
+  ILoginFailure,
+  ILoginRecord,
+  INotificationInput,
+  IUserInput,
+} from "@types";
+import verificationService from "services/verification.service";
 
 // 사용자 정보 등록
 const signupUser = asyncWrapper(
@@ -55,6 +61,7 @@ const signupUser = asyncWrapper(
       birth,
       email,
       phone,
+      gender,
       language,
       notifications,
       password,
@@ -74,18 +81,18 @@ const signupUser = asyncWrapper(
     } else if (!password) {
       throw new BadRequestError("비밀번호가 제공되어야 합니다.");
     } else if (!userId) {
-      throw new BadRequestError("유저 아이디가 제공되어야 합니다.");
+      throw new BadRequestError("사용자 아이디가 제공되어야 합니다.");
     } else if (!username) {
-      throw new BadRequestError("유저 이름이 제공되어야 합니다.");
+      throw new BadRequestError("사용자의 이름이 제공되어야 합니다.");
     } else if (!birth.year || !birth.month || !birth.date) {
-      throw new BadRequestError("유저 생년월일이 제공되어야 합니다.");
+      throw new BadRequestError("사용자의 생년월일이 제공되어야 합니다.");
     } else if (
       notifications.messages === undefined ||
       notifications.replies === undefined ||
       notifications.newFollower === undefined ||
       notifications.posts === undefined
     ) {
-      throw new BadRequestError("유저 알림 설정이 제공되어야 합니다.");
+      throw new BadRequestError("알림 설정이 제공되어야 합니다.");
     } else if (
       device.type === undefined ||
       device.os === undefined ||
@@ -116,73 +123,47 @@ const signupUser = asyncWrapper(
       uploadedProfileImage = await uploadImages(profileImage);
 
       // 생년월일 합치기
-      const birthCombined =
-        birth.year + birth.month.padStart(2, "0") + birth.date.padStart(2, "0");
+      const birthCombined = combineBirth(birth.year, birth.month, birth.date);
 
       // 국가
-      const country = language.split("-")[1];
+      const country = extractCountryFromLanguage(language);
 
-      const newUser = {
+      const newUser: IUserInput = {
         password: hashedPassword,
         userId,
         username,
         email,
         birth: birthCombined,
         phone,
-        // gender, // 어떻게 할 지 아직 안정함
-        country, // 생성 여부 결정하기
+        gender,
+        country,
         language,
         ip,
         location,
         profileImage: uploadedProfileImage[0]?.secure_url || "",
       };
 
-      const newSecurity = {
+      const newNotification: INotificationInput = {
         userId,
-        devices: [
-          {
-            type: device.type,
-            os: device.os,
-            browser: device.browser,
-          },
-        ],
-      };
-
-      const newNotification = {
-        userId,
-        pushNotifications: {
+        pushNotificationSettings: {
           posts: notifications.posts,
-          messages: notifications.messages,
+          messagesEnabled: notifications.messages,
           replies: notifications.replies ? "all" : "off",
-          newFollower: notifications.newFollower,
+          newFollowersEnabled: notifications.newFollower,
         },
       };
 
-      await createUser(newUser, { session });
-
-      await createUserSecurity(newSecurity, { session });
-
-      await createUserNotifications(newNotification, { session });
-
-      await createUserDisplay(userId, { session });
-
-      await createUserPrivacy(userId, { session });
+      await UserService.initializeUser(
+        newUser,
+        newNotification,
+        userId,
+        session
+      );
 
       await session.commitTransaction();
 
-      // 인증 이메일 전송하기
-      // 인증 번호 생성하기
-      const verificationCode = generateAuthCode();
-
-      const subject = "인증코드";
-      const html = `<p>인증코드 ${verificationCode}</p>`;
-
-      // 인증 이메일 전송하기
-      await sendEmail(email, subject, html);
-
-      // 전송이 되었다면 인증 관련 모델에 저장해야 함
-      // 내용 인증 번호, userId, 적정 시간 이내에 인증이 되지 않으면 삭제됨
-      await createVerification({ userId, verificationCode });
+      // 인증 이메일 전송하고 인증 코드 저장
+      await verificationService.sendVerificationCode(email, userId);
 
       res.status(201).json({ success: true });
     } catch (error) {
