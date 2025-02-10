@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IDisplay } from "types/display.type";
 
-const displaySchema = new mongoose.Schema(
+const displaySchema = new mongoose.Schema<IDisplay>(
   {
     userId: {
       type: String,
@@ -12,11 +13,11 @@ const displaySchema = new mongoose.Schema(
     // 접근성, 표시, 언어
     // 접근성
     // 색 대비
-    colorContrast: { type: Boolean, default: false },
+    isColorContrastEnabled: { type: Boolean, default: false },
     // 동작 줄이기
-    reduceMotion: { type: Boolean, default: false },
+    isMotionReduced: { type: Boolean, default: false },
     // 이미지 설명 추가 알림
-    addImgExpl: { type: Boolean, default: false },
+    isImageDescriptionAdded: { type: Boolean, default: false },
 
     // 표시
 
@@ -43,10 +44,10 @@ const displaySchema = new mongoose.Schema(
 
     // 데이터 사용량
     // 데이터 세이버
-    dataSaver: { type: Boolean, default: false },
+    isDataSaverEnabled: { type: Boolean, default: false },
 
     // 자동 재생
-    autoplay: { type: Boolean, default: true },
+    isAutoplayEnabled: { type: Boolean, default: true },
   },
   { timestamps: true, versionKey: false }
 );

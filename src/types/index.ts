@@ -47,6 +47,13 @@ import {
   INotification,
 } from "./notification.type";
 
+import {
+  BgThemeType,
+  ColorThemeType,
+  FontSizeType,
+  IDisplay,
+} from "./display.type";
+
 export {
   // user
   IUser,
@@ -105,4 +112,10 @@ export {
   IEmailNotificationSettings,
   IEmailSpecialNotifications,
   INotification,
+
+  // display
+  BgThemeType,
+  ColorThemeType,
+  FontSizeType,
+  IDisplay,
 };
