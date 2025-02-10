@@ -1,6 +1,7 @@
+import { ISecurity } from "@types";
 import mongoose from "mongoose";
 
-const securitySchema = new mongoose.Schema(
+const securitySchema = new mongoose.Schema<ISecurity>(
   {
     userId: {
       type: String,
@@ -24,35 +25,6 @@ const securitySchema = new mongoose.Schema(
     connectedApps: { type: [String], default: [] },
     // 세션
     sessions: { type: [String], default: [] },
-    // 로그인 기록
-    loginHistory: { type: [String], default: [] },
-    // 로그인된 디바이스 및 앱
-    devices: {
-      type: [
-        {
-          type: {
-            type: String,
-            enum: ["Web", "Mobile", "Tablet"],
-            required: true,
-          },
-          os: {
-            type: String,
-            enum: ["Windows", "MacOs", "Linux", "Android", "iOS", "Unknown"],
-            required: true,
-          },
-          browser: {
-            type: String,
-            enum: ["Chrome", "Firefox", "Safari", "Edge", "Opera", "Unknown"],
-            required: true,
-          },
-          lastLog: {
-            type: Date,
-            default: Date.now,
-          },
-        },
-      ],
-      default: [],
-    },
     // 연결된 계정
     connectedAccounts: { type: [String] },
     // 위임

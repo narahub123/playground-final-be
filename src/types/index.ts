@@ -17,6 +17,12 @@ import {
 } from "./login-failure.type";
 import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
 import { IVerification, IVerificationInput } from "./verification.type";
+import {
+  IDelegate,
+  TwoFactorAuthenticationType,
+  ISecurity,
+  ISecurityInput,
+} from "./security.type";
 
 export {
   // user
@@ -49,4 +55,10 @@ export {
   // verification
   IVerification,
   IVerificationInput,
+
+  // security
+  IDelegate,
+  TwoFactorAuthenticationType,
+  ISecurity,
+  ISecurityInput,
 };
