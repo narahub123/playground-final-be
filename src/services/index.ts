@@ -7,7 +7,7 @@ import {
   checkUserIdDuplication,
   createUser,
   updateLockStatus,
-} from "./user.service";
+} from "./user-finder.service";
 
 import { createUserDisplay } from "./display.service";
 
@@ -40,6 +40,7 @@ import {
 import { getLoginRecordsByUserId } from "./login-record.service";
 
 import DuplicateDetection from "./duplicate-detection.service";
+import UserService from "./user.service";
 
 export {
   getUserByUserId,
@@ -86,4 +87,7 @@ export {
 
   // duplicate-detection
   DuplicateDetection,
+
+  // user-lookup
+  UserService,
 };
