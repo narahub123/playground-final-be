@@ -19,9 +19,8 @@ import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
 import { IVerification, IVerificationInput } from "./verification.type";
 import {
   IDelegate,
-  TwoFactorAuthenticationType,
+  twoFactorAuthenticationMethodType,
   ISecurity,
-  ISecurityInput,
 } from "./security.type";
 
 import {
@@ -88,9 +87,8 @@ export {
 
   // security
   IDelegate,
-  TwoFactorAuthenticationType,
+  twoFactorAuthenticationMethodType,
   ISecurity,
-  ISecurityInput,
 
   // privacy
   IMuteSettings,

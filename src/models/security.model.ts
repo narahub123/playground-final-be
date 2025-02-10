@@ -1,7 +1,7 @@
 import { ISecurity } from "@types";
 import mongoose from "mongoose";
 
-const securitySchema = new mongoose.Schema<ISecurity>(
+const SecuritySchema = new mongoose.Schema<ISecurity>(
   {
     userId: {
       type: String,
@@ -10,37 +10,37 @@ const securitySchema = new mongoose.Schema<ISecurity>(
       unique: true,
     },
     // 보안
-    // 2단계 인증
-    twoFactorAuthentication: {
+    // 2단계 인증 방법
+    twoFactorAuthenticationMethod: {
       type: String,
       default: "",
       enum: ["sms", "app", "key", ""],
     },
     // 인증 라벨 숨기기
-    hideLabel: { type: Boolean, default: false },
+    isLabelHidden: { type: Boolean, default: false },
     // 비밀번호 재설정 보호
-    protectRenewPassword: { type: Boolean, default: false },
+    isPasswordRenewalProtected: { type: Boolean, default: false },
     // 앱 및 세션
-    // 연결된 앱
-    connectedApps: { type: [String], default: [] },
-    // 세션
-    sessions: { type: [String], default: [] },
+    // 연결된 애플리케이션
+    connectedApplications: { type: [String], default: [] },
+    // 활성 세션
+    activeSessions: { type: [String], default: [] },
     // 연결된 계정
-    connectedAccounts: { type: [String] },
+    linkedAccounts: { type: [String] },
     // 위임
-    // 다른 사용자가 나를 초대 가능 여부
-    canBeInvited: { type: Boolean, default: false },
+    // 다른 사용자가 나를 초대할 수 있는지 여부
+    isInviteable: { type: Boolean, default: false },
     // 위임
     delegate: {
-      // 그룹
-      groups: { type: [String], default: [] },
-      // 멤버
-      members: { type: [String], default: [] },
+      // 위임된 그룹
+      delegatedGroups: { type: [String], default: [] },
+      // 위임된 멤버
+      delegatedMembers: { type: [String], default: [] },
     },
   },
   { timestamps: true, versionKey: false }
 );
 
-const Security = mongoose.model("Security", securitySchema);
+const Security = mongoose.model("Security", SecuritySchema);
 
 export default Security;

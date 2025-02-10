@@ -6,30 +6,23 @@ interface IDelegate {
   members: string[];
 }
 
-type TwoFactorAuthenticationType = "sms" | "app" | "key" | "";
+type twoFactorAuthenticationMethodType = "sms" | "app" | "key" | "";
 
 interface ISecurity extends Document {
-  _id: Types.ObjectId;
   userId: string;
-  twoFactorAuthentication: TwoFactorAuthenticationType;
-  hideLabel: boolean;
-  protectRenewPassword: boolean;
-  connectedApps: string[];
-  sessions: string[];
-  connectedAccounts: string[];
-  canBeInvited: boolean;
-  delegate: IDelegate;
+  twoFactorAuthenticationMethod: twoFactorAuthenticationMethodType;
+  isLabelHidden: boolean;
+  isPasswordRenewalProtected: boolean;
+  connectedApplications: string[];
+  activeSessions: string[];
+  linkedAccounts: string[];
+  isInviteable: boolean;
+  delegate: {
+    delegatedGroups: string[];
+    delegatedMembers: string[];
+  };
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface ISecurityInput {
-  userId: string;
-}
-
-export type {
-  IDelegate,
-  TwoFactorAuthenticationType,
-  ISecurity,
-  ISecurityInput,
-};
+export type { IDelegate, twoFactorAuthenticationMethodType, ISecurity };
