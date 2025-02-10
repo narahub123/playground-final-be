@@ -34,6 +34,19 @@ import {
   TagTargetType,
 } from "./privacy.type";
 
+import {
+  RepliesType,
+  RepostsType,
+  LikesType,
+  ReplyMessagesType,
+  PopularPostsType,
+  INotificationMuteRules,
+  IPushNotificationSettings,
+  IEmailNotificationSettings,
+  IEmailSpecialNotifications,
+  INotification,
+} from "./notification.type";
+
 export {
   // user
   IUser,
@@ -80,4 +93,16 @@ export {
   MuteDurationType,
   MuteTargetType,
   TagTargetType,
+
+  // privacy
+  RepliesType,
+  RepostsType,
+  LikesType,
+  ReplyMessagesType,
+  PopularPostsType,
+  INotificationMuteRules,
+  IPushNotificationSettings,
+  IEmailNotificationSettings,
+  IEmailSpecialNotifications,
+  INotification,
 };

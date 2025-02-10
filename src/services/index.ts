@@ -11,7 +11,7 @@ import {
 
 import { createUserDisplay } from "./display.service";
 
-import { createUserNotifications } from "./notifications.service";
+import { createUserNotifications } from "./notification.service";
 
 import { createUserSecurity } from "./security.service";
 

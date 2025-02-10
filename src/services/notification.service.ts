@@ -1,4 +1,4 @@
-import { Notifications } from "@models";
+import { Notification } from "@models";
 import {
   MongoDBCastError,
   MongoDBDuplicateKeyError,
@@ -14,7 +14,7 @@ const createUserNotifications = async (
   options?: { session?: mongoose.ClientSession }
 ) => {
   try {
-    const newNotifications = await Notifications.create(
+    const newNotifications = await Notification.create(
       [notifications],
       options
     );
