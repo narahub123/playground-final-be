@@ -4,10 +4,15 @@ import {
   getUserByPhone,
   getUserByUserId,
 } from "./user-finder.service";
+import { IUser } from "@types";
 
 class UserService {
-  async findUserByIndentifier(email?: string, phone?: string, userId?: string) {
-    let user;
+  async findUserByIndentifier(
+    email?: string,
+    phone?: string,
+    userId?: string
+  ): Promise<IUser> {
+    let user: IUser | undefined;
 
     if (email) {
       user = await getUserByEmail(email);

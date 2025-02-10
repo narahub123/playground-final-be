@@ -1,35 +1,33 @@
 import { User } from "@models";
+import { IUser } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 
 class UserRepository {
-  async getUserByEmail(email: string): Promise<boolean> {
+  async getUserByEmail(email: string): Promise<IUser | undefined> {
     try {
       const user = await User.findOne({ email });
 
-      return Boolean(user);
+      return user || undefined;
     } catch (error: any) {
       mongoDBErrorHandler("getUserByEmail", error, { email });
-      return false;
     }
   }
-  async getUserByUserId(userId: string): Promise<boolean> {
+  async getUserByUserId(userId: string): Promise<IUser | undefined> {
     try {
       const user = await User.findOne({ userId });
 
-      return Boolean(user);
+      return user || undefined;
     } catch (error: any) {
       mongoDBErrorHandler("getUserByUserId", error, { userId });
-      return false;
     }
   }
-  async getUserByPhone(phone: string): Promise<boolean> {
+  async getUserByPhone(phone: string): Promise<IUser | undefined> {
     try {
       const user = await User.findOne({ phone });
 
-      return Boolean(user);
+      return user || undefined;
     } catch (error: any) {
       mongoDBErrorHandler("getUserByPhone", error, { phone });
-      return false;
     }
   }
 }
