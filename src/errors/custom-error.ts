@@ -1,18 +1,18 @@
 class CustomAPIError extends Error {
   statusCode: number;
   statusText: string;
-  errorCode: string;
+  code: string;
 
   constructor(
     message: string,
     statusCode: number = 500,
     statusText: string = "Internal Error",
-    errorCode: string = "INTERNAL_ERROR"
+    code: string = "INTERNAL_ERROR"
   ) {
     super(message);
     this.statusCode = statusCode;
     this.statusText = statusText;
-    this.errorCode = errorCode;
+    this.code = code;
     this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);
   }
