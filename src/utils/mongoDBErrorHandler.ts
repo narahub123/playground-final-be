@@ -1,3 +1,4 @@
+import { API_CALL_TIMEOUT } from "@constants";
 import {
   MongoDBCastError,
   MongoDBDuplicateKeyError,
@@ -11,52 +12,90 @@ const mongoDBErrorHandler = (
   error: any,
   params?: Record<string, any>
 ): never => {
-  const errorDetails = {
+  const errorLog = {
     method,
     params,
     message: error.message,
     stack: error.stack,
   };
 
-  console.error(`[${method}] error: ${error.message}`, errorDetails);
+  console.error(`[${method}] error: ${error.message}`, errorLog);
 
-  // Duplicate Key Error 처리
+  // 중복된 키 값이 존재할 경우 처리
   if (error.code === 11000) {
+    const field = Object.keys(error.keyValue)[0] || "key"; // 중복된 필드명 추출
+    const fieldValue = error.keyValue[field]; // 해당 필드의 중복 값 추출
+
     throw new MongoDBDuplicateKeyError(
-      "이미 존재하는 데이터입니다.",
-      "DUPLICATE_KEY" // code 추가
+      `Duplicate ${field} exists. (중복된 키 존재)`,
+      `DUPLICATE_${field.toUpperCase()}`,
+      { [field]: fieldValue } // 중복 필드명과 값 추가
     );
   }
 
-  // Validation Error 처리
+  // MongoDB 유효성 검사 오류 처리
   if (error.name === "ValidationError") {
+    const errorDetails: Record<string, string> = {};
+
+    // 유효성 검사 실패한 필드와 오류 메시지 추출하여 errorDetails에 추가
+    for (const field in error.errors) {
+      if (error.errors.hasOwnProperty(field)) {
+        const fieldError = error.errors[field];
+        errorDetails[field] = fieldError.message || "Invalid value"; // 오류 메시지 기본값 설정
+      }
+    }
+
     throw new MongoDBValidationError(
       error.message,
-      "MONGODB_VALIDATION_ERROR" // code 추가
+      "MONGODB_VALIDATION_ERROR",
+      errorDetails
     );
   }
 
-  // Cast Error 처리
+  // MongoDB 데이터 타입 변환 오류 처리
   if (error.name === "CastError") {
+    const errorDetails: Record<string, string> = {};
+
+    // 잘못된 데이터 타입의 필드명과 해당 값을 errorDetails에 추가
+    errorDetails[error.path] = error.value;
+
     throw new MongoDBCastError(
-      "잘못된 데이터 타입입니다.",
-      "MONGODB_CAST_ERROR" // code 추가
+      "Invalid data type. (잘못된 데이터 타입)",
+      "MONGODB_CAST_ERROR",
+      errorDetails
     );
   }
 
-  // MongoDB 네트워크 오류 처리
+  // MongoDB 네트워크 연결 오류 처리
   if (error.message.includes("failed to connect")) {
+    const { host, port } = error; // 연결 실패 시, MongoDB의 호스트와 포트 추출
+
+    // 네트워크 오류에 관한 세부 정보를 errorDetails에 추가
+    const errorDetails = {
+      endpoint: `mongodb://${host}:${port}`, // MongoDB 서버 주소
+      driverVersion: error.driverVersion || "N/A", // 드라이버 버전 (없다면 "N/A")
+      errorCode: error.code || "UNKNOWN", // MongoDB 에러 코드
+      timeout: `${API_CALL_TIMEOUT / 1000}s`, // 사용한 타임아웃 임계값 (예: 30s)
+    };
+
     throw new MongoDBNetworkError(
-      "MongoDB 서버 연결에 실패했습니다.",
-      "MONGODB_NETWORK_ERROR" // code 추가
+      "Failed to connect to MongoDB server. (MongoDB 서버 연결 실패)",
+      "MONGODB_NETWORK_ERROR",
+      errorDetails
     );
   }
 
   // MongoDB 타임아웃 오류 처리
   if (error.message.includes("timeout")) {
+    const endpoint = error.host || "Unknown endpoint"; // 타임아웃 오류 발생 시, endpoint 정보 추출
+
     throw new MongoDBTimeoutError(
-      "MongoDB 요청이 시간 초과되었습니다.",
-      "MONGODB_TIMEOUT_ERROR" // code 추가
+      "MongoDB request timed out. (MongoDB 요청 시간 초과)",
+      "MONGODB_TIMEOUT_ERROR",
+      {
+        endpoint, // 타임아웃 발생한 endpoint
+        timeout: `${API_CALL_TIMEOUT / 1000}s`, // 타임아웃 임계값 (예: 30s)
+      }
     );
   }
 
