@@ -1,7 +1,7 @@
 import {
   checkEmailDuplication,
   checkPhoneAvailability,
-  checkUserIdAvailability,
+  checkUserIdDuplication,
   getContactsBeforeLogin,
 } from "./users.controller";
 
@@ -18,7 +18,7 @@ export {
   // user
   checkEmailDuplication,
   checkPhoneAvailability,
-  checkUserIdAvailability,
+  checkUserIdDuplication,
   getContactsBeforeLogin,
 
   // auth

@@ -59,24 +59,41 @@ const checkPhoneAvailability = asyncWrapper(
   }
 );
 
-const checkUserIdAvailability = asyncWrapper(
-  "checkUserIdAvailability",
+const checkUserIdDuplication = asyncWrapper(
+  "checkUserIdDuplication", // 함수의 이름
+  "UserId duplicate check failed. (사용자 아이디 중복 체크 실패)", // 에러 메시지
   async (req: Request, res: Response) => {
-    // 요청 본문에서 이메일을 추출합니다.
+    // 요청 본문에서 사용자 아이디를 추출합니다.
     const { userId } = req.body;
 
-    // 휴대 전화 번호가 제공되지 않았을 경우 BadRequestError를 던집니다.
+    // 사용자 아이디가 제공되지 않았을 경우 BadRequestError를 던집니다.
     if (!userId) {
-      throw new BadRequestError("휴대 전화 번호를 제공해주세요.");
+      throw new BadRequestError(
+        "UserId is required. (사용자 아이디 필수)", // 에러 메시지
+        "USERID_MISSING", // 에러 코드
+        {
+          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+        }
+      );
     }
 
-    // 이메일 중복 체크
-    const isDuplicate = await duplicateDetectionService.checkUserIdDuplication(
+    // 사용자 아이디 중복 체크
+    const isDuplicate = await duplicateDetectionService.isUserIdDuplicate(
       userId
     );
 
+    // 성공적인 응답 생성
+    const response: IApiSuccessResponse<{ isDuplicate: boolean }> = {
+      success: true,
+      message:
+        "UserId duplicate check succeeded. (사용자 아이디 중복 체크 성공)", // 성공 메시지
+      code: "USERID_DUPLICATE_CHECK_SUCCEEDED", // 응답 코드
+      timestamp: new Date().toISOString(), // 응답 시각
+      data: { isDuplicate }, // 중복 여부
+    };
+
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res.status(200).json({ success: true, data: { isDuplicate } });
+    res.status(200).json(response);
   }
 );
 
@@ -105,6 +122,6 @@ const getContactsBeforeLogin = asyncWrapper(
 export {
   checkEmailDuplication,
   checkPhoneAvailability,
-  checkUserIdAvailability,
+  checkUserIdDuplication,
   getContactsBeforeLogin,
 };

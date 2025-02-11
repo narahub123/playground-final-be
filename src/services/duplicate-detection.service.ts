@@ -17,16 +17,17 @@ class DuplicateDetectionService {
     return user ? true : false; // 중복되면 true, 아니면 false
   }
 
-  async checkUserIdDuplication(userId: string) {
+  /**
+   * 사용자 아이디 중복 여부를 확인하는 함수
+   * @param {string} userId - 중복 여부를 확인할 사용자 아이디
+   * @returns {Promise<boolean>} - 사용자 아이디가 중복되면 true, 그렇지 않으면 false를 반환
+   */
+  async isUserIdDuplicate(userId: string): Promise<boolean> {
+    // 사용자 아이디로 유저를 조회합니다.
     const user = await userRepository.getUserByUserId(userId);
 
-    if (user)
-      throw new ConflictError(
-        "이미 등록된 사용자 아이디입니다.",
-        "USERID_DUPLICATION"
-      );
-
-    return false;
+    // 유저가 존재하면 중복된 아이디, 존재하지 않으면 중복되지 않은 아이디로 판단
+    return user ? true : false;
   }
 
   async checkPhoneDuplication(phone: string) {
