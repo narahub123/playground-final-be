@@ -30,16 +30,17 @@ class DuplicateDetectionService {
     return user ? true : false;
   }
 
-  async checkPhoneDuplication(phone: string) {
+  /**
+   * 사용자 전화번호 중복 여부를 확인하는 함수
+   * @param {string} phone - 중복 여부를 확인할 전화번호
+   * @returns {Promise<boolean>} - 전화번호가 중복되면 true, 그렇지 않으면 false를 반환
+   */
+  async isPhoneDuplication(phone: string): Promise<boolean> {
+    // 사용자 전화번호로 유저를 조회합니다.
     const user = await userRepository.getUserByPhone(phone);
 
-    if (user)
-      throw new ConflictError(
-        "이미 등록된 사용자 아이디입니다.",
-        "PHONE_DUPLICATION"
-      );
-
-    return false;
+    // 유저가 존재하면 중복된 전화번호, 존재하지 않으면 중복되지 않은 전화번호로 판단
+    return user ? true : false;
   }
 }
 

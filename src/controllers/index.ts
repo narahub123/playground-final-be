@@ -1,6 +1,6 @@
 import {
   checkEmailDuplication,
-  checkPhoneAvailability,
+  checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
 } from "./users.controller";
@@ -17,7 +17,7 @@ import { oauthCallback } from "./oauth.controller";
 export {
   // user
   checkEmailDuplication,
-  checkPhoneAvailability,
+  checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
 

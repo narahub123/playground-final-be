@@ -38,24 +38,40 @@ const checkEmailDuplication = asyncWrapper(
   }
 );
 
-const checkPhoneAvailability = asyncWrapper(
-  "checkPhoneAvailability",
+const checkPhoneDuplication = asyncWrapper(
+  "checkPhoneDuplication",
+  "Phone duplicate check failed. (휴대 전화 번호 중복 체크 실패)",
   async (req: Request, res: Response) => {
-    // 요청 본문에서 이메일을 추출합니다.
+    // 요청 본문에서 휴대 전화 번호를 추출합니다.
     const { phone } = req.body;
 
     // 휴대 전화 번호가 제공되지 않았을 경우 BadRequestError를 던집니다.
     if (!phone) {
-      throw new BadRequestError("휴대 전화 번호를 제공해주세요.");
+      throw new BadRequestError(
+        "Phone is required. (휴대 전화 번호 필수)",
+        "PHONE_MISSING",
+        {
+          phone: "휴대 전화 번호 필드가 제공되지 않았습니다.",
+        }
+      );
     }
 
-    // 이메일 중복 체크
-    const isDuplicate = await duplicateDetectionService.checkPhoneDuplication(
+    // 휴대 전화 번호 중복 체크
+    const isDuplicate = await duplicateDetectionService.isPhoneDuplication(
       phone
     );
 
+    const response: IApiSuccessResponse<{ isDuplicate: boolean }> = {
+      success: true,
+      message:
+        "Phone duplicate check succeeded. (휴대 전화 번호 중복 체크 성공)",
+      code: "PHONE_DUPLICATE_CHECK_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+      data: { isDuplicate },
+    };
+
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res.status(200).json({ success: true, data: { isDuplicate } });
+    res.status(200).json(response);
   }
 );
 
@@ -121,7 +137,7 @@ const getContactsBeforeLogin = asyncWrapper(
 
 export {
   checkEmailDuplication,
-  checkPhoneAvailability,
+  checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
 };
