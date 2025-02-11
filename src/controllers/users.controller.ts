@@ -2,29 +2,39 @@ import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import { duplicateDetectionService, userService } from "@services";
+import { IApiSuccessResponse } from "@types";
 
-const checkEmailAvailability = asyncWrapper(
-  "checkEmailAvailability",
+const checkEmailDuplication = asyncWrapper(
+  "checkEmailDuplication",
+  "Email duplicate check failed. (이메일 중복 체크 실패)",
   async (req: Request, res: Response) => {
     // 요청 본문에서 이메일을 추출합니다.
     const { email } = req.body;
 
     // 이메일이 제공되지 않았을 경우 BadRequestError를 던집니다.
     if (!email) {
-      throw new BadRequestError("이메일을 제공해주세요.");
+      throw new BadRequestError(
+        "Email is required. (이메일 필수)",
+        "EMAIL_MISSING",
+        {
+          email: "이메일 필드가 제공되지 않았습니다.",
+        }
+      );
     }
 
     // 이메일 중복 체크
     const isDuplicate = await duplicateDetectionService.isEmailDuplicate(email);
 
+    const response: IApiSuccessResponse<{ isDuplicate: boolean }> = {
+      success: true,
+      message: "Email duplicate check succeeded. (이메일 중복 체크 성공)",
+      code: "EMAIL_DUPLICATE_CHECK_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+      data: { isDuplicate },
+    };
+
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "이메일 중복 체크 성공",
-        data: { isDuplicate },
-      });
+    res.status(200).json(response);
   }
 );
 
@@ -93,7 +103,7 @@ const getContactsBeforeLogin = asyncWrapper(
 );
 
 export {
-  checkEmailAvailability,
+  checkEmailDuplication,
   checkPhoneAvailability,
   checkUserIdAvailability,
   getContactsBeforeLogin,

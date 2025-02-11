@@ -1,5 +1,5 @@
 import {
-  checkEmailAvailability,
+  checkEmailDuplication,
   checkPhoneAvailability,
   checkUserIdAvailability,
   getContactsBeforeLogin,
@@ -7,7 +7,7 @@ import {
 import { Router } from "express";
 
 export default (router: Router) => {
-  router.post("/users/check-duplication/email", checkEmailAvailability);
+  router.post("/users/check-duplication/email", checkEmailDuplication);
   router.post("/users/check-duplication/phone", checkPhoneAvailability);
   router.post("/users/check-duplication/userid", checkUserIdAvailability);
   router.post("/users/contacts", getContactsBeforeLogin);
