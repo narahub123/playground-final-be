@@ -9,45 +9,81 @@ import {
 class MongoDBDuplicateKeyError extends ConflictError {
   constructor(
     message: string = "MongoDB Duplicate key error: 중복된 키가 존재합니다.",
+<<<<<<< Updated upstream
     code: string = "DUPLICATE_KEY"
   ) {
     super(message, code);
+=======
+    code: string = "DUPLICATE_KEY",
+    errorDetails: Record<string, string> = {}
+  ) {
+    // 생성자에서 부모 클래스 호출
+    super(message, code, errorDetails);
+>>>>>>> Stashed changes
   }
 }
 
 class MongoDBValidationError extends UnprocessableEntityError {
   constructor(
     message: string = "MongoDB 스키마 유효성 검사 실패",
+<<<<<<< Updated upstream
     code: string = "MONGODB_VALIDATION_ERROR"
   ) {
     super(message, code);
+=======
+    code: string = "MONGODB_VALIDATION_ERROR",
+    errorDetails: Record<string, string> = {}
+  ) {
+    super(message, code, errorDetails);
+>>>>>>> Stashed changes
   }
 }
 
 class MongoDBCastError extends BadRequestError {
   constructor(
     message: string = "MongoDB 데이터 타입 변환 실패",
+<<<<<<< Updated upstream
     code: string = "MONGODB_CAST_ERROR"
   ) {
     super(message, code);
+=======
+    code: string = "MONGODB_CAST_ERROR",
+    errorDetails: Record<string, string> = {}
+  ) {
+    super(message, code, errorDetails);
+>>>>>>> Stashed changes
   }
 }
 
 class MongoDBNetworkError extends ServiceUnavailableError {
   constructor(
     message: string = "MongoDB 서버 연결 실패",
+<<<<<<< Updated upstream
     code: string = "MONGODB_NETWORK_ERROR"
   ) {
     super(message, code);
+=======
+    code: string = "MONGODB_NETWORK_ERROR",
+    errorDetails: Record<string, string> = {}
+  ) {
+    super(message, code, errorDetails);
+>>>>>>> Stashed changes
   }
 }
 
 class MongoDBTimeoutError extends GatewayTimeoutError {
   constructor(
     message: string = "MongoDB 요청 시간 초과",
+<<<<<<< Updated upstream
     code: string = "MONGODB_TIMEOUT_ERROR"
   ) {
     super(message, code);
+=======
+    code: string = "MONGODB_TIMEOUT_ERROR",
+    errorDetails: Record<string, string> = {}
+  ) {
+    super(message, code, errorDetails);
+>>>>>>> Stashed changes
   }
 }
 
