@@ -8,6 +8,7 @@ import {
 } from "@errors";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import { timeStamp } from "console";
 
 dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
 
@@ -28,6 +29,7 @@ const errorHandler = (
   let statusCode = err.statusCode || 500;
   let statusText = err.statusText || "Internal Server Error";
   let message = err.message || "내부 서버 에러가 발생했습니다.";
+  let code = err.code || "INTERNAL_SERVER_ERROR";
 
   // 몽고DB 관련 에러 처리
   if (err.code === 11000) {
@@ -67,7 +69,15 @@ const errorHandler = (
   }
 
   // 클라이언트에 에러 응답
-  res.status(statusCode).json({ statusText, message });
+  res
+    .status(statusCode)
+    .json({
+      success: false,
+      message,
+      statusText,
+      code,
+      timestamp: new Date().toISOString(),
+    });
 };
 
 export default errorHandler;

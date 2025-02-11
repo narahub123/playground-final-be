@@ -54,6 +54,12 @@ import {
   IDisplay,
 } from "./display.type";
 
+import {
+  IApiResponse,
+  IApiSuccessResponse,
+  IApiErrorResponse,
+} from "./api.type";
+
 export {
   // user
   IUser,
@@ -118,4 +124,9 @@ export {
   ColorThemeType,
   FontSizeType,
   IDisplay,
+
+  // api
+  IApiResponse,
+  IApiSuccessResponse,
+  IApiErrorResponse,
 };
