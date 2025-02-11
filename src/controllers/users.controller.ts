@@ -15,12 +15,16 @@ const checkEmailAvailability = asyncWrapper(
     }
 
     // 이메일 중복 체크
-    const isDuplicate = await duplicateDetectionService.checkEmailDuplication(
-      email
-    );
+    const isDuplicate = await duplicateDetectionService.isEmailDuplicate(email);
 
     // 중복 여부를 클라이언트에 JSON 형식으로 반환합니다.
-    res.status(200).json({ success: true, data: { isDuplicate } });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "이메일 중복 체크 성공",
+        data: { isDuplicate },
+      });
   }
 );
 

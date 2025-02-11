@@ -168,7 +168,7 @@
         }
       }
     },
-    "/signup/checkEmailDuplication": {
+    "/signup/isEmailDuplicate": {
       "post": {
         "tags": ["Auth"],
         "summary": "회원 가입 시 이메일 중복 확인",

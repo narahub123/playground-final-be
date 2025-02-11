@@ -5,15 +5,35 @@ import { mongoDBErrorHandler } from "@utils";
 import { UpdateWriteOpResult } from "mongoose";
 
 class UserRepository {
-  async getUserByEmail(email: string): Promise<IUser | undefined> {
+  /**
+   * 주어진 이메일 주소로 사용자를 조회합니다.
+   *
+   * @param {string} email - 조회할 사용자의 이메일 주소입니다.
+   * @returns {Promise<IUser | null>} - 이메일에 해당하는 사용자가 있으면 `IUser` 객체를 반환하고, 없으면 `null`을 반환합니다.
+   *
+   * @example
+   * const user = await getUserByEmail('example@example.com');
+   * if (user) {
+   *   console.log("사용자 정보:", user);
+   * } else {
+   *   console.log("사용자를 찾을 수 없습니다.");
+   * }
+   */
+  async getUserByEmail(email: string): Promise<IUser | null> {
     try {
+      // 이메일로 사용자를 조회
       const user = await User.findOne({ email });
 
-      return user || undefined;
+      // 사용자가 있으면 해당 사용자 반환, 없으면 null 반환
+      return user;
     } catch (error: any) {
+      // 에러 발생 시 오류 핸들러 호출
       mongoDBErrorHandler("getUserByEmail", error, { email });
+      // 에러 처리 후 null 반환
+      return null;
     }
   }
+
   async getUserByUserId(userId: string): Promise<IUser | undefined> {
     try {
       const user = await User.findOne({ userId });
