@@ -8,7 +8,7 @@ import {
 } from "@errors";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
-import { timeStamp } from "console";
+import { IApiErrorResponse } from "@types";
 
 dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 환경 변수 로드
 
@@ -20,64 +20,47 @@ dotenv.config({ path: ".env.development.local" }); // .env 파일에 정의된 �
  * @param next - 다음 미들웨어로 전달하는 함수
  */
 const errorHandler = (
-  err: CustomAPIError | any,
+  err: { error: CustomAPIError | any; failureMessage: string } | any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // 기본 에러 정보 설정
-  let statusCode = err.statusCode || 500;
-  let statusText = err.statusText || "Internal Server Error";
-  let message = err.message || "내부 서버 에러가 발생했습니다.";
-  let code = err.code || "INTERNAL_SERVER_ERROR";
+  const error = err?.error ?? err ?? {};
+  const failureMessage =
+    err?.failureMessage || "An error occurred. (에러 발생)";
 
-  // 몽고DB 관련 에러 처리
-  if (err.code === 11000) {
-    const mongoError = new MongoDBDuplicateKeyError(err.message);
-    statusCode = mongoError.statusCode;
-    statusText = mongoError.statusText;
-    message = mongoError.message;
-  } else if (err.name === "ValidationError") {
-    const mongoError = new MongoDBValidationError(err.message);
-    statusCode = mongoError.statusCode;
-    statusText = mongoError.statusText;
-    message = mongoError.message;
-  } else if (err.name === "CastError") {
-    const mongoError = new MongoDBCastError(err.message);
-    statusCode = mongoError.statusCode;
-    statusText = mongoError.statusText;
-    message = mongoError.message;
-  } else if (err.name === "MongoNetworkError") {
-    const mongoError = new MongoDBNetworkError(err.message);
-    statusCode = mongoError.statusCode;
-    statusText = mongoError.statusText;
-    message = mongoError.message;
-  } else if (err.message?.includes("timeout")) {
-    const mongoError = new MongoDBTimeoutError(err.message);
-    statusCode = mongoError.statusCode;
-    statusText = mongoError.statusText;
-    message = mongoError.message;
-  }
+  const {
+    statusCode = 500,
+    statusText = "Internal Server Error",
+    message = "An unexpected error occurred. ()",
+    code = "INTERNAL_SERVER_ERROR",
+    errorDetails,
+  } = error;
 
   // 에러 로그 기록
   if (process.env.NODE_ENV !== "production") {
     console.error(`[Error] ${message}`, {
       statusCode,
       statusText,
-      stack: err.stack,
+      stack: error.stack || err.stack,
     });
   }
 
-  // 클라이언트에 에러 응답
-  res
-    .status(statusCode)
-    .json({
-      success: false,
-      message,
+  const errorResponse: IApiErrorResponse = {
+    success: false,
+    message: failureMessage || "An error occurred. (에러 발생)",
+    code,
+    timestamp: new Date().toISOString(),
+    error: {
+      statusCode,
       statusText,
-      code,
-      timestamp: new Date().toISOString(),
-    });
+      message,
+      ...(errorDetails ? { details: errorDetails } : {}),
+    },
+  };
+
+  // 클라이언트에 에러 응답
+  res.status(statusCode).json(errorResponse);
 };
 
 export default errorHandler;

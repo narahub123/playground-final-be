@@ -12,7 +12,7 @@ interface IApiSuccessResponse<T = null> extends IApiResponse {
 }
 
 interface IApiErrorResponse extends IApiResponse {
-  errorDetails?: any;
+  error: Record<string, string>;
 }
 
 export type { IApiResponse, IApiSuccessResponse, IApiErrorResponse };
