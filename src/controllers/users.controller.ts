@@ -116,22 +116,39 @@ const checkUserIdDuplication = asyncWrapper(
 // 계정 정보로 연락처를 조회하는 API 핸들러
 const getContactsBeforeLogin = asyncWrapper(
   "getContactsByAccount",
+  "Failed to fetch contacts. (연락처 조회 실패)",
   async (req: Request, res: Response) => {
     // 요청 본문에서 사용자 ID, 이메일, 전화번호 추출
     const { userId, email, phone } = req.body;
 
     // 이메일, 휴대 전화 번호, 사용자 아이디 중 하나라도 없으면 BadRequestError 발생
-    if (!userId && !email && !phone)
+    if (!userId && !email && !phone) {
       throw new BadRequestError(
-        "이메일, 휴대 전화 번호 혹은 사용자 아이디를 제공해주세요."
+        "At least one of email, phone, and userId is required. (이메일, 휴대전화번호, 사용자 아이디 중 최소 하나는 필수)", // 에러 메시지
+        "MISSING_USER_IDENTIFIER", // 에러 코드
+        {
+          email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
+          phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
+          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+        }
       );
+    }
 
     const user = await userService.findUserByIdentifier(email, phone, userId);
 
-    res.status(200).json({
+    // 성공적인 응답 생성
+    const response: IApiSuccessResponse<{
+      emails: string[];
+      phones: string[];
+    }> = {
       success: true,
-      data: { emails: user.email, phones: user.phone },
-    });
+      message: "Contacts fetched successfully. (연락처 조회 성공)", // 성공 메시지
+      code: "GET_CONTACTS_SUCCEEDED", // 응답 코드
+      timestamp: new Date().toISOString(), // 응답 시각
+      data: { emails: user.email, phones: user.phone }, // 중복 여부
+    };
+
+    res.status(200).json(response);
   }
 );
 

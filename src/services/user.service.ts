@@ -1,9 +1,4 @@
 import { LockedError, NotFoundError } from "@errors";
-import {
-  getUserByEmail,
-  getUserByPhone,
-  getUserByUserId,
-} from "./user-finder.service";
 import { INotificationInput, IUser, IUserInput, LockReasonType } from "@types";
 import {
   displayRepository,
@@ -16,23 +11,41 @@ import mongoose from "mongoose";
 import { ACCOUNT_LOCK_THRESHOLD } from "@constants";
 
 class UserService {
+  /**
+   * 사용자 식별자 (이메일, 전화번호, 사용자 아이디)를 통해 사용자를 조회합니다.
+   * @param email - 이메일 (선택적)
+   * @param phone - 전화번호 (선택적)
+   * @param userId - 사용자 아이디 (선택적)
+   * @returns 사용자 정보 (IUser)
+   * @throws NotFoundError - 사용자가 존재하지 않을 경우
+   */
   async findUserByIdentifier(
     email?: string,
     phone?: string,
     userId?: string
   ): Promise<IUser> {
-    let user: IUser | undefined;
+    let user: IUser | null = null;
 
+    // 이메일을 통해 사용자를 조회
     if (email) {
-      user = await getUserByEmail(email);
-    } else if (phone) {
-      user = await getUserByPhone(phone);
-    } else if (userId) {
-      user = await getUserByUserId(userId);
+      user = await userRepository.getUserByEmail(email);
+    }
+    // 전화번호를 통해 사용자를 조회
+    else if (phone) {
+      user = await userRepository.getUserByPhone(phone);
+    }
+    // 사용자 아이디를 통해 사용자를 조회
+    else if (userId) {
+      user = await userRepository.getUserByUserId(userId);
     }
 
+    // 사용자가 없으면 NotFoundError 던짐
     if (!user) {
-      throw new NotFoundError("조건에 맞는 사용자를 찾을 수 없습니다.");
+      throw new NotFoundError(
+        "User is not found (사용자 조회 불가)", // 에러 메시지
+        "USER_NOT_FOUND", // 에러 코드
+        {}
+      );
     }
 
     return user;

@@ -34,24 +34,46 @@ class UserRepository {
     }
   }
 
-  async getUserByUserId(userId: string): Promise<IUser | undefined> {
+  /**
+   * 사용자 아이디를 기준으로 사용자를 조회합니다.
+   * @param userId - 사용자 아이디
+   * @returns 사용자 정보 (IUser) 또는 null (사용자가 없으면 null)
+   */
+  async getUserByUserId(userId: string): Promise<IUser | null> {
     try {
+      // 사용자 아이디를 기준으로 사용자 정보를 조회
       const user = await User.findOne({ userId });
 
-      return user || undefined;
+      return user;
     } catch (error: any) {
+      // 오류 발생 시 mongoDBErrorHandler로 에러를 처리하고 로그를 기록
       mongoDBErrorHandler("getUserByUserId", error, { userId });
+
+      // 에러 처리 후 null 반환
+      return null;
     }
   }
-  async getUserByPhone(phone: string): Promise<IUser | undefined> {
+
+  /**
+   * 전화번호를 기준으로 사용자를 조회합니다.
+   * @param phone - 전화번호
+   * @returns 사용자 정보 (IUser) 또는 null (사용자가 없으면 null)
+   */
+  async getUserByPhone(phone: string): Promise<IUser | null> {
     try {
+      // 전화번호를 기준으로 사용자 정보를 조회
       const user = await User.findOne({ phone });
 
-      return user || undefined;
+      return user;
     } catch (error: any) {
+      // 오류 발생 시 mongoDBErrorHandler로 에러를 처리하고 로그를 기록
       mongoDBErrorHandler("getUserByPhone", error, { phone });
+
+      // 에러 처리 후 null 반환
+      return null;
     }
   }
+
   async createUser(
     user: IUserInput,
     options?: { session: mongoose.ClientSession }
