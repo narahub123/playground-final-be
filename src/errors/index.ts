@@ -8,6 +8,7 @@ import {
   GoneError, // 410
   UnprocessableEntityError, // 422
   LockedError, // 423
+  InternalServerError, // 500
   ServiceUnavailableError, // 503
   GatewayTimeoutError, // 504
 } from "./http-errors";
@@ -18,6 +19,7 @@ import {
   MongoDBNetworkError, // 503
   MongoDBTimeoutError, // 504
 } from "./mongodb-errors";
+
 export {
   CustomAPIError,
   // http errors
@@ -29,6 +31,7 @@ export {
   GoneError, // 410
   UnprocessableEntityError, // 422
   LockedError, // 423
+  InternalServerError, // 500
   ServiceUnavailableError, // 503
   GatewayTimeoutError, // 504
   // mongodb errors

@@ -2,14 +2,14 @@ class CustomAPIError extends Error {
   statusCode: number;
   statusText: string;
   code: string;
-  errorDetails: Record<string, string>;
+  errorDetails: Record<string, any>;
 
   constructor(
     message: string,
     statusCode: number = 500,
     statusText: string = "Internal Server Error",
     code: string = "INTERNAL_SERVER_ERROR",
-    errorDetails: Record<string, string> = {}
+    errorDetails: Record<string, any> = {}
   ) {
     super(message);
     this.statusCode = statusCode;
