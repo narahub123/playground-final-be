@@ -51,6 +51,19 @@ class UserService {
     return user;
   }
 
+  /**
+   * 새 사용자의 데이터를 초기화하는 함수입니다. 이 함수는 사용자의 기본 정보, 보안 정보, 알림 설정,
+   * 디스플레이 설정, 개인정보 설정 등을 데이터베이스에 저장합니다.
+   * 모든 DB 작업은 트랜잭션 내에서 수행됩니다.
+   *
+   * @param newUser - 새 사용자 정보. 사용자의 기본 정보(이름, 이메일 등)가 포함된 객체.
+   * @param newNotification - 새 사용자에 대한 알림 설정 정보.
+   * @param userId - 새 사용자 고유 ID.
+   * @param session - Mongoose 클라이언트 세션 객체. 트랜잭션을 관리하는데 사용됩니다.
+   *
+   * @throws Error - 트랜잭션 내에서 하나라도 실패할 경우 롤백됩니다. 이 함수 자체에서 오류를 처리하지 않으며,
+   * 외부에서 트랜잭션을 처리하는 로직이 필요합니다.
+   */
   async initializeUser(
     newUser: IUserInput,
     newNotification: INotificationInput,

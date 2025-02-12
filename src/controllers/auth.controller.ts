@@ -18,7 +18,7 @@ import {
 import { UploadApiResponse } from "cloudinary";
 import mongoose from "mongoose";
 import { REFRESHTOKEN_EXPIRES } from "@constants";
-import { INotificationInput, IUserInput } from "@types";
+import { IApiSuccessResponse, INotificationInput, IUserInput } from "@types";
 import verificationService from "services/verification.service";
 import loginRecordService from "services/login-record.service";
 import { loginRecordRepository } from "@repositories";
@@ -26,6 +26,7 @@ import { loginRecordRepository } from "@repositories";
 // 사용자 정보 등록
 const signupUser = asyncWrapper(
   "signupUser",
+  "User registration failed. (회원 가입 실패)",
   async (req: Request, res: Response) => {
     const { user } = req.body;
 
@@ -47,39 +48,94 @@ const signupUser = asyncWrapper(
 
     // user에 대한 필수 값 확인
     if (!email && !phone) {
-      throw new BadRequestError("이메일 혹은 휴대폰이 제공되어야 합니다.");
-    } else if (!language) {
-      throw new BadRequestError("언어 설정이 제공되어야 합니다.");
-    } else if (!password) {
-      throw new BadRequestError("비밀번호가 제공되어야 합니다.");
-    } else if (!userId) {
-      throw new BadRequestError("사용자 아이디가 제공되어야 합니다.");
-    } else if (!username) {
-      throw new BadRequestError("사용자의 이름이 제공되어야 합니다.");
-    } else if (!birth.year || !birth.month || !birth.date) {
-      throw new BadRequestError("사용자의 생년월일이 제공되어야 합니다.");
-    } else if (
-      notifications.messages === undefined ||
-      notifications.replies === undefined ||
-      notifications.newFollower === undefined ||
-      notifications.posts === undefined
+      throw new BadRequestError(
+        "At least one of email or phone is required. (이메일, 휴대폰 중 적어도 하나 필수)",
+        "MISSING_USER_IDENTIFIER",
+        {
+          email: "이메일이 제공되지 않았습니다.",
+          phone: "휴대전화 번호가 제공되지 않았습니다.",
+        }
+      );
+    }
+
+    if (!language) {
+      throw new BadRequestError(
+        "Language setting is required. (언어 설정 필수)",
+        "MISSING_LANGUAGE_SETTING",
+        { language: "언어 설정이 제공되지 않았습니다." }
+      );
+    }
+
+    if (!password) {
+      throw new BadRequestError(
+        "Password is required. (비밀번호 필수)",
+        "MISSING_PASSWORD",
+        { password: "비밀번호가 제공되지 않았습니다." }
+      );
+    }
+
+    if (!userId) {
+      throw new BadRequestError(
+        "User ID is required. (사용자 아이디 필수)",
+        "MISSING_USER_ID",
+        { userId: "사용자 아이디가 제공되지 않았습니다." }
+      );
+    }
+
+    if (!username) {
+      throw new BadRequestError(
+        "Username is required. (사용자의 이름 필수)",
+        "MISSING_USERNAME",
+        { username: "사용자의 이름이 제공되지 않았습니다." }
+      );
+    }
+
+    if (!birth.year || !birth.month || !birth.date) {
+      throw new BadRequestError(
+        "User's birth date (year, month, date) is required. (사용자의 생년월일(year, month, date) 필수)",
+        "MISSING_BIRTH_DATE",
+        { birth: "생년월일이 제공되지 않았습니다." }
+      );
+    }
+
+    const { messages, replies, newFollower, posts } = notifications;
+    if (
+      messages === undefined ||
+      replies === undefined ||
+      newFollower === undefined ||
+      posts === undefined
     ) {
-      throw new BadRequestError("알림 설정이 제공되어야 합니다.");
-    } else if (
-      device.type === undefined ||
-      device.os === undefined ||
-      device.browser === undefined
-    ) {
-      throw new BadRequestError("기기 정보가 제공되어야 합니다.");
-    } else if (
-      !location.country ||
-      !location.state ||
-      !location.city ||
-      !location.county
-    ) {
-      throw new BadRequestError("주소 정보가 제공되어야 합니다.");
-    } else if (!ip) {
-      throw new BadRequestError("IP 정보가 제공되어야 합니다.");
+      throw new BadRequestError(
+        "Notification settings (messages, replies, newFollower, posts) are required. (알림 설정(messages, replies, newFollower, posts) 필수)",
+        "MISSING_NOTIFICATION_SETTINGS",
+        { notifications: "알림 설정이 제공되지 않았습니다." }
+      );
+    }
+
+    const { type, os, browser } = device;
+    if (type === undefined || os === undefined || browser === undefined) {
+      throw new BadRequestError(
+        "Device information (type, os, browser) is required. (기기 정보(type, os, browser) 필수)",
+        "MISSING_DEVICE_INFO",
+        { device: "기기 정보가 제공되지 않았습니다." }
+      );
+    }
+
+    const { country, state, city, county } = location;
+    if (!country || !state || !city || !county) {
+      throw new BadRequestError(
+        "Address information (country, state, city, county) is required. (주소 정보(country, state, city, county) 필수)",
+        "MISSING_ADDRESS_INFO",
+        { location: "주소 정보가 제공되지 않았습니다." }
+      );
+    }
+
+    if (!ip) {
+      throw new BadRequestError(
+        "IP information is required. (IP 주소 필수)",
+        "MISSING_IP_ADDRESS",
+        { ip: "IP 주소가 제공되지 않았습니다." }
+      );
     }
 
     const session = await mongoose.startSession();
@@ -98,7 +154,7 @@ const signupUser = asyncWrapper(
       const birthCombined = combineBirth(birth.year, birth.month, birth.date);
 
       // 국가
-      const country = extractCountryFromLanguage(language);
+      const countryInfo = extractCountryFromLanguage(language);
 
       const newUser: IUserInput = {
         password: hashedPassword,
@@ -108,7 +164,7 @@ const signupUser = asyncWrapper(
         birth: birthCombined,
         phone,
         gender,
-        country,
+        country: countryInfo,
         language,
         ip,
         location,
@@ -137,7 +193,14 @@ const signupUser = asyncWrapper(
       // 인증 이메일 전송하고 인증 코드 저장
       await verificationService.sendVerificationCode(email, userId);
 
-      res.status(201).json({ success: true });
+      const response: IApiSuccessResponse = {
+        success: true,
+        message: "User registration successful. (회원 가입 성공)",
+        code: "USER_REGISTRATION_SUCCESS",
+        timestamp: new Date().toISOString(),
+      };
+
+      res.status(201).json(response);
     } catch (error) {
       if (uploadedProfileImage.length > 0) {
         deleteImages(uploadedProfileImage);
