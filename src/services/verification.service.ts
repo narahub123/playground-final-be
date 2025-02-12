@@ -70,6 +70,17 @@ class VerificationService {
     }
   }
 
+  /**
+   * 사용자 인증 코드 검증을 수행하는 함수.
+   * 주어진 userId와 인증 코드가 일치하는지 확인하고, 만료된 인증 코드에 대해서는 예외를 던집니다.
+   *
+   * @param {string} userId - 인증 코드가 저장된 사용자의 고유 ID
+   * @param {string} verificationCode - 클라이언트가 제출한 인증 코드
+   *
+   * @returns {Promise<boolean>} 인증 코드가 일치하면 true, 아니면 false
+   *
+   * @throws {GoneError} 인증 코드가 만료된 경우 예외를 던집니다.
+   */
   async verifyVerificationCode(
     userId: string,
     verificationCode: string
@@ -81,12 +92,17 @@ class VerificationService {
 
     // 인증 코드 만료 확인
     if (!verification) {
+      // 인증 코드가 존재하지 않으면 만료된 것으로 처리
       throw new GoneError(
-        "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.",
-        "VERIFICATION_CODE_EXPIRED"
+        "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.", // 에러 메시지
+        "VERIFICATION_CODE_EXPIRED", // 에러 코드
+        {
+          verification_code: "인증코드가 만료되었습니다.", // 세부 에러 설명
+        }
       );
     }
 
+    // 인증 코드가 일치하는지 비교
     return verificationCode === verification.verificationCode;
   }
 }

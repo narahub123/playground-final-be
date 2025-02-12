@@ -72,22 +72,33 @@ const requestLoginVerificationCode = asyncWrapper(
 // 인증 코드 확인 핸들러
 const checkLoginVerificationCode = asyncWrapper(
   "checkLoginVerificationCode",
+  "Verification code verification failed (인증 코드 인증 실패)",
   async (req: Request, res: Response) => {
     const { email, phone, userId, verificationCode } = req.body;
 
-    // 필수 입력값 검증
-    if (!email && !phone && !userId)
+    // 이메일, 휴대 전화 번호, 사용자 아이디 중 하나라도 없으면 BadRequestError 발생
+    if (!userId && !email && !phone) {
       throw new BadRequestError(
-        "이메일, 휴대 전화 번호 혹은 사용자 아이디를 제공해주세요."
+        "At least one of email, phone, and userId is required. (이메일, 휴대전화번호, 사용자 아이디 중 최소 하나는 필수)", // 에러 메시지
+        "MISSING_USER_IDENTIFIER", // 에러 코드
+        {
+          email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
+          phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
+          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+        }
       );
-    if (!verificationCode)
-      throw new BadRequestError("인증 코드를 작성해주세요.");
-
-    const user = await findUserByIdentifier(email, phone, userId);
-
-    if (!user) {
-      throw new NotFoundError("조건에 맞는 유저가 없습니다.");
     }
+    if (!verificationCode) {
+      throw new BadRequestError(
+        "verification code is required. (인증 코드 필수)", // 에러 메시지
+        "MISSING_VERIFICATION_CODE", // 에러 코드
+        {
+          verification_code: "인증코드가 제공되지 않았습니다.", // 에러 세부사항
+        }
+      );
+    }
+
+    const user = await userService.findUserByIdentifier(email, phone, userId);
 
     // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
     const isVerified = await verficationService.verifyVerificationCode(
@@ -97,13 +108,21 @@ const checkLoginVerificationCode = asyncWrapper(
 
     // 인증 코드 일치 여부 확인
     if (isVerified) {
-      return res
-        .status(200)
-        .json({ success: true, message: "인증 코드가 확인되었습니다." });
+      const response: IApiSuccessResponse = {
+        success: true,
+        message:
+          "Verification code successfully verified. (인증 코드 인증 성공)",
+        code: "VERIFICATION_CODE_VERIFIED", // 인증 코드가 인증 성공한 경우의 응답 코드
+        timestamp: new Date().toISOString(),
+      };
+      return res.status(200).json(response);
     } else {
       throw new UnauthorizedError(
-        "입력하신 정보가 잘못되었습니다. 다시 시도해주세요.",
-        "VERIFICATION_CODE_MISMATCH"
+        "The verification code is incorrect. (인증 코드 인증 코드 불일치)",
+        "VERIFICATION_CODE_MISMATCH",
+        {
+          verification_code: "인증 코드가 일치하지 않습니다.",
+        }
       );
     }
   }
