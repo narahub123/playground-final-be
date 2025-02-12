@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BadRequestError, CustomAPIError } from "@errors";
+import { BadRequestError, CustomAPIError, InternalServerError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   verifyAccountLock,
@@ -21,7 +21,6 @@ import { REFRESHTOKEN_EXPIRES } from "@constants";
 import { IApiSuccessResponse, INotificationInput, IUserInput } from "@types";
 import verificationService from "services/verification.service";
 import loginRecordService from "services/login-record.service";
-import { loginRecordRepository } from "@repositories";
 
 // 사용자 정보 등록
 const signupUser = asyncWrapper(
@@ -216,33 +215,50 @@ const signupUser = asyncWrapper(
 // 로그인 처리 핸들러
 const loginUser = asyncWrapper(
   "loginUser",
+  "Login failed. (로그인 실패)",
   async (req: Request, res: Response) => {
     // 요청 바디에서 사용자 정보 추출
     const { email, phone, userId, password, device, ip, location } = req.body;
 
     // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
     if (!password) {
-      throw new BadRequestError("확인할 비밀번호를 제공해주세요.");
+      throw new BadRequestError(
+        "Password is required. (비밀번호 필수)",
+        "MISSING_PASSWORD",
+        { password: "비밀번호가 제공되지 않았습니다." }
+      );
     }
 
     // 이메일, 전화번호, 사용자 ID 중 하나도 제공되지 않은 경우 BadRequestError 발생
     if (!email && !phone && !userId) {
       throw new BadRequestError(
-        "이메일, 휴대전화 번호 혹은 사용자 이름을 제공해주세요."
+        "At least one of email, phone, or userId is required. (이메일, 휴대전화 번호, 사용자 아이디 중 적어도 하나 필수)",
+        "MISSING_USER_IDENTIFIER",
+        {
+          email: "이메일이 제공되지 않았습니다.",
+          phone: "휴대전화 번호가 제공되지 않았습니다.",
+          userId: "사용자 아이디가 제공되지 않았습니다.",
+        }
       );
     }
 
     // 기기, IP, 장소 중 하나라도 제공되지 않은 경우 BadRequestError 발생
     if (!device || !ip || !location) {
       throw new BadRequestError(
-        "사용 기기, IP, 장소에 대한 정보를 제공해주세요."
+        "Device, IP, and location information is required. (기기, IP, 장소 필수)",
+        "MISSING_DEVICE_IP_LOCATION",
+        {
+          device: "기기 정보가 제공되지 않았습니다.",
+          ip: "IP 정보가 제공되지 않았습니다.",
+          location: "장소 정보가 제공되지 않았습니다.",
+        }
       );
     }
 
     // 사용자 정보 조회
     const user = await userService.findUserByIdentifier(email, phone, userId);
 
-    // 해당 계정이 잠금 계정인지 여부 확인
+    // 해당 계정이 잠금 계정인지 여부 확인(유틸)
     verifyAccountLock(user.lockStatus);
 
     // 비밀번호 검증 및 로그인 실패 처리
@@ -266,7 +282,12 @@ const loginUser = asyncWrapper(
 
     // 기존 세션이 있으면 바로 로그인 성공 응답 반환
     if (isExistingSession) {
-      return res.status(200).json({ success: true, message: "로그인 성공" });
+      return res.status(200).json({
+        success: true,
+        message: "Login successful. (로그인 성공)",
+        code: "LOGIN_SUCCESS", // 추가적으로 코드도 명시
+        timestamp: new Date().toISOString(),
+      });
     }
 
     // 새로운 세션 생성 및 토큰 발급
@@ -288,16 +309,12 @@ const loginUser = asyncWrapper(
     });
 
     // 로그인 기록을 저장
-    const savedRecord = await loginRecordRepository.createLoginRecord({
+    await loginRecordService.createLoginRecord({
       userId: user.userId,
       device,
       ip,
       location,
     });
-
-    if (!savedRecord) {
-      throw new CustomAPIError("로그인 기록 저장에 실패했습니다.");
-    }
 
     // 로그인 성공 시 Normal 로그인 실패 삭제
     await loginFailureService.clearNormalLoginFailures(user.userId);
@@ -328,7 +345,9 @@ const loginUser = asyncWrapper(
     // 로그인 성공 응답
     res.status(200).json({
       success: true,
-      message: "로그인 성공",
+      message: "Login successful. (로그인 성공)",
+      code: "LOGIN_SUCCESS", // 추가적으로 코드도 명시
+      timestamp: new Date().toISOString(),
       meta: {
         newLoginAttempt: {
           status: hasNewLoginAttempt,

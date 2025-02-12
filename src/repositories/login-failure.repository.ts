@@ -106,7 +106,7 @@ class LoginFailureRepository {
       return await LoginFailure.deleteMany({ _id: { $in: failureIds } });
     } catch (error) {
       // 데이터베이스 오류 핸들링
-      mongoDBErrorHandler("", error, { failureIds });
+      mongoDBErrorHandler("deleteLoginFailuresByIds", error, { failureIds });
     }
   }
 }

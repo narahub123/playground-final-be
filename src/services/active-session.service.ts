@@ -1,4 +1,4 @@
-import { CustomAPIError } from "@errors";
+import { CustomAPIError, InternalServerError } from "@errors";
 import { IDevice, ILocation, UserRoleType } from "@types";
 import { activeSessionRepository } from "@repositories";
 import { createAccessToken, createRefreshToken } from "@utils";
@@ -71,11 +71,9 @@ class ActiveSessionService {
 
     // active session 생성 실패 시 에러 발생
     if (!activeSession) {
-      throw new CustomAPIError(
-        "active session 생성 실패",
-        500,
-        "Internal Error",
-        "ACTIVE_SESSION_FAILED"
+      throw new InternalServerError(
+        "Failed to create active session. (활성 세션 생성 실패)",
+        "SESSION_CREATION_FAILED"
       );
     }
 

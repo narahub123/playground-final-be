@@ -14,7 +14,7 @@ class ActiveSessionRepository {
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
-  }): Promise<IActiveSession | null | undefined> {
+  }): Promise<IActiveSession | null> {
     try {
       // 세션 정보를 기반으로 MongoDB에서 활성 세션을 찾음
       return await ActiveSession.findOne({
@@ -33,7 +33,7 @@ class ActiveSessionRepository {
       mongoDBErrorHandler("getActiveSessionByInfo", error, sessionInfo);
 
       // 오류가 발생한 경우 undefined 반환
-      return undefined;
+      return null;
     }
   }
 
@@ -50,7 +50,7 @@ class ActiveSessionRepository {
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
-  }){
+  }) {
     // 반환 값: 생성된 활성 세션 객체 또는 오류 발생 시 undefined
     try {
       // 세션 정보를 기반으로 새로운 활성 세션 생성

@@ -1,5 +1,6 @@
-import { IDevice, ILocation } from "@types";
+import { IDevice, ILocation, ILoginRecordInput } from "@types";
 import { loginRecordRepository } from "@repositories";
+import { InternalServerError } from "@errors";
 
 class LoginRecordService {
   /**
@@ -78,6 +79,29 @@ class LoginRecordService {
     // 새로운 로그인 시도에 대한 메시지 값을 포함한 객체 반환
     // 해당 사항이 없으면 값이 null로 반환된다.
     return newLoginAttempt;
+  }
+
+  /**
+   * 로그인 기록을 생성하는 메서드입니다.
+   *
+   * @param {ILoginRecordInput} loginInfo - 로그인 기록에 필요한 정보를 담고 있는 객체.
+   * @throws {InternalServerError} 로그인 기록 저장에 실패한 경우 발생합니다.
+   *
+   * @returns {Promise<void>} 로그인 기록 생성이 성공하면 void를 반환합니다.
+   */
+  async createLoginRecord(loginInfo: ILoginRecordInput): Promise<void> {
+    // 로그인 기록 생성
+    const loginRecord = await loginRecordRepository.createLoginRecord(
+      loginInfo
+    );
+
+    // 로그인 기록이 생성되지 않은 경우 오류를 던짐
+    if (!loginRecord) {
+      throw new InternalServerError(
+        "Failed to save login record. (로그인 기록 저장에 실패했습니다.)", // 오류 메시지
+        "LOGIN_RECORD_SAVE_FAILED" // 에러 코드
+      );
+    }
   }
 }
 

@@ -1,7 +1,9 @@
 import { LoginFailure } from "@models";
 import {
+  ConflictError,
   CustomAPIError,
   ForbiddenError,
+  InternalServerError,
   MongoDBCastError,
   MongoDBDuplicateKeyError,
   MongoDBNetworkError,
@@ -70,7 +72,7 @@ class LoginFailureService {
     // 업데이트된 문서의 수가 예상된 수와 일치하지 않으면 예외 던짐
     if (result?.modifiedCount !== bruteForceIds.length) {
       throw new ForbiddenError(
-        "계정 잠금 처리 중 문제가 발생했습니다. 관리자에게 문의하세요.",
+        "An issue occurred while locking the account. (계정 처리 중 에러)",
         "LOCK_PROCESS_FAILED"
       );
     }
@@ -122,10 +124,8 @@ class LoginFailureService {
 
     if (!savedFailure) {
       // 로그인 실패 기록 저장 실패 시, 예외 던짐
-      throw new CustomAPIError(
+      throw new InternalServerError(
         "로그인 실패 기록 저장 실패",
-        500,
-        "Internal Error",
         "LOGIN_FAILURE_UNSAVED"
       );
     }
@@ -181,7 +181,22 @@ class LoginFailureService {
       .map((failure) => failure._id);
 
     // 'Normal' 타입의 로그인 실패 기록들을 삭제
-    await loginFailureRepository.deleteLoginFailuresByIds(normalIds);
+    const response = await loginFailureRepository.deleteLoginFailuresByIds(
+      normalIds
+    );
+
+    if (response?.deletedCount !== normalIds.length) {
+      // 삭제된 수가 예상한 수와 다른 경우 처리
+      throw new ConflictError(
+        "Some login failures were not deleted. (일부 로그인 실패 기록이 삭제되지 않았습니다.)",
+        "PARTIAL_DELETION_FAILED",
+        {
+          userId,
+          expectedCount: normalIds.length,
+          deletedCount: response?.deletedCount,
+        }
+      );
+    }
   }
 }
 

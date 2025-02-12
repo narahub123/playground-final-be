@@ -79,21 +79,32 @@ class UserService {
     await privacyRepository.createPrivacy(userId, { session });
   }
 
+  /**
+   * 사용자 계정을 잠급니다.
+   * 로그인 시도가 비정상적으로 감지되었거나, 로그인 실패 횟수가 초과되었을 경우 계정을 잠급니다.
+   *
+   * @param userId - 잠금 처리를 할 사용자의 ID
+   * @param lockReason - 계정을 잠그는 이유 (예: 비정상적인 로그인 시도, 로그인 실패 횟수 초과 등)
+   * @throws {LockedError} 계정 잠금 이유에 해당하는 에러를 던집니다.
+   */
   async lockAccount(userId: string, lockReason: LockReasonType) {
+    // 계정 잠금 이유에 따른 에러 메시지를 설정
     const errorMessages: Record<LockReasonType, string> = {
       BRUTE_FORCE_DETECTED:
-        "비정상적인 로그인 시도가 감지되어 계정이 잠깁니다. 로그인을 위해서는 관리자에게 문의하세요.",
+        "Abnormal login attempts detected, and the account has been locked. (비정상적인 로그인 시도로 인한 계정 잠금)",
 
-      TOO_MANY_LOGIN_FAILURES: `로그인 시도 횟수 ${ACCOUNT_LOCK_THRESHOLD}회가 되어서 계정이 잠겼습니다. 비밀번호 찾기 또는 관리자에게 문의하세요.`,
+      TOO_MANY_LOGIN_FAILURES:
+        "The account has been locked due to excessive login attempts. (로그인 횟수 초과로 인한 계정 잠금)",
     };
 
-    // 잠금 처리
+    // 사용자 계정 잠금 처리
     await userRepository.updateLockStatus(userId, {
-      isLocked: true,
-      lockReason,
-      lockedAt: new Date(),
+      isLocked: true, // 계정 잠금 상태로 설정
+      lockReason, // 계정 잠금 사유 설정
+      lockedAt: new Date(), // 계정 잠금 시간을 현재 시간으로 설정
     });
 
+    // 잠금 처리 후, 해당 사유에 맞는 LockedError를 던짐
     throw new LockedError(errorMessages[lockReason], lockReason);
   }
 }
