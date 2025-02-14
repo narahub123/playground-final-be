@@ -16,9 +16,9 @@ const checkEmailDuplication = asyncWrapper(
     if (!email) {
       throw new BadRequestError(
         "Email is required. (이메일 필수)",
-        "MISS_EMAIL",
+        "VALIDATION_ERROR",
         {
-          email: "이메일 필드가 제공되지 않았습니다.",
+          email: "MISS_EMAIL",
         }
       );
     }
@@ -53,9 +53,9 @@ const checkPhoneDuplication = asyncWrapper(
     if (!phone) {
       throw new BadRequestError(
         "Phone is required. (휴대 전화 번호 필수)",
-        "MISSING_PHONE",
+        "VALIDATION_ERROR", // 에러 코드
         {
-          phone: "휴대 전화 번호 필드가 제공되지 않았습니다.",
+          phone: "MISSING_PHONE",
         }
       );
     }
@@ -91,9 +91,9 @@ const checkUserIdDuplication = asyncWrapper(
     if (!userId) {
       throw new BadRequestError(
         "UserId is required. (사용자 아이디 필수)", // 에러 메시지
-        "MISSING_USERID", // 에러 코드
+        "VALIDATION_ERROR", // 에러 코드
         {
-          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+          userId: "MISSING_USERID",
         }
       );
     }
@@ -131,11 +131,11 @@ const getContactsBeforeLogin = asyncWrapper(
     if (!userId && !email && !phone) {
       throw new BadRequestError(
         "At least one of email, phone, and userId is required. (이메일, 휴대전화번호, 사용자 아이디 중 최소 하나는 필수)", // 에러 메시지
-        "MISSING_USERIDENTIFIER", // 에러 코드
+        "VALIDATION_ERROR", // 에러 코드
         {
-          email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
-          phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
-          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+          email: "MISSING_EMAIL", // 에러 세부사항
+          phone: "MISSING_PHONE", // 에러 세부사항
+          userId: "MISSING_USERID", // 에러 세부사항
         }
       );
     }

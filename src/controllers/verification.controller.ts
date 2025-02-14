@@ -25,10 +25,10 @@ const requestLoginVerificationCode = asyncWrapper(
     if (!email && !phone) {
       throw new BadRequestError(
         "At least one of email and phone is required. (이메일, 휴대전화번호 중 최소 하나는 필수)", // 에러 메시지
-        "MISSING_USERIDENTIFIER", // 에러 코드
+        "VALIDATION_ERROR",
         {
-          email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
-          phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
+          email: "MISSING_EMAIL", // 에러 세부사항
+          phone: "MISSING_PHONE", // 에러 세부사항
         }
       );
     }
@@ -80,20 +80,20 @@ const checkLoginVerificationCode = asyncWrapper(
     if (!userId && !email && !phone) {
       throw new BadRequestError(
         "At least one of email, phone, and userId is required. (이메일, 휴대전화번호, 사용자 아이디 중 최소 하나는 필수)", // 에러 메시지
-        "MISSING_USERIDENTIFIER", // 에러 코드
+        "VALIDATION_ERROR",
         {
-          email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
-          phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
-          userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
+          email: "MISSING_EMAIL", // 에러 세부사항
+          phone: "MISSING_PHONE", // 에러 세부사항
+          userId: "MISSING_USERID", // 에러 세부사항
         }
       );
     }
     if (!verificationCode) {
       throw new BadRequestError(
         "verification code is required. (인증 코드 필수)", // 에러 메시지
-        "MISSING_VERIFICATION_CODE", // 에러 코드
+        "VALIDATION_ERROR",
         {
-          verification_code: "인증코드가 제공되지 않았습니다.", // 에러 세부사항
+          verification_code: "MISSING_VERIFICATION_CODE", // 에러 코드
         }
       );
     }
@@ -119,9 +119,9 @@ const checkLoginVerificationCode = asyncWrapper(
     } else {
       throw new UnauthorizedError(
         "The verification code is incorrect. (인증 코드 인증 코드 불일치)",
-        "VERIFICATION_CODE_MISMATCH",
+        "VERIFICATION_ERROR",
         {
-          verification_code: "인증 코드가 일치하지 않습니다.",
+          verification_code: "VERIFICATION_CODE_MISMATCH",
         }
       );
     }

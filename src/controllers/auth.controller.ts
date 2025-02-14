@@ -50,10 +50,10 @@ const signupUser = asyncWrapper(
     if (!email && !phone) {
       throw new BadRequestError(
         "At least one of email or phone is required. (이메일, 휴대폰 중 적어도 하나 필수)",
-        "MISSING_USERIDENTIFIER",
+        "VALIDATION_ERROR",
         {
-          email: "이메일이 제공되지 않았습니다.",
-          phone: "휴대전화 번호가 제공되지 않았습니다.",
+          email: "MISSING_EMAIL",
+          phone: "MISSING_PHONE",
         }
       );
     }
@@ -61,40 +61,40 @@ const signupUser = asyncWrapper(
     if (!language) {
       throw new BadRequestError(
         "Language setting is required. (언어 설정 필수)",
-        "MISSING_LANGUAGE_SETTING",
-        { language: "언어 설정이 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { language: "MISSING_LANGUAGE_SETTING" }
       );
     }
 
     if (!password) {
       throw new BadRequestError(
         "Password is required. (비밀번호 필수)",
-        "MISSING_PASSWORD",
-        { password: "비밀번호가 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { password: "MISSING_PASSWORD" }
       );
     }
 
     if (!userId) {
       throw new BadRequestError(
         "User ID is required. (사용자 아이디 필수)",
-        "MISSING_USERID",
-        { userId: "사용자 아이디가 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { userId: "MISSING_USERID" }
       );
     }
 
     if (!username) {
       throw new BadRequestError(
         "Username is required. (사용자의 이름 필수)",
-        "MISSING_USERNAME",
-        { username: "사용자의 이름이 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { username: "MISSING_USERNAME" }
       );
     }
 
     if (!birth.year || !birth.month || !birth.date) {
       throw new BadRequestError(
         "User's birth date (year, month, date) is required. (사용자의 생년월일(year, month, date) 필수)",
-        "MISSING_BIRTH_DATE",
-        { birth: "생년월일이 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { birth: "MISSING_BIRTH" }
       );
     }
 
@@ -107,8 +107,8 @@ const signupUser = asyncWrapper(
     ) {
       throw new BadRequestError(
         "Notification settings (messages, replies, newFollower, posts) are required. (알림 설정(messages, replies, newFollower, posts) 필수)",
-        "MISSING_NOTIFICATION_SETTINGS",
-        { notifications: "알림 설정이 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { notifications: "MISSING_NOTIFICATION_SETTINGS" }
       );
     }
 
@@ -116,8 +116,8 @@ const signupUser = asyncWrapper(
     if (type === undefined || os === undefined || browser === undefined) {
       throw new BadRequestError(
         "Device information (type, os, browser) is required. (기기 정보(type, os, browser) 필수)",
-        "MISSING_DEVICE_INFO",
-        { device: "기기 정보가 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { device: "MISSING_DEVICE" }
       );
     }
 
@@ -125,16 +125,16 @@ const signupUser = asyncWrapper(
     if (!country || !state || !city || !county) {
       throw new BadRequestError(
         "Locatioin information (country, state, city, county) is required. (주소 정보(country, state, city, county) 필수)",
-        "MISSING_LOCATION",
-        { location: "주소 정보가 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { location: "MISSING_LOCATION" }
       );
     }
 
     if (!ip) {
       throw new BadRequestError(
         "IP information is required. (IP 주소 필수)",
-        "MISSING_IP",
-        { ip: "IP 주소가 제공되지 않았습니다." }
+        "VALIDATION_ERROR",
+        { ip: "MISSING_IP" }
       );
     }
 
@@ -248,7 +248,7 @@ const loginUser = asyncWrapper(
         "Device, IP, and location information is required. (기기, IP, 장소 필수)",
         "MISSING_DEVICE_IP_LOCATION",
         {
-          device: "MISSING_DEVICE_INFO",
+          device: "MISSING_DEVICE",
           ip: "MISSING_IP",
           location: "MISSING_LOCATION",
         }
