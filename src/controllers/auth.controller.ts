@@ -124,8 +124,8 @@ const signupUser = asyncWrapper(
     const { country, state, city, county } = location;
     if (!country || !state || !city || !county) {
       throw new BadRequestError(
-        "Address information (country, state, city, county) is required. (주소 정보(country, state, city, county) 필수)",
-        "MISSING_ADDRESS_INFO",
+        "Locatioin information (country, state, city, county) is required. (주소 정보(country, state, city, county) 필수)",
+        "MISSING_LOCATION",
         { location: "주소 정보가 제공되지 않았습니다." }
       );
     }
@@ -133,7 +133,7 @@ const signupUser = asyncWrapper(
     if (!ip) {
       throw new BadRequestError(
         "IP information is required. (IP 주소 필수)",
-        "MISSING_IP_ADDRESS",
+        "MISSING_IP",
         { ip: "IP 주소가 제공되지 않았습니다." }
       );
     }
@@ -237,9 +237,7 @@ const loginUser = asyncWrapper(
         "At least one of email, phone, or userId is required. (이메일, 휴대전화 번호, 사용자 아이디 중 적어도 하나 필수)",
         "MISSING_USER_IDENTIFIER",
         {
-          email: "이메일이 제공되지 않았습니다.",
-          phone: "휴대전화 번호가 제공되지 않았습니다.",
-          userId: "사용자 아이디가 제공되지 않았습니다.",
+          identifier: "MISSING_USER_IDENTIFIER",
         }
       );
     }
@@ -250,9 +248,9 @@ const loginUser = asyncWrapper(
         "Device, IP, and location information is required. (기기, IP, 장소 필수)",
         "MISSING_DEVICE_IP_LOCATION",
         {
-          device: "기기 정보가 제공되지 않았습니다.",
-          ip: "IP 정보가 제공되지 않았습니다.",
-          location: "장소 정보가 제공되지 않았습니다.",
+          device: "MISSING_DEVICE_INFO",
+          ip: "MISSING_IP",
+          location: "MISSING_LOCATION",
         }
       );
     }

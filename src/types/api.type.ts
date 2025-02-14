@@ -13,6 +13,8 @@ interface IApiSuccessResponse<T = null> extends IApiResponse {
 
 interface IApiErrorResponse extends IApiResponse {
   error: Record<string, any>;
+  statusCode: number;
+  statusText: string;
 }
 
 export type { IApiResponse, IApiSuccessResponse, IApiErrorResponse };

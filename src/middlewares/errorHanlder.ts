@@ -29,6 +29,7 @@ const errorHandler = (
     message = "An unexpected error occurred. ()",
     code = "INTERNAL_SERVER_ERROR",
     errorDetails,
+    type = "logic",
   } = error;
 
   // 에러 로그 기록
@@ -43,11 +44,12 @@ const errorHandler = (
   const errorResponse: IApiErrorResponse = {
     success: false,
     message: failureMessage || "An error occurred. (에러 발생)",
+    statusCode,
+    statusText,
     code: errorCode || "ERROR",
     timestamp: new Date().toISOString(),
     error: {
-      statusCode,
-      statusText,
+      type,
       message,
       code,
       ...(errorDetails ? { details: errorDetails } : {}),
