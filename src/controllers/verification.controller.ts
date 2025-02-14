@@ -25,7 +25,7 @@ const requestLoginVerificationCode = asyncWrapper(
     if (!email && !phone) {
       throw new BadRequestError(
         "At least one of email and phone is required. (이메일, 휴대전화번호 중 최소 하나는 필수)", // 에러 메시지
-        "MISSING_USER_IDENTIFIER", // 에러 코드
+        "MISSING_USERIDENTIFIER", // 에러 코드
         {
           email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
           phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항
@@ -80,7 +80,7 @@ const checkLoginVerificationCode = asyncWrapper(
     if (!userId && !email && !phone) {
       throw new BadRequestError(
         "At least one of email, phone, and userId is required. (이메일, 휴대전화번호, 사용자 아이디 중 최소 하나는 필수)", // 에러 메시지
-        "MISSING_USER_IDENTIFIER", // 에러 코드
+        "MISSING_USERIDENTIFIER", // 에러 코드
         {
           email: "이메일이 제공되지 않았습니다.", // 에러 세부사항
           phone: "휴대 전화 번호가 제공되지 않았습니다.", // 에러 세부사항

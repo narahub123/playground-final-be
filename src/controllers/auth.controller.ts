@@ -50,7 +50,7 @@ const signupUser = asyncWrapper(
     if (!email && !phone) {
       throw new BadRequestError(
         "At least one of email or phone is required. (이메일, 휴대폰 중 적어도 하나 필수)",
-        "MISSING_USER_IDENTIFIER",
+        "MISSING_USERIDENTIFIER",
         {
           email: "이메일이 제공되지 않았습니다.",
           phone: "휴대전화 번호가 제공되지 않았습니다.",
@@ -77,7 +77,7 @@ const signupUser = asyncWrapper(
     if (!userId) {
       throw new BadRequestError(
         "User ID is required. (사용자 아이디 필수)",
-        "MISSING_USER_ID",
+        "MISSING_USERID",
         { userId: "사용자 아이디가 제공되지 않았습니다." }
       );
     }
@@ -235,9 +235,9 @@ const loginUser = asyncWrapper(
     if (!email && !phone && !userId) {
       throw new BadRequestError(
         "At least one of email, phone, or userId is required. (이메일, 휴대전화 번호, 사용자 아이디 중 적어도 하나 필수)",
-        "MISSING_USER_IDENTIFIER",
+        "MISSING_USERIDENTIFIER",
         {
-          identifier: "MISSING_USER_IDENTIFIER",
+          identifier: "MISSING_USERIDENTIFIER",
         }
       );
     }
