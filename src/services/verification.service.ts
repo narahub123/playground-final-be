@@ -101,7 +101,7 @@ class VerificationService {
       // 인증 코드가 존재하지 않으면 만료된 것으로 처리
       throw new GoneError(
         "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.", // 에러 메시지
-        "AUTHENTICATION_ERROR", // 에러 코드
+        "AUTHENTICATION_FAILED", // 에러 코드
         {
           verification_code: "VERIFICATION_CODE_EXPIRED", // 세부 에러 설명
         }
