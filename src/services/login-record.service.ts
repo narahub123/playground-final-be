@@ -99,7 +99,10 @@ class LoginRecordService {
     if (!loginRecord) {
       throw new InternalServerError(
         "Failed to save login record. (로그인 기록 저장에 실패했습니다.)", // 오류 메시지
-        "LOGIN_RECORD_SAVE_FAILED" // 에러 코드
+        "SAVE_FAILED",
+        {
+          loginRecord: "LOGIN_RECORD_SAVE_FAILED", // 에러 코드
+        }
       );
     }
   }

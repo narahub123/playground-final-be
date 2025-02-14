@@ -41,9 +41,9 @@ class AuthService {
       // 비밀번호가 일치하지 않으면 UnauthorizedError 예외를 던짐
       throw new UnauthorizedError(
         "Incorrect password. (비밀번호 불일치)",
-        "PASSWORD_UNMATCHED",
+        "AUTHENTICATION_FAILED",
         {
-          password: "비밀번호가 일치하지 않습니다.",
+          password: "PASSWORD_UNMATCHED",
         }
       );
     }

@@ -43,8 +43,10 @@ class UserService {
     if (!user) {
       throw new NotFoundError(
         "User is not found (사용자 조회 불가)", // 에러 메시지
-        "USER_NOT_FOUND", // 에러 코드
-        {}
+        "NOT_FOUND", // 에러 코드
+        {
+          user: "USER_NOT_FOUND", // 에러 코드
+        }
       );
     }
 
@@ -105,7 +107,9 @@ class UserService {
     });
 
     // 잠금 처리 후, 해당 사유에 맞는 LockedError를 던짐
-    throw new LockedError(errorMessages[lockReason], lockReason);
+    throw new LockedError(errorMessages[lockReason], "ACCOUNT_LOCK", {
+      lock: lockReason,
+    });
   }
 }
 

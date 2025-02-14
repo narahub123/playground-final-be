@@ -29,8 +29,11 @@ class VerificationService {
       if (!deletedVerification) {
         throw new InternalServerError(
           "Failed to delete verificationCode. (인증 코드 삭제 실패)", // 에러 메시지
-          "FAILED_TO_DELETE_VERIFICATION_CODE", // 에러 코드
-          { verificationId: verification._id } // 에러 세부 사항
+          "DELETE_FAILED", // 에러 코드
+          {
+            verificationId: verification._id,
+            verification_code: "FAILED_TO_DELETE_VERIFICATION_CODE",
+          } // 에러 세부 사항
         );
       }
     }
@@ -65,7 +68,10 @@ class VerificationService {
     if (!verification) {
       throw new InternalServerError(
         "Failed to create verification code (인증 코드 저장 실패)",
-        "FAILED_TO_CREATE_VERIFICATION_CODE"
+        "SAVE_FAILED",
+        {
+          verification_code: "FAILED_TO_CREATE_VERIFICATION_CODE",
+        }
       );
     }
   }
@@ -95,9 +101,9 @@ class VerificationService {
       // 인증 코드가 존재하지 않으면 만료된 것으로 처리
       throw new GoneError(
         "인증코드가 만료되었습니다. 인증 코드를 다시 요청해주세요.", // 에러 메시지
-        "VERIFICATION_CODE_EXPIRED", // 에러 코드
+        "AUTHENTICATION_ERROR", // 에러 코드
         {
-          verification_code: "인증코드가 만료되었습니다.", // 세부 에러 설명
+          verification_code: "VERIFICATION_CODE_EXPIRED", // 세부 에러 설명
         }
       );
     }
