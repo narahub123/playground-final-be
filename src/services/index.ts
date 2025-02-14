@@ -1,5 +1,5 @@
 import { sendEmail } from "./email.service";
-import verficationService from "./verification.service";
+import verificationService from "./verification.service";
 import duplicateDetectionService from "./duplicate-detection.service";
 import userService from "./user.service";
 import loginFailureService from "./login-failure.service";
@@ -12,7 +12,7 @@ export {
   sendEmail,
 
   // verificationCode
-  verficationService,
+  verificationService,
 
   // duplicate-detection
   duplicateDetectionService,

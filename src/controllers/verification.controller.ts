@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "@errors";
-import { userService, verficationService } from "@services";
-import verificationService from "services/verification.service";
-import { findUserByIdentifier } from "@utils";
+import { BadRequestError, UnauthorizedError } from "@errors";
+import { userService, verificationService } from "@services";
 import { IApiSuccessResponse } from "@types";
 
 /**
@@ -19,6 +17,7 @@ import { IApiSuccessResponse } from "@types";
 const requestLoginVerificationCode = asyncWrapper(
   "requestLoginVerificationCode",
   "Failed to send verification code. (인증 코드 전송 실패)",
+  "VERIFICATION_CODE_SEND_FAILED", // 인증 코드 전송 실패
   async (req: Request, res: Response) => {
     const { email, phone } = req.body;
 
@@ -73,6 +72,7 @@ const requestLoginVerificationCode = asyncWrapper(
 const checkLoginVerificationCode = asyncWrapper(
   "checkLoginVerificationCode",
   "Verification code verification failed (인증 코드 인증 실패)",
+  "VERIFICATION_CODE_VERIFICATION_FAILED", // 인증 코드 인증 실패
   async (req: Request, res: Response) => {
     const { email, phone, userId, verificationCode } = req.body;
 
@@ -101,7 +101,7 @@ const checkLoginVerificationCode = asyncWrapper(
     const user = await userService.findUserByIdentifier(email, phone, userId);
 
     // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
-    const isVerified = await verficationService.verifyVerificationCode(
+    const isVerified = await verificationService.verifyVerificationCode(
       user.userId,
       verificationCode
     );

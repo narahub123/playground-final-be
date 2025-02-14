@@ -26,6 +26,7 @@ import loginRecordService from "services/login-record.service";
 const signupUser = asyncWrapper(
   "signupUser",
   "User registration failed. (회원 가입 실패)",
+  "USER_REGISTRATION_FAILED", // 회원 가입 실패
   async (req: Request, res: Response) => {
     const { user } = req.body;
 
@@ -216,6 +217,7 @@ const signupUser = asyncWrapper(
 const loginUser = asyncWrapper(
   "loginUser",
   "Login failed. (로그인 실패)",
+  "LOGIN_FAILED", // 로그인 실패
   async (req: Request, res: Response) => {
     // 요청 바디에서 사용자 정보 추출
     const { email, phone, userId, password, device, ip, location } = req.body;

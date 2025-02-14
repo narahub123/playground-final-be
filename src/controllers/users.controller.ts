@@ -7,6 +7,7 @@ import { IApiSuccessResponse } from "@types";
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
   "Email duplicate check failed. (이메일 중복 체크 실패)",
+  "EMAIL_DUPLICATE_CHECK_FAILED", // 이메일 중복 체크 실패
   async (req: Request, res: Response) => {
     // 요청 본문에서 이메일을 추출합니다.
     const { email } = req.body;
@@ -15,7 +16,7 @@ const checkEmailDuplication = asyncWrapper(
     if (!email) {
       throw new BadRequestError(
         "Email is required. (이메일 필수)",
-        "EMAIL_MISSING",
+        "MISS_EMAIL",
         {
           email: "이메일 필드가 제공되지 않았습니다.",
         }
@@ -24,6 +25,8 @@ const checkEmailDuplication = asyncWrapper(
 
     // 이메일 중복 체크
     const isDuplicate = await duplicateDetectionService.isEmailDuplicate(email);
+
+    console.log(isDuplicate);
 
     const response: IApiSuccessResponse<{ isDuplicate: boolean }> = {
       success: true,
@@ -41,6 +44,7 @@ const checkEmailDuplication = asyncWrapper(
 const checkPhoneDuplication = asyncWrapper(
   "checkPhoneDuplication",
   "Phone duplicate check failed. (휴대 전화 번호 중복 체크 실패)",
+  "PHONE_DUPLICATE_CHECK_FAILED", // 휴대 전화 번호 중복 체크 실패
   async (req: Request, res: Response) => {
     // 요청 본문에서 휴대 전화 번호를 추출합니다.
     const { phone } = req.body;
@@ -49,7 +53,7 @@ const checkPhoneDuplication = asyncWrapper(
     if (!phone) {
       throw new BadRequestError(
         "Phone is required. (휴대 전화 번호 필수)",
-        "PHONE_MISSING",
+        "MISSING_PHONE",
         {
           phone: "휴대 전화 번호 필드가 제공되지 않았습니다.",
         }
@@ -78,6 +82,7 @@ const checkPhoneDuplication = asyncWrapper(
 const checkUserIdDuplication = asyncWrapper(
   "checkUserIdDuplication", // 함수의 이름
   "UserId duplicate check failed. (사용자 아이디 중복 체크 실패)", // 에러 메시지
+  "USERID_DUPLICATE_CHECK_FAILED", // 사용자 아이디 중복 체크 실패
   async (req: Request, res: Response) => {
     // 요청 본문에서 사용자 아이디를 추출합니다.
     const { userId } = req.body;
@@ -86,7 +91,7 @@ const checkUserIdDuplication = asyncWrapper(
     if (!userId) {
       throw new BadRequestError(
         "UserId is required. (사용자 아이디 필수)", // 에러 메시지
-        "USERID_MISSING", // 에러 코드
+        "MISSING_USERID", // 에러 코드
         {
           userId: "사용자 아이디가 제공되지 않았습니다.", // 에러 세부사항
         }
@@ -117,6 +122,7 @@ const checkUserIdDuplication = asyncWrapper(
 const getContactsBeforeLogin = asyncWrapper(
   "getContactsByAccount",
   "Failed to fetch contacts. (연락처 조회 실패)",
+  "GET_CONTACTS_FAILED", // 연락처 조회 실패
   async (req: Request, res: Response) => {
     // 요청 본문에서 사용자 ID, 이메일, 전화번호 추출
     const { userId, email, phone } = req.body;

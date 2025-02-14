@@ -1,11 +1,4 @@
-import {
-  CustomAPIError,
-  MongoDBCastError,
-  MongoDBDuplicateKeyError,
-  MongoDBNetworkError,
-  MongoDBTimeoutError,
-  MongoDBValidationError,
-} from "@errors";
+import { CustomAPIError } from "@errors";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { IApiErrorResponse } from "@types";
@@ -28,6 +21,7 @@ const errorHandler = (
   const error = err?.error ?? err ?? {};
   const failureMessage =
     err?.failureMessage || "An error occurred. (에러 발생)";
+  const errorCode = err.errorCode;
 
   const {
     statusCode = 500,
@@ -49,12 +43,13 @@ const errorHandler = (
   const errorResponse: IApiErrorResponse = {
     success: false,
     message: failureMessage || "An error occurred. (에러 발생)",
-    code,
+    code: errorCode || "ERROR",
     timestamp: new Date().toISOString(),
     error: {
       statusCode,
       statusText,
       message,
+      code,
       ...(errorDetails ? { details: errorDetails } : {}),
     },
   };

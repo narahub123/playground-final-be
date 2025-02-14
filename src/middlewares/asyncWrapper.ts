@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express"; // Express의 Request
 const asyncWrapper = (
   name: string, // 함수 이름을 전달받습니다. 에러 발생 시 이 이름을 출력할 때 사용
   failureMessage: string,
+  errorCode: string,
   fn: (req: Request, res: Response, next: NextFunction) => Promise<any> // 비동기 처리를 위한 함수. Express의 Request, Response, NextFunction을 받으며, Promise를 반환하는 함수입니다.
 ) => {
   // 반환되는 함수는 Express 미들웨어 함수로 사용됩니다.
@@ -19,6 +20,7 @@ const asyncWrapper = (
       next({
         error: err,
         failureMessage,
+        errorCode,
       });
     }
   };
