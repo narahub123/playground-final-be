@@ -13,7 +13,7 @@ class MongoDBDuplicateKeyError extends ConflictError {
     errorDetails: Record<string, any> = {}
   ) {
     // 생성자에서 부모 클래스 호출
-    super(message, code, errorDetails);
+    super(message, code, errorDetails, "database");
   }
 }
 
@@ -23,7 +23,7 @@ class MongoDBValidationError extends UnprocessableEntityError {
     code: string = "MONGODB_VALIDATION_ERROR",
     errorDetails: Record<string, any> = {}
   ) {
-    super(message, code, errorDetails);
+    super(message, code, errorDetails, "database");
   }
 }
 
@@ -33,7 +33,7 @@ class MongoDBCastError extends BadRequestError {
     code: string = "MONGODB_CAST_ERROR",
     errorDetails: Record<string, any> = {}
   ) {
-    super(message, code, errorDetails);
+    super(message, code, errorDetails, "database");
   }
 }
 
@@ -43,7 +43,7 @@ class MongoDBNetworkError extends ServiceUnavailableError {
     code: string = "MONGODB_NETWORK_ERROR",
     errorDetails: Record<string, any> = {}
   ) {
-    super(message, code, errorDetails);
+    super(message, code, errorDetails, "database");
   }
 }
 
@@ -53,7 +53,7 @@ class MongoDBTimeoutError extends GatewayTimeoutError {
     code: string = "MONGODB_TIMEOUT_ERROR",
     errorDetails: Record<string, any> = {}
   ) {
-    super(message, code, errorDetails);
+    super(message, code, errorDetails, "database");
   }
 }
 
