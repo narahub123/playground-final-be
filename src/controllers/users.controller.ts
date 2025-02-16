@@ -26,8 +26,6 @@ const checkEmailDuplication = asyncWrapper(
     // 이메일 중복 체크
     const isDuplicate = await duplicateDetectionService.isEmailDuplicate(email);
 
-    console.log(isDuplicate);
-
     const response: IApiSuccessResponse<{ isDuplicate: boolean }> = {
       success: true,
       message: "Email duplicate check succeeded. (이메일 중복 체크 성공)",

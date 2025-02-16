@@ -8,6 +8,7 @@ import loginFailureRepository from "./login-failure.repository";
 import activeSessionRepository from "./active-session.repository";
 import loginRecordRepository from "./login-record.repository";
 import emailRepository from "./email.repository";
+import phoneRepository from "./phone.repository";
 
 export {
   userRepository,
@@ -20,4 +21,5 @@ export {
   activeSessionRepository,
   loginRecordRepository,
   emailRepository,
+  phoneRepository,
 };
