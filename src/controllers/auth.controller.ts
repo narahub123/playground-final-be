@@ -185,19 +185,29 @@ const signupUser = asyncWrapper(
         language,
       };
 
-      const newEmail = {
-        userId,
-        email,
-      };
+      const newEmail = email
+        ? {
+            userId,
+            email,
+          }
+        : undefined;
 
-      await authService.initializeUser(
+      const newPhone = phone
+        ? {
+            userId,
+            phone,
+          }
+        : undefined;
+
+      await authService.initializeUser({
         newUser,
         newEmail,
+        newPhone,
         newNotification,
         newDisplay,
         userId,
-        session
-      );
+        session,
+      });
 
       await session.commitTransaction();
 

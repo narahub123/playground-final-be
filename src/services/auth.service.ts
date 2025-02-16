@@ -4,6 +4,7 @@ import {
   IEmailInput,
   ILocation,
   INotificationInput,
+  IPhoneInput,
   IUserInput,
 } from "@types";
 import { comparePassword } from "@utils";
@@ -14,6 +15,7 @@ import {
   displayRepository,
   emailRepository,
   notificationRepository,
+  phoneRepository,
   privacyRepository,
   securityRepository,
   userRepository,
@@ -78,16 +80,27 @@ class AuthService {
    * @throws Error - 트랜잭션 내에서 하나라도 실패할 경우 롤백됩니다. 이 함수 자체에서 오류를 처리하지 않으며,
    * 외부에서 트랜잭션을 처리하는 로직이 필요합니다.
    */
-  async initializeUser(
-    newUser: IUserInput,
-    newEmail: IEmailInput,
-    newNotification: INotificationInput,
-    newDisplay: IDisplayInput,
-    userId: string,
-    session: mongoose.ClientSession
-  ) {
+  async initializeUser(userInfo: {
+    newUser: IUserInput;
+    newEmail?: IEmailInput;
+    newPhone?: IPhoneInput;
+    newNotification: INotificationInput;
+    newDisplay: IDisplayInput;
+    userId: string;
+    session: mongoose.ClientSession;
+  }) {
+    const {
+      newUser,
+      newNotification,
+      newDisplay,
+      userId,
+      newEmail,
+      newPhone,
+      session,
+    } = userInfo;
     await userRepository.createUser(newUser, { session });
-    await emailRepository.createEmail(newEmail, { session });
+    if (newEmail) await emailRepository.createEmail(newEmail, { session });
+    if (newPhone) await phoneRepository.createPhone(newPhone, { session });
     await securityRepository.createSecurity(userId, { session });
     await notificationRepository.createNotification(newNotification, {
       session,
