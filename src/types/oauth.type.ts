@@ -10,6 +10,7 @@ type UserData = {
   gender?: string; // 사용자의 성별 (선택 사항)
   phone?: string; // 사용자의 전화번호 (선택 사항)
   birth?: string; // 사용자의 생일 (선택 사항)
+  oauth?: OauthType;
 };
 
 export type { OauthType, UserData };

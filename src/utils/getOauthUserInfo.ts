@@ -56,6 +56,7 @@ const getOauthUserInfo = async (
         email,
         username: name,
         profileImage: picture,
+        oauth: type,
       };
     } else if (type === "kakao") {
       const { kakao_account } = res; // Kakao 응답 데이터에서 필요한 정보 추출
@@ -66,6 +67,7 @@ const getOauthUserInfo = async (
         email,
         username: nickname,
         profileImage: profile_image_url,
+        oauth: type,
       };
     } else if (type === "naver") {
       const {
@@ -91,6 +93,7 @@ const getOauthUserInfo = async (
         gender,
         phone: mobile_e164,
         birth,
+        oauth: type,
       };
     }
 
