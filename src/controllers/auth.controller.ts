@@ -44,6 +44,8 @@ const signupUser = asyncWrapper(
       device,
       location,
       ip,
+      emailOauth,
+      phoneOauth,
     } = user;
 
     // user에 대한 필수 값 확인
@@ -187,6 +189,7 @@ const signupUser = asyncWrapper(
         ? {
             userId,
             email,
+            oauth: emailOauth,
           }
         : undefined;
 
@@ -194,6 +197,7 @@ const signupUser = asyncWrapper(
         ? {
             userId,
             phone,
+            oauth: phoneOauth,
           }
         : undefined;
 

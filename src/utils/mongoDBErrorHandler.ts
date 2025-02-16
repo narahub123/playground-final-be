@@ -24,12 +24,11 @@ const mongoDBErrorHandler = (
   // 중복된 키 값이 존재할 경우 처리
   if (error.code === 11000) {
     const field = Object.keys(error.keyValue)[0] || "key"; // 중복된 필드명 추출
-    const fieldValue = error.keyValue[field]; // 해당 필드의 중복 값 추출
 
     throw new MongoDBDuplicateKeyError(
       `Duplicate ${field} exists. (중복된 키 존재)`,
-      `DUPLICATE_${field.toUpperCase()}`,
-      { [field]: fieldValue } // 중복 필드명과 값 추가
+      `VALIDATION_ERROR`,
+      { [field]: `DUPLICATE_${field.toUpperCase()}` } // 중복 필드명과 값 추가
     );
   }
 
