@@ -1,6 +1,10 @@
 import { LockedError, NotFoundError } from "@errors";
 import { IUser, LockReasonType } from "@types";
-import { emailRepository, userRepository } from "@repositories";
+import {
+  emailRepository,
+  phoneRepository,
+  userRepository,
+} from "@repositories";
 
 class UserService {
   /**
@@ -28,7 +32,38 @@ class UserService {
     }
 
     // 이메일 정보를 바탕으로 사용자를 조회
-    const user = await userRepository.getUserByUserId(emailInfo.email);
+    const user = await userRepository.getUserByUserId(emailInfo.userId);
+
+    // 사용자 정보 반환
+    return user;
+  }
+
+  /**
+   * 전화번호를 통해 해당 사용자의 정보를 조회하는 함수.
+   * 전화번호에 해당하는 정보를 먼저 가져오고, 그 정보를 바탕으로 사용자를 조회합니다.
+   *
+   * @param {string} phone - 조회할 사용자의 전화번호.
+   * @returns {Promise<IUser | null>} - 사용자 정보 (`IUser` 인터페이스)에 해당하는 데이터를 반환하거나,
+   *                                    사용자를 찾을 수 없으면 `null`을 반환.
+   * @throws {NotFoundError} - 전화번호 정보가 존재하지 않는 경우, `NotFoundError`를 던집니다.
+   */
+  async getUserByPhone(phone: string): Promise<IUser | null> {
+    // 전화번호를 통해 전화번호 정보 조회
+    const phoneInfo = await phoneRepository.getPhoneInfoByPhone(phone);
+
+    // 전화번호 정보가 존재하지 않는 경우, 예외를 던짐
+    if (!phoneInfo) {
+      throw new NotFoundError(
+        "Phone info is not Found (휴대 전화 번호 정보 조회 실패)",
+        "NOT_FOUND",
+        {
+          email: "PHONE_INFO_NOT_FOUND", // 오류 세부 정보
+        }
+      );
+    }
+
+    // 전화번호 정보를 바탕으로 사용자 정보 조회
+    const user = await userRepository.getUserByUserId(phoneInfo.userId);
 
     // 사용자 정보 반환
     return user;
@@ -55,7 +90,7 @@ class UserService {
     }
     // 전화번호를 통해 사용자를 조회
     else if (phone) {
-      user = await userRepository.getUserByPhone(phone);
+      user = await this.getUserByPhone(phone);
     }
     // 사용자 아이디를 통해 사용자를 조회
     else if (userId) {
