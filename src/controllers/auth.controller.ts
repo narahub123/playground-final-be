@@ -254,9 +254,11 @@ const loginUser = asyncWrapper(
     if (!email && !phone && !userId) {
       throw new BadRequestError(
         "At least one of email, phone, or userId is required. (이메일, 휴대전화 번호, 사용자 아이디 중 적어도 하나 필수)",
-        "MISSING_USERIDENTIFIER",
+        "VALIDATION_ERROR",
         {
-          identifier: "MISSING_USERIDENTIFIER",
+          email: "MISSING_EMAIL", // 에러 세부사항
+          phone: "MISSING_PHONE", // 에러 세부사항
+          userId: "MISSING_USERID", // 에러 세부사항
         }
       );
     }
