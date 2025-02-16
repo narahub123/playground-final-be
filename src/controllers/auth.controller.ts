@@ -18,7 +18,13 @@ import {
 import { UploadApiResponse } from "cloudinary";
 import mongoose from "mongoose";
 import { REFRESHTOKEN_EXPIRES } from "@constants";
-import { IApiSuccessResponse, INotificationInput, IUserInput } from "@types";
+import {
+  IApiSuccessResponse,
+  IEmailInput,
+  INotificationInput,
+  IPhoneInput,
+  IUserInput,
+} from "@types";
 import verificationService from "services/verification.service";
 import loginRecordService from "services/login-record.service";
 
@@ -185,19 +191,19 @@ const signupUser = asyncWrapper(
         language,
       };
 
-      const newEmail = email
+      const newEmail: IEmailInput | undefined = email
         ? {
             userId,
             email,
-            oauth: emailOauth,
+            social: emailOauth,
           }
         : undefined;
 
-      const newPhone = phone
+      const newPhone: IPhoneInput | undefined = phone
         ? {
             userId,
             phone,
-            oauth: phoneOauth,
+            social: phoneOauth,
           }
         : undefined;
 
