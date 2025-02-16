@@ -8,6 +8,7 @@ import ActiveSession from "./active-session.model";
 import LoginFailure from "./login-failure.model";
 import LoginRecord from "./login-record.model";
 import Email from "./email.model";
+import Phone from "./phone.model";
 
 export {
   User,
@@ -20,4 +21,5 @@ export {
   LoginFailure,
   LoginRecord,
   Email,
+  Phone,
 };

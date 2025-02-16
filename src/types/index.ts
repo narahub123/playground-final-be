@@ -62,6 +62,8 @@ import {
 
 import { IEmail, SocialType, IEmailInput } from "./email.type";
 
+import { IPhone, IPhoneInput } from "./phone.type";
+
 export {
   // user
   IUser,
@@ -136,4 +138,8 @@ export {
   IEmail,
   SocialType,
   IEmailInput,
+
+  // phone
+  IPhone,
+  IPhoneInput,
 };
