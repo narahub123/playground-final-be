@@ -7,6 +7,7 @@ import Verification from "./verification.model";
 import ActiveSession from "./active-session.model";
 import LoginFailure from "./login-failure.model";
 import LoginRecord from "./login-record.model";
+import Email from "./email.model";
 
 export {
   User,
@@ -18,4 +19,5 @@ export {
   ActiveSession,
   LoginFailure,
   LoginRecord,
+  Email,
 };

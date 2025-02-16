@@ -5,7 +5,6 @@ import {
   ILocation,
   GenderType,
   UserRoleType,
-  SocialType,
   IUserInput,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
@@ -61,6 +60,8 @@ import {
   IApiErrorResponse,
 } from "./api.type";
 
+import { IEmail, SocialType } from "./email.type";
+
 export {
   // user
   IUser,
@@ -69,7 +70,6 @@ export {
   LockReasonType,
   GenderType,
   UserRoleType,
-  SocialType,
   IUserInput,
 
   // oauth
@@ -131,4 +131,8 @@ export {
   IApiResponse,
   IApiSuccessResponse,
   IApiErrorResponse,
+
+  // email
+  IEmail,
+  SocialType,
 };
