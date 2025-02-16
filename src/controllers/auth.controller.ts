@@ -165,7 +165,6 @@ const signupUser = asyncWrapper(
         phone,
         gender,
         country: countryInfo,
-        language,
         ip,
         location,
         profileImage: uploadedProfileImage[0]?.secure_url || "",
@@ -181,9 +180,15 @@ const signupUser = asyncWrapper(
         },
       };
 
-      await userService.initializeUser(
+      const newDisplay = {
+        userId,
+        language,
+      };
+
+      await authService.initializeUser(
         newUser,
         newNotification,
+        newDisplay,
         userId,
         session
       );

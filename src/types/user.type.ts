@@ -130,7 +130,6 @@ interface IUserInput {
   email?: string;
   phone?: string;
   country: string;
-  language: string;
   ip: string;
   location: ILocation;
   profileImage: string;

@@ -52,6 +52,7 @@ import {
   ColorThemeType,
   FontSizeType,
   IDisplay,
+  IDisplayInput,
 } from "./display.type";
 
 import {
@@ -124,6 +125,7 @@ export {
   ColorThemeType,
   FontSizeType,
   IDisplay,
+  IDisplayInput,
 
   // api
   IApiResponse,

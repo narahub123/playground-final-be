@@ -27,4 +27,9 @@ interface IDisplay extends Document {
   updatedAt: Date;
 }
 
-export { BgThemeType, ColorThemeType, FontSizeType, IDisplay };
+interface IDisplayInput {
+  userId: string;
+  language: string;
+}
+
+export { BgThemeType, ColorThemeType, FontSizeType, IDisplay, IDisplayInput };
