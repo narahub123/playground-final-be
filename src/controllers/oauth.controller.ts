@@ -4,10 +4,12 @@ import { getOauthAccessToken, getOauthUserInfo } from "@utils";
 import { OauthType, UserData } from "@types";
 import { BASE_URL } from "@constants";
 import { BadRequestError } from "@errors";
-import { userService } from "@services";
+import { emailRepository } from "@repositories";
 
 const oauthCallback = asyncWrapper(
   "oauthCallback",
+  "",
+  "",
   async (req: Request, res: Response) => {
     const code = req.query.code as string | null;
     const type = req.query.state as OauthType | null;
@@ -28,10 +30,13 @@ const oauthCallback = asyncWrapper(
       }
 
       // 기존 유저 여부 확인하기
-      const user = await userService.findUserByIdentifier(userData.email);
+      const emailInfo = await emailRepository.getEmailInfoByAddress(
+        userData.email
+      );
 
       // 기존 유저 정보가 존재한다면 로그인 과정으로
-      if (user) {
+      if (emailInfo) {
+        
       } else {
         // 기존 유저 정보가 존재하지 않는다면 회원 가입 과정으로
         // 쿠키로 사용자 정보를 전송
