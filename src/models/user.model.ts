@@ -51,26 +51,12 @@ const UserSchema = new mongoose.Schema<IUser>(
       ],
       match: usernameRegExp,
     },
-    // 이메일
-    email: {
-      type: [String],
-      default: [],
-      unique: true,
-      match: [emailRegExp, "유효하지 않은 이메일 형식입니다."], // 이메일 유효성 검사
-    },
     // 생년월일
     birth: {
       type: String,
       required: true,
       trim: true,
       match: birthRegExp, // YYYYMMDD 형식의 생년월일
-    },
-    // 전화번호
-    phone: {
-      type: [String],
-      unique: true,
-      default: [],
-      match: [phoneRegExp, "유효하지 않은 전화번호 형식입니다."],
     },
     // 성별: 남성 여성 중성 양성
     gender: {
@@ -167,12 +153,6 @@ const UserSchema = new mongoose.Schema<IUser>(
     isAuthenticated: {
       type: Boolean,
       default: false,
-    },
-    // 소셜 계정
-    social: {
-      type: [String],
-      enum: ["google", "naver", "kakao"],
-      default: [],
     },
 
     // 계정 잠금 여부에 대한 필드

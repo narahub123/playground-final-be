@@ -102,9 +102,7 @@ interface IUser extends Document {
   password: string;
   userId: string;
   username: string;
-  email: string[];
   birth: string;
-  phone: string[];
   gender: GenderType;
   userRole: UserRoleType;
   country: string;
@@ -117,7 +115,6 @@ interface IUser extends Document {
   followers: string[];
   isAuthorized: boolean;
   isAuthenticated: boolean;
-  social: SocialType[];
   lockStatus: ILockStatus;
 }
 
@@ -127,8 +124,6 @@ interface IUserInput {
   username: string;
   birth: string;
   gender: GenderType;
-  email?: string;
-  phone?: string;
   country: string;
   ip: string;
   location: ILocation;
