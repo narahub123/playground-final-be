@@ -1,6 +1,7 @@
 import {
   IDevice,
   IDisplayInput,
+  IEmailInput,
   ILocation,
   INotificationInput,
   IUserInput,
@@ -11,6 +12,7 @@ import { UnauthorizedError } from "@errors";
 import mongoose from "mongoose";
 import {
   displayRepository,
+  emailRepository,
   notificationRepository,
   privacyRepository,
   securityRepository,
@@ -78,12 +80,14 @@ class AuthService {
    */
   async initializeUser(
     newUser: IUserInput,
+    newEmail: IEmailInput,
     newNotification: INotificationInput,
     newDisplay: IDisplayInput,
     userId: string,
     session: mongoose.ClientSession
   ) {
     await userRepository.createUser(newUser, { session });
+    await emailRepository.createEmail(newEmail, { session });
     await securityRepository.createSecurity(userId, { session });
     await notificationRepository.createNotification(newNotification, {
       session,

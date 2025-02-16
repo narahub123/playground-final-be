@@ -60,7 +60,7 @@ import {
   IApiErrorResponse,
 } from "./api.type";
 
-import { IEmail, SocialType } from "./email.type";
+import { IEmail, SocialType, IEmailInput } from "./email.type";
 
 export {
   // user
@@ -135,4 +135,5 @@ export {
   // email
   IEmail,
   SocialType,
+  IEmailInput,
 };

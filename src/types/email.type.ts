@@ -8,4 +8,10 @@ interface IEmail extends Document {
   social: SocialType | null; // 소셜 계정 (google, naver, kakao 중 하나 또는 null)
 }
 
-export type { SocialType, IEmail };
+interface IEmailInput {
+  userId: string;
+  email: string; // 이메일
+  social?: SocialType;
+}
+
+export type { SocialType, IEmail, IEmailInput };

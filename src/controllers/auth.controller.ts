@@ -185,8 +185,14 @@ const signupUser = asyncWrapper(
         language,
       };
 
+      const newEmail = {
+        userId,
+        email,
+      };
+
       await authService.initializeUser(
         newUser,
+        newEmail,
         newNotification,
         newDisplay,
         userId,
