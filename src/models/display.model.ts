@@ -1,3 +1,4 @@
+import { LANGUAGE_DEFAULT } from "@constants";
 import mongoose from "mongoose";
 import { IDisplay } from "types/display.type";
 
@@ -40,6 +41,13 @@ const displaySchema = new mongoose.Schema<IDisplay>(
       type: String,
       default: "light",
       enum: ["light", "dark", "darker"],
+    },
+
+    // 언어
+    language: {
+      type: String,
+      required: true,
+      default: LANGUAGE_DEFAULT,
     },
 
     // 데이터 사용량

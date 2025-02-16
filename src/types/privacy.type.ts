@@ -31,6 +31,8 @@ interface IPrivacy extends Document {
   isSensitiveMediaDisplayed: boolean;
   topics: string[];
   interests: string[];
+  blockedUsers: string[];
+  mutedUsers: string[];
   mutedWords: string[];
   muteSettings: IMuteSettings;
   messageAllowSettings: MessageAllowSettingsType;

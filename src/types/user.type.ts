@@ -108,7 +108,6 @@ interface IUser extends Document {
   gender: GenderType;
   userRole: UserRoleType;
   country: string;
-  language: string;
   ip: string;
   location: ILocation;
   profileImage: string;
@@ -116,9 +115,6 @@ interface IUser extends Document {
   intro: string;
   followings: string[];
   followers: string[];
-  mutedUsers: string[];
-  blockedUsers: string[];
-  isPrivate: boolean;
   isAuthorized: boolean;
   isAuthenticated: boolean;
   social: SocialType[];

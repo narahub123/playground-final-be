@@ -34,6 +34,17 @@ const privacySchema = new mongoose.Schema<IPrivacy>(
     // 관심사
     interests: { type: [String], default: [] },
     // 뮤트 및 차단
+    // 차단한 계정
+    blockedUsers: {
+      type: [{ type: String, ref: "User" }],
+      default: [],
+    },
+    // 뮤트한 계정
+    mutedUsers: {
+      type: [{ type: String, ref: "User" }],
+      default: [],
+    },
+
     // 뮤트한 단어
     mutedWords: { type: [String], default: [] },
     // 뮤트한 단어 추가

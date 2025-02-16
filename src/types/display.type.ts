@@ -20,6 +20,7 @@ interface IDisplay extends Document {
   fontSize: FontSizeType;
   colorTheme: ColorThemeType;
   bgTheme: BgThemeType;
+  language: string;
   isDataSaverEnabled: boolean;
   isAutoplayEnabled: boolean;
   createdAt: Date;

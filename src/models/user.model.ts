@@ -10,7 +10,6 @@ import {
 import {
   COUNTRY_DEFAULT,
   INTRO_MAX,
-  LANGUAGE_DEFAULT,
   USERID_MAX,
   USERID_MIN,
   USERNAME_MAX,
@@ -95,19 +94,14 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: true,
       default: COUNTRY_DEFAULT,
     },
-    // 언어
-    language: {
-      type: String,
-      required: true,
-      default: LANGUAGE_DEFAULT,
-    },
+
     // 가입시 IP 주소
     ip: {
       type: String,
       required: true,
       match: [ipRegExp, "유효하지 않은 IP 주소 형식입니다."], // IP 주소 유효성 검사
     },
-    // 위치 정보 필드 정의
+    // 가입시 위치 정보
     location: {
       // 국가 (필수 항목)
       country: {
@@ -163,21 +157,6 @@ const UserSchema = new mongoose.Schema<IUser>(
     followers: {
       type: [{ type: String, ref: "User" }],
       default: [],
-    },
-    // 뮤트한 유저 목록
-    mutedUsers: {
-      type: [{ type: String, ref: "User" }],
-      default: [],
-    },
-    // 블록한 유저 목록
-    blockedUsers: {
-      type: [{ type: String, ref: "User" }],
-      default: [],
-    },
-    // 게시물 공개 여부
-    isPrivate: {
-      type: Boolean,
-      default: false,
     },
     // 유료 개정 여부
     isAuthorized: {
