@@ -1,22 +1,39 @@
 import { LockedError, NotFoundError } from "@errors";
-import {
-  IDisplayInput,
-  INotificationInput,
-  IUser,
-  IUserInput,
-  LockReasonType,
-} from "@types";
-import {
-  displayRepository,
-  notificationRepository,
-  privacyRepository,
-  securityRepository,
-  userRepository,
-} from "@repositories";
-import mongoose from "mongoose";
-import { ACCOUNT_LOCK_THRESHOLD } from "@constants";
+import { IUser, LockReasonType } from "@types";
+import { emailRepository, userRepository } from "@repositories";
 
 class UserService {
+  /**
+   * 이메일을 통해 해당 사용자 정보를 조회하는 함수.
+   * 이메일에 해당하는 정보를 먼저 가져오고, 그 정보를 바탕으로 사용자를 조회합니다.
+   *
+   * @param {string} email - 조회할 사용자의 이메일 주소.
+   * @returns {Promise<IUser | null>} - 사용자 정보 (`IUser` 인터페이스)에 해당하는 데이터를 반환하거나,
+   *                                    사용자를 찾을 수 없으면 `null`을 반환.
+   * @throws {NotFoundError} - 이메일 정보가 존재하지 않는 경우, `NotFoundError`를 던집니다.
+   */
+  async getUserByEmail(email: string): Promise<IUser | null> {
+    // 이메일을 통해 이메일 정보를 조회
+    const emailInfo = await emailRepository.getEmailInfoByAddress(email);
+
+    // 이메일 정보가 존재하지 않는 경우, 예외를 던짐
+    if (!emailInfo) {
+      throw new NotFoundError(
+        "Email info is not Found (이메일 정보 조회 실패)",
+        "NOT_FOUND",
+        {
+          email: "EMAIL_INFO_NOT_FOUND", // 오류 세부 정보
+        }
+      );
+    }
+
+    // 이메일 정보를 바탕으로 사용자를 조회
+    const user = await userRepository.getUserByUserId(emailInfo.email);
+
+    // 사용자 정보 반환
+    return user;
+  }
+
   /**
    * 사용자 식별자 (이메일, 전화번호, 사용자 아이디)를 통해 사용자를 조회합니다.
    * @param email - 이메일 (선택적)
@@ -34,7 +51,7 @@ class UserService {
 
     // 이메일을 통해 사용자를 조회
     if (email) {
-      user = await userRepository.getUserByEmail(email);
+      user = await this.getUserByEmail(email);
     }
     // 전화번호를 통해 사용자를 조회
     else if (phone) {
