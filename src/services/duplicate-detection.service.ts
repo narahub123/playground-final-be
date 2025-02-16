@@ -1,5 +1,4 @@
-import { userRepository } from "@repositories";
-import { ConflictError } from "@errors";
+import { emailRepository, userRepository } from "@repositories";
 
 class DuplicateDetectionService {
   /**
@@ -11,10 +10,10 @@ class DuplicateDetectionService {
    */
   async isEmailDuplicate(email: string): Promise<boolean> {
     // 주어진 이메일로 사용자 조회
-    const user = await userRepository.getUserByEmail(email);
+    const emailInfo = await emailRepository.getEmailInfoByAddress(email);
 
     // 사용자 정보가 존재하면 이메일이 중복된 것임
-    return user ? true : false; // 중복되면 true, 아니면 false
+    return emailInfo ? true : false; // 중복되면 true, 아니면 false
   }
 
   /**
