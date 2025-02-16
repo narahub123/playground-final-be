@@ -34,6 +34,26 @@ class EmailRepository {
       return undefined;
     }
   }
+
+  /**
+   * 주어진 사용자 ID를 기반으로 이메일 목록을 조회하는 함수.
+   *
+   * @param {string} userId - 이메일 정보를 조회할 사용자 ID.
+   * @returns {Promise<IEmail[]>} - 조회된 이메일 배열 (조회 실패 시 빈 배열 반환).
+   */
+  async getEamilsByUserId(userId: string): Promise<IEmail[]> {
+    try {
+      // userId를 기준으로 이메일 목록 조회
+      const emails = await Email.find({ userId });
+      return emails;
+    } catch (error) {
+      // 에러 발생 시 오류 핸들러 호출
+      mongoDBErrorHandler("getEamilsByUserId", error, { userId });
+
+      // 에러 처리 후 빈 배열 반환
+      return [];
+    }
+  }
 }
 
 export default new EmailRepository();

@@ -1,10 +1,11 @@
 import { LockedError, NotFoundError } from "@errors";
-import { IUser, LockReasonType } from "@types";
+import { IEmail, IPhone, IUser, LockReasonType } from "@types";
 import {
   emailRepository,
   phoneRepository,
   userRepository,
 } from "@repositories";
+import { Email } from "@models";
 
 class UserService {
   /**
@@ -140,6 +141,38 @@ class UserService {
     throw new LockedError(errorMessages[lockReason], "ACCOUNT_LOCK", {
       lock: lockReason,
     });
+  }
+
+  /**
+   * 주어진 사용자 ID를 통해 이메일과 전화번호 정보를 조회하는 함수.
+   *
+   * 이메일과 전화번호 정보가 없을 경우, NotFoundError를 던집니다.
+   *
+   * @param {string} userId - 연락처 정보를 조회할 사용자 ID.
+   * @returns {Promise<{ emails: IEmail[]; phones: IPhone[] }>} - 사용자에 해당하는 이메일과 전화번호 배열을 반환.
+   * @throws {NotFoundError} - 이메일과 전화번호 정보가 모두 없을 경우 에러를 던집니다.
+   */
+  async getContactsByIdentifier(
+    userId: string
+  ): Promise<{ emails: IEmail[]; phones: IPhone[] }> {
+    // 사용자 ID로 이메일과 전화번호 정보를 각각 조회합니다.
+    const emails = await emailRepository.getEamilsByUserId(userId);
+    const phones = await phoneRepository.getPhonesByUserId(userId);
+
+    // 이메일과 전화번호가 모두 없는 경우
+    if (emails.length === 0 && phones.length === 0) {
+      // 연락처 정보가 없다는 에러를 던집니다.
+      throw new NotFoundError(
+        "No contact information found for the given user (연락처 조회 불가)",
+        "NOT_FOUND",
+        {
+          userId: "CONTACT_INFO_NOT_FOUND", // 에러에 대한 세부 정보
+        }
+      );
+    }
+
+    // 이메일과 전화번호가 있을 경우 반환합니다.
+    return { emails, phones };
   }
 }
 

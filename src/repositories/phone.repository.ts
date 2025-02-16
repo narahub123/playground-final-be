@@ -56,6 +56,26 @@ class PhoneRepository {
       return undefined;
     }
   }
+
+  /**
+   * 주어진 사용자 ID를 기반으로 전화번호 목록을 조회하는 함수.
+   *
+   * @param {string} userId - 전화번호 정보를 조회할 사용자 ID.
+   * @returns {Promise<IPhone[]>} - 조회된 전화번호 배열 (조회 실패 시 빈 배열 반환).
+   */
+  async getPhonesByUserId(userId: string): Promise<IPhone[]> {
+    try {
+      // userId를 기준으로 전화번호 목록 조회
+      const phones = await Phone.find({ userId });
+      return phones;
+    } catch (error) {
+      // 에러 발생 시 오류 핸들러 호출 (함수명 수정)
+      mongoDBErrorHandler("getPhonesByUserId", error, { userId });
+
+      // 에러 처리 후 빈 배열 반환
+      return [];
+    }
+  }
 }
 
 export default new PhoneRepository();

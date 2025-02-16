@@ -140,6 +140,10 @@ const getContactsBeforeLogin = asyncWrapper(
 
     const user = await userService.findUserByIdentifier(email, phone, userId);
 
+    const { emails, phones } = await userService.getContactsByIdentifier(
+      user.userId
+    );
+
     // 성공적인 응답 생성
     const response: IApiSuccessResponse<{
       emails: string[];
@@ -149,7 +153,10 @@ const getContactsBeforeLogin = asyncWrapper(
       message: "Contacts fetched successfully. (연락처 조회 성공)", // 성공 메시지
       code: "GET_CONTACTS_SUCCEEDED", // 응답 코드
       timestamp: new Date().toISOString(), // 응답 시각
-      data: { emails: user.email, phones: user.phone }, // 중복 여부
+      data: {
+        emails: emails.map((item) => item.email),
+        phones: phones.map((item) => item.phone),
+      }, // 중복 여부
     };
 
     res.status(200).json(response);
