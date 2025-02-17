@@ -1,6 +1,7 @@
 import { LoginRecord } from "@models";
-import { ILoginRecord, ILoginRecordInput } from "@types";
+import { ILoginRecord, ILoginRecordInput, ILogoutInfo } from "@types";
 import { mongoDBErrorHandler } from "@utils";
+import { UpdateResult } from "mongoose";
 
 class LoginRecordRepository {
   /**
@@ -39,6 +40,29 @@ class LoginRecordRepository {
     } catch (error) {
       // DB 관련 오류 처리
       mongoDBErrorHandler("createLoginRecord", error, loginRecord);
+    }
+  }
+
+  // loginRecord 업데이트
+  async updateLogoutInfo(
+    refreshToken: string,
+    logoutInfo: ILogoutInfo
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const loginRecord = await LoginRecord.updateOne(
+        {
+          refreshToken,
+          logoutInfo: { $exists: false },
+        },
+        { $set: { logoutInfo } }
+      );
+
+      return loginRecord;
+    } catch (error) {
+      mongoDBErrorHandler("createLoginRecord", error, {
+        refreshToken,
+        logoutInfo,
+      });
     }
   }
 }

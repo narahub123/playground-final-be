@@ -3,6 +3,7 @@ import {
   IDisplayInput,
   IEmailInput,
   ILocation,
+  ILogoutInfo,
   INotificationInput,
   IPhoneInput,
   IUserInput,
@@ -20,6 +21,8 @@ import {
   securityRepository,
   userRepository,
 } from "@repositories";
+import activeSessionService from "./active-session.service";
+import loginRecordService from "./login-record.service";
 
 class AuthService {
   /**
@@ -107,6 +110,19 @@ class AuthService {
     });
     await displayRepository.createDisplay(newDisplay, { session });
     await privacyRepository.createPrivacy(userId, { session });
+  }
+
+  // 로그아웃
+  async logout(refreshToken: string): Promise<void> {
+    // 활성 세션 삭제
+    await activeSessionService.deleteActiveSessionByRefreshToken(refreshToken);
+
+    const logoutInfo: ILogoutInfo = {
+      loggedOutAt: new Date(),
+      reason: "SESSION_EXPIRED",
+    };
+    // 로그아웃 기록 업데이트
+    await loginRecordService.updateLogoutInfo(refreshToken, logoutInfo);
   }
 }
 

@@ -120,6 +120,22 @@ class ActiveSessionService {
 
     return activeSession;
   }
+
+  // refresh 토큰으로 활성 섹션 삭제하기
+  async deleteActiveSessionByRefreshToken(refreshToken: string) {
+    const activeSession =
+      await activeSessionRepository.deleteActiveSessionByRefreshToken(
+        refreshToken
+      );
+
+    if (activeSession === null) {
+      throw new NotFoundError(
+        "Active session not found. (활성 세션을 찾을 수 없음)",
+        "NOT_FOUND",
+        { refreshToken: "ACTIVE_SESSION_NOT_FOUND" }
+      );
+    }
+  }
 }
 
 export default new ActiveSessionService();

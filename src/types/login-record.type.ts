@@ -64,4 +64,4 @@ interface ILoginRecord extends Document {
   logoutInfo: ILogoutInfo | null;
 }
 
-export type { ILoginRecordInput, ILoginRecord };
+export type { ILoginRecordInput, ILoginRecord, ILogoutInfo };

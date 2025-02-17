@@ -1,6 +1,16 @@
 import { ACCESSTOKEN_EXPIRES } from "@constants";
-import { activeSessionService, userService } from "@services";
-import { createAccessToken } from "@utils";
+import {
+  activeSessionService,
+  authService,
+  loginRecordService,
+  userService,
+} from "@services";
+import { ILogoutInfo } from "@types";
+import {
+  clearRefreshTokenCookie,
+  createAccessToken,
+  handleLogout,
+} from "@utils";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
@@ -9,14 +19,19 @@ const authTokenMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const accessToken = req.headers.authorization;
+  const accessToken = req.headers.authorization?.split(" ")[1];
   const { refresh } = req.cookies;
 
   const secret = process.env.JWT_SECRET_KEY as string;
 
   try {
     if (!accessToken) {
-      // 로그아웃
+      await handleLogout(
+        refresh,
+        res,
+        "Access token missing. (액세스 토큰이 없습니다.)",
+        "TOKEN_MISSING"
+      );
       return;
     }
 
@@ -26,6 +41,12 @@ const authTokenMiddleware = async (
 
     if (user === null) {
       // 로그아웃
+      await handleLogout(
+        refresh,
+        res,
+        "User not found for the given token, logged out. (사용자 조회 실패로 인한 로그아웃)",
+        "USER_NOT_FOUND"
+      );
     }
 
     req.user = user;
@@ -39,7 +60,13 @@ const authTokenMiddleware = async (
         await activeSessionService.getActiveSessionByRefreshToken(refresh);
 
       if (!activeSession) {
-        // 로그아웃
+        await handleLogout(
+          refresh,
+          res,
+          "Session expired due to refresh token expiration, logged out. (리프레시 토큰 만료로 인한 로그아웃)",
+          "TOKEN_EXPIRED"
+        );
+
         return;
       }
 
@@ -54,6 +81,13 @@ const authTokenMiddleware = async (
       const user = await userService.getUserByUserId(activeSession.userId);
       if (!user) {
         // 로그아웃
+        await handleLogout(
+          refresh,
+          res,
+          "User not found for the given token, logged out. (사용자 조회 실패로 인한 로그아웃)",
+          "USER_NOT_FOUND"
+        );
+
         return;
       }
 
@@ -62,7 +96,12 @@ const authTokenMiddleware = async (
       next();
     } else {
       // 로그아웃
-      return;
+      await handleLogout(
+        refresh,
+        res,
+        "An error occurred while processing your request, logged out. (요청 처리 중 오류가 발생하여 로그아웃)",
+        "LOGOUT_ERROR"
+      );
     }
   }
 };

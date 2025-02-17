@@ -15,7 +15,11 @@ import {
   ILoginFailure,
   LoginFailureType,
 } from "./login-failure.type";
-import { ILoginRecordInput, ILoginRecord } from "./login-record.type";
+import {
+  ILoginRecordInput,
+  ILoginRecord,
+  ILogoutInfo,
+} from "./login-record.type";
 import { IVerification, IVerificationInput } from "./verification.type";
 import {
   IDelegate,
@@ -92,6 +96,7 @@ export {
   // login-record
   ILoginRecordInput,
   ILoginRecord,
+  ILogoutInfo,
 
   // verification
   IVerification,

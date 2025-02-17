@@ -89,6 +89,24 @@ class ActiveSessionRepository {
       return null;
     }
   }
+
+  // 활성 섹션 삭제하기
+  async deleteActiveSessionByRefreshToken(
+    refreshToken: string
+  ): Promise<IActiveSession | null> {
+    try {
+      const activeSession = await ActiveSession.findOneAndDelete({
+        refreshToken,
+      });
+
+      return activeSession;
+    } catch (error) {
+      mongoDBErrorHandler("deleteActiveSessionByRefreshToken", error, {
+        refreshToken,
+      });
+      return null;
+    }
+  }
 }
 
 export default new ActiveSessionRepository();

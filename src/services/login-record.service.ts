@@ -1,6 +1,12 @@
-import { IDevice, ILocation, ILoginRecordInput, ILoginRecord } from "@types";
+import {
+  IDevice,
+  ILocation,
+  ILoginRecordInput,
+  ILoginRecord,
+  ILogoutInfo,
+} from "@types";
 import { loginRecordRepository } from "@repositories";
-import { InternalServerError, NotFoundError } from "@errors";
+import { ConflictError, InternalServerError, NotFoundError } from "@errors";
 
 class LoginRecordService {
   /**
@@ -123,6 +129,33 @@ class LoginRecordService {
     }
 
     return loginRecords;
+  }
+
+  async updateLogoutInfo(
+    refreshToken: string,
+    logoutInfo: ILogoutInfo
+  ): Promise<void> {
+    const result = await loginRecordRepository.updateLogoutInfo(
+      refreshToken,
+      logoutInfo
+    );
+
+    if (result?.matchedCount === 0) {
+      return;
+    }
+
+    if (
+      result === undefined ||
+      (result.matchedCount !== 0 && result.modifiedCount === 0)
+    ) {
+      throw new ConflictError(
+        "Logout info was not updated. (로그아웃 정보 업데이트 실패)",
+        "UPDATE_FAILED",
+        {
+          loginRecord: "LOGOUT_UPDATE_FAILED",
+        }
+      );
+    }
   }
 }
 
