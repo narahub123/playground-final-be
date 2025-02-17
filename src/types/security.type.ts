@@ -1,6 +1,3 @@
-import { Types } from "mongoose";
-import { IDevice } from "./active-session.type";
-
 interface IDelegate {
   groups: string[];
   members: string[];
@@ -14,7 +11,6 @@ interface ISecurity extends Document {
   isLabelHidden: boolean;
   isPasswordRenewalProtected: boolean;
   connectedApplications: string[];
-  activeSessions: string[];
   linkedAccounts: string[];
   isInviteable: boolean;
   delegate: {

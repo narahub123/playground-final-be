@@ -23,8 +23,6 @@ const SecuritySchema = new mongoose.Schema<ISecurity>(
     // 앱 및 세션
     // 연결된 애플리케이션
     connectedApplications: { type: [String], default: [] },
-    // 활성 세션
-    activeSessions: { type: [String], default: [] },
     // 연결된 계정
     linkedAccounts: { type: [String] },
     // 위임
