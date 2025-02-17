@@ -70,6 +70,12 @@ class UserService {
     return user;
   }
 
+  async getUserByUserId(userId: string): Promise<IUser | null> {
+    const user = await userRepository.getUserByUserId(userId);
+
+    return user;
+  }
+
   /**
    * 사용자 식별자 (이메일, 전화번호, 사용자 아이디)를 통해 사용자를 조회합니다.
    * @param email - 이메일 (선택적)

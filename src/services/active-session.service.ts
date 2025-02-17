@@ -109,6 +109,17 @@ class ActiveSessionService {
 
     return activeSessions;
   }
+
+  async getActiveSessionByRefreshToken(
+    refreshToken: string
+  ): Promise<IActiveSession | null> {
+    const activeSession =
+      await activeSessionRepository.getActiveSessionByRefreshToken(
+        refreshToken
+      );
+
+    return activeSession;
+  }
 }
 
 export default new ActiveSessionService();

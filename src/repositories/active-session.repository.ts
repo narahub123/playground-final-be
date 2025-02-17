@@ -76,6 +76,19 @@ class ActiveSessionRepository {
       return [];
     }
   }
+
+  async getActiveSessionByRefreshToken(
+    refreshToken: string
+  ): Promise<IActiveSession | null> {
+    try {
+      const activeSession = await ActiveSession.findOne({ refreshToken });
+
+      return activeSession;
+    } catch (error) {
+      mongoDBErrorHandler("getActiveSessionsByUserId", error, { refreshToken });
+      return null;
+    }
+  }
 }
 
 export default new ActiveSessionRepository();
