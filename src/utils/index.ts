@@ -9,7 +9,6 @@ import comparePassword from "./comparePassword";
 import createRefreshToken from "./createRefreshToken";
 import createAccessToken from "./createAccessToken";
 import mongoDBErrorHandler from "./mongoDBErrorHandler";
-import convertBirthToNumber from "./convertBirthToNumber";
 import extractCountryFromLanguage from "./extractCountryFromLanguage";
 import verifyAccountLock from "./verifyAccountLock";
 
@@ -24,7 +23,6 @@ export {
   comparePassword,
   createRefreshToken,
   createAccessToken,
-  convertBirthToNumber,
   extractCountryFromLanguage,
   mongoDBErrorHandler,
   verifyAccountLock,

@@ -3,7 +3,6 @@ import { BadRequestError, CustomAPIError, InternalServerError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   verifyAccountLock,
-  convertBirthToNumber,
   createHashedPassword,
   deleteImages,
   extractCountryFromLanguage,
@@ -158,9 +157,6 @@ const signupUser = asyncWrapper(
       // 사진 업로드: 다중 업로드되어 있기 때문에 [0]을 적용해야 함 주의!!!
       uploadedProfileImage = await uploadImages(profileImage);
 
-      // 생년월일 합치기
-      const birthConverted = convertBirthToNumber(birth);
-
       // 국가
       const countryInfo = extractCountryFromLanguage(language);
 
@@ -168,7 +164,7 @@ const signupUser = asyncWrapper(
         password: hashedPassword,
         userId,
         username,
-        birth: birthConverted,
+        birth,
         gender,
         country: countryInfo,
         ip,
