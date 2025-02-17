@@ -14,14 +14,14 @@ import mongoose from "mongoose";
  */
 const createAccessToken = (
   activeSessionId: mongoose.Types.ObjectId,
-  user: string,
+  userId: string,
   role: string,
   expiresIn: number
 ): string => {
   // 토큰에 포함할 payload 객체
   const payload = {
     activeSessionId, // 활성 세션 ID
-    user, // 사용자 ID
+    userId, // 사용자 ID
     role, // 사용자 역할
   };
 
