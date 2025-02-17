@@ -1,7 +1,16 @@
 import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "@errors";
 import { asyncWrapper } from "@middlewares";
-import { duplicateDetectionService, userService } from "@services";
+import {
+  activeSessionService,
+  displayService,
+  duplicateDetectionService,
+  loginRecordService,
+  notificationService,
+  privacyService,
+  securityService,
+  userService,
+} from "@services";
 import { IApiSuccessResponse } from "@types";
 
 const checkEmailDuplication = asyncWrapper(
@@ -163,9 +172,69 @@ const getContactsBeforeLogin = asyncWrapper(
   }
 );
 
+const getCurrentUser = asyncWrapper(
+  "getCurrentUser",
+  "User not found. (사용자를 찾을 수 없음)",
+  "USER_NOT_FOUND",
+  async (req: Request, res: Response) => {
+    const userId = "test1234";
+
+    const { emails, phones } = await userService.getContactsByIdentifier(
+      userId
+    );
+
+    const userInfo = {
+      emails: emails.map((item) => item.email),
+      phones: phones.map((item) => item.phone),
+    };
+
+    const display = await displayService.getDisplayByUserId(userId);
+
+    const security = await securityService.getSecurityByUserId(userId);
+
+    const privacy = await privacyService.getPrivacyByUserId(userId);
+
+    const notification = await notificationService.getNotificationByUserId(
+      userId
+    );
+
+    const activeSessions = await activeSessionService.getActiveSessionsByUserId(
+      userId
+    );
+
+    const loginRecords = await loginRecordService.getLoginRecordsByUserId(
+      userId
+    );
+
+    const securityInfo = {
+      ...JSON.parse(JSON.stringify(security)),
+      activeSessions,
+      loginRecords,
+    };
+
+    const response = {
+      success: true,
+      message:
+        "Current user info retrieved successfully. (현재 사용자 정보 조회 성공)",
+      code: "GET_CURRENT_USER_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+      data: {
+        user: userInfo,
+        security: securityInfo,
+        privacy,
+        notification,
+        display,
+      },
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
+  getCurrentUser,
 };

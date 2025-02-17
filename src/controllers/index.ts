@@ -3,6 +3,7 @@ import {
   checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
+  getCurrentUser,
 } from "./users.controller";
 
 import { signupUser, loginUser } from "./auth.controller";
@@ -20,6 +21,7 @@ export {
   checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
+  getCurrentUser,
 
   // auth
   loginUser,

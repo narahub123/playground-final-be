@@ -16,6 +16,17 @@ class SecurityRepository {
       mongoDBErrorHandler("createSecurity", error, { userId });
     }
   }
+
+  async getSecurityByUserId(userId: string): Promise<ISecurity | null> {
+    try {
+      const security = await Security.findOne({ userId });
+
+      return security;
+    } catch (error) {
+      mongoDBErrorHandler("createSecurity", error, { userId });
+      return null;
+    }
+  }
 }
 
 export default new SecurityRepository();

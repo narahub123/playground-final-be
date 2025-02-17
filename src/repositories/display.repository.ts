@@ -16,6 +16,17 @@ class DisplayRepository {
       mongoDBErrorHandler("createDisplay", error, { display });
     }
   }
+
+  async getDisplayByUserId(userId: string): Promise<IDisplay | null> {
+    try {
+      const display = await Display.findOne({ userId });
+
+      return display;
+    } catch (error) {
+      mongoDBErrorHandler("getDisplayByUserId", error, { userId });
+      return null;
+    }
+  }
 }
 
 export default new DisplayRepository();

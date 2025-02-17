@@ -1,6 +1,6 @@
-import { IDevice, ILocation, ILoginRecordInput } from "@types";
+import { IDevice, ILocation, ILoginRecordInput, ILoginRecord } from "@types";
 import { loginRecordRepository } from "@repositories";
-import { InternalServerError } from "@errors";
+import { InternalServerError, NotFoundError } from "@errors";
 
 class LoginRecordService {
   /**
@@ -105,6 +105,24 @@ class LoginRecordService {
         }
       );
     }
+  }
+
+  async getLoginRecordsByUserId(userId: string): Promise<ILoginRecord[]> {
+    const loginRecords = await loginRecordRepository.getLoginRecordsByUserId(
+      userId
+    );
+
+    if (loginRecords.length === 0) {
+      throw new NotFoundError(
+        "Login record not found. (로그인 기록 조회 실패)",
+        "NOT_FOUND",
+        {
+          loginRecords: "LOGIN_RECORD_NOT_FOUND",
+        }
+      );
+    }
+
+    return loginRecords;
   }
 }
 

@@ -1,5 +1,5 @@
-import { InternalServerError } from "@errors";
-import { IDevice, ILocation, UserRoleType } from "@types";
+import { InternalServerError, NotFoundError } from "@errors";
+import { IActiveSession, IDevice, ILocation, UserRoleType } from "@types";
 import { activeSessionRepository } from "@repositories";
 import { createAccessToken, createRefreshToken } from "@utils";
 import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
@@ -91,6 +91,23 @@ class ActiveSessionService {
 
     // 리프레시 토큰과 액세스 토큰을 반환
     return { refreshToken, accessToken };
+  }
+
+  async getActiveSessionsByUserId(userId: string): Promise<IActiveSession[]> {
+    const activeSessions =
+      await activeSessionRepository.getActiveSessionsByUserId(userId);
+
+    if (activeSessions.length === 0) {
+      throw new NotFoundError(
+        "Active session not found. (활성 세션 조회 실패)",
+        "NOT_FOUND",
+        {
+          activeSession: "ACTIVE_SESSION_NOT_FOUND",
+        }
+      );
+    }
+
+    return activeSessions;
   }
 }
 

@@ -19,6 +19,17 @@ class NotificationRepository {
       mongoDBErrorHandler("createNotification", error, { notification });
     }
   }
+
+  async getNotificationByUserId(userId: string): Promise<INotification | null> {
+    try {
+      const notification = await Notification.findOne({ userId });
+
+      return notification;
+    } catch (error) {
+      mongoDBErrorHandler("getNotificationByUserId", error, { userId });
+      return null;
+    }
+  }
 }
 
 export default new NotificationRepository();

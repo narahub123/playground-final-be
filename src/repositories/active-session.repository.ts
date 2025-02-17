@@ -65,6 +65,17 @@ class ActiveSessionRepository {
       return undefined; // 오류 발생 시 undefined 반환
     }
   }
+
+  async getActiveSessionsByUserId(userId: string): Promise<IActiveSession[]> {
+    try {
+      const activeSessions = await ActiveSession.find({ userId });
+
+      return activeSessions;
+    } catch (error) {
+      mongoDBErrorHandler("getActiveSessionsByUserId", error, { userId });
+      return [];
+    }
+  }
 }
 
 export default new ActiveSessionRepository();

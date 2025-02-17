@@ -6,6 +6,10 @@ import loginFailureService from "./login-failure.service";
 import authService from "./auth.service";
 import activeSessionService from "./active-session.service";
 import loginRecordService from "./login-record.service";
+import displayService from "./display.service";
+import notificationService from "./notification.service";
+import privacyService from "./privacy.service";
+import securityService from "./security.service";
 
 export {
   // email
@@ -31,4 +35,16 @@ export {
 
   // login-record
   loginRecordService,
+
+  // display
+  displayService,
+
+  // notification
+  notificationService,
+
+  // privacy
+  privacyService,
+
+  // security
+  securityService,
 };

@@ -16,6 +16,17 @@ class PrivacyRepository {
       mongoDBErrorHandler("createPrivacy", error, { userId });
     }
   }
+
+  async getPrivacyByUserId(userId: string): Promise<IPrivacy | null> {
+    try {
+      const privacy = await Privacy.findOne({ userId });
+
+      return privacy;
+    } catch (error) {
+      mongoDBErrorHandler("createPrivacy", error, { userId });
+      return null;
+    }
+  }
 }
 
 export default new PrivacyRepository();
