@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { ILocation } from "./user.type";
+import { ILocation, UserRoleType } from "./user.type";
 
 /**
  * 사용자의 장치 유형을 나타내는 타입입니다.
@@ -54,22 +54,48 @@ type IDevice = {
 };
 
 /**
- * 활성 세션 정보를 나타내는 인터페이스입니다.
- *
- * - `userId`: 사용자 ID (문서의 `userId`)
- * - `refreshToken`: 리프레시 토큰
- * - `device`: 장치 정보 (`IDevice`)
- * - `ip`: 접속한 IP 주소
- * - `location`: 사용자 위치 정보 (`ILocation`)
- * - `createdAt`: 세션 생성 시간
+ * 활성 사용자 세션을 나타내는 인터페이스.
+ * MongoDB의 Document를 확장하여 세션 정보를 저장합니다.
  */
 interface IActiveSession extends Document {
+  /**
+   * 세션의 고유 ID (MongoDB ObjectId)
+   */
   _id: Types.ObjectId;
+
+  /**
+   * 세션 소유자의 사용자 ID
+   */
   userId: string;
+
+  /**
+   * 사용자 역할 (예: "admin", "user", "moderator" 등)
+   */
+  userRole: UserRoleType;
+
+  /**
+   * 세션을 갱신하는 데 사용되는 Refresh Token
+   */
   refreshToken: string;
-  device: IDevice;
+
+  /**
+   * 사용자의 장치 정보 (선택적)
+   */
+  device?: IDevice;
+
+  /**
+   * 사용자의 IP 주소
+   */
   ip: string;
-  location: ILocation;
+
+  /**
+   * 사용자의 위치 정보 (선택적)
+   */
+  location?: ILocation;
+
+  /**
+   * 세션이 생성된 날짜 및 시간
+   */
   sessionCreatedAt: Date;
 }
 

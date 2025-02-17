@@ -1,13 +1,24 @@
 import mongoose from "mongoose";
 import { ipRegExp } from "@data";
 import { REFRESHTOKEN_EXPIRES } from "@constants";
+import { IActiveSession } from "@types";
 
-const ActiveSessionSchema = new mongoose.Schema(
+const ActiveSessionSchema = new mongoose.Schema<IActiveSession>(
   {
     userId: {
       type: String,
       ref: "User",
       required: true,
+    },
+    // 사용자 등급
+    userRole: {
+      type: String,
+      enum: {
+        values: ["ADMIN", "USER"],
+        message: `{VALUE}는 지원되지 않는 사용자 등급입니다.`,
+      },
+      default: "USER", // 기본값은 "USER"
+      uppercase: true,
     },
     refreshToken: {
       type: String,
