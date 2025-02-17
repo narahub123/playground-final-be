@@ -350,9 +350,6 @@ const loginUser = asyncWrapper(
     // 로그인 성공 시 Normal 로그인 실패 삭제
     await loginFailureService.clearNormalLoginFailures(user.userId);
 
-    // access token을 헤더에 저장
-    res.setHeader("Authorization", `Bearer ${accessToken}`);
-
     // refresh token을 쿠키에 저장 (보안 설정 포함)
     res.cookie("refresh", refreshToken, {
       httpOnly: true, // 클라이언트에서 JavaScript로 쿠키 접근 차단
@@ -379,6 +376,9 @@ const loginUser = asyncWrapper(
       message: "Login successful. (로그인 성공)",
       code: "LOGIN_SUCCESS", // 추가적으로 코드도 명시
       timestamp: new Date().toISOString(),
+      data: {
+        accessToken,
+      },
       meta: {
         newLoginAttempt: {
           status: hasNewLoginAttempt,
