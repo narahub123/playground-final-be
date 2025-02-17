@@ -311,16 +311,6 @@ const loginUser = asyncWrapper(
         location,
       });
 
-    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
-    if (isExistingSession) {
-      return res.status(200).json({
-        success: true,
-        message: "Login successful. (로그인 성공)",
-        code: "LOGIN_SUCCESS", // 추가적으로 코드도 명시
-        timestamp: new Date().toISOString(),
-      });
-    }
-
     // 새로운 세션 생성 및 토큰 발급
     const { refreshToken, accessToken } =
       await activeSessionService.createSessionAndIssueTokens({
@@ -330,6 +320,29 @@ const loginUser = asyncWrapper(
         location,
         userRole: user.userRole,
       });
+
+    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
+    if (isExistingSession) {
+      // refresh token을 쿠키에 저장 (보안 설정 포함)
+      res.cookie("refresh", refreshToken, {
+        httpOnly: true, // 클라이언트에서 JavaScript로 쿠키 접근 차단
+        maxAge:
+          (Number(process.env.REFRESHTOKEN_EXPIRES) || REFRESHTOKEN_EXPIRES) *
+          1000, // 만료 시간 (밀리초 단위)
+        sameSite: "lax", // CSRF 공격 방지 설정
+        secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서만 https 사용
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Login successful. (로그인 성공)",
+        code: "LOGIN_SUCCESS", // 추가적으로 코드도 명시
+        timestamp: new Date().toISOString(),
+        data: {
+          accessToken,
+        },
+      });
+    }
 
     // 새로운 로그인 시도 확인
     const newLoginAttempt = await loginRecordService.detectNewLoginAttempt({
@@ -369,6 +382,10 @@ const loginUser = asyncWrapper(
           .filter(([key, value]) => value === true)
           .map(([key]) => key)
       : [];
+
+    console.log("refreshToken", refreshToken);
+
+    console.log("accessToken", accessToken);
 
     // 로그인 성공 응답
     res.status(200).json({
