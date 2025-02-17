@@ -3,7 +3,7 @@ import { BadRequestError, CustomAPIError, InternalServerError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   verifyAccountLock,
-  combineBirth,
+  convertBirthToNumber,
   createHashedPassword,
   deleteImages,
   extractCountryFromLanguage,
@@ -159,7 +159,7 @@ const signupUser = asyncWrapper(
       uploadedProfileImage = await uploadImages(profileImage);
 
       // 생년월일 합치기
-      const birthCombined = combineBirth(birth.year, birth.month, birth.date);
+      const birthConverted = convertBirthToNumber(birth);
 
       // 국가
       const countryInfo = extractCountryFromLanguage(language);
@@ -168,7 +168,7 @@ const signupUser = asyncWrapper(
         password: hashedPassword,
         userId,
         username,
-        birth: birthCombined,
+        birth: birthConverted,
         gender,
         country: countryInfo,
         ip,
