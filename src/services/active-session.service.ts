@@ -58,6 +58,7 @@ class ActiveSessionService {
     // 세션 정보 객체 생성
     const sessionInfo = {
       userId,
+      userRole,
       refreshToken,
       device,
       ip,

@@ -1,5 +1,5 @@
 import { ActiveSession } from "@models";
-import { IActiveSession, IDevice, ILocation } from "@types";
+import { IActiveSession, IDevice, ILocation, UserRoleType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 
 class ActiveSessionRepository {
@@ -46,6 +46,7 @@ class ActiveSessionRepository {
    */
   async createActiveSession(sessionInfo: {
     userId: string; // 사용자의 고유 ID
+    userRole: UserRoleType;
     refreshToken: string; // 사용자의 리프레시 토큰
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
