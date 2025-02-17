@@ -97,12 +97,18 @@ interface ILockStatus {
   lockedAt: Date | null;
 }
 
+interface IBirth {
+  year: number;
+  month: number;
+  date: number;
+}
+
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
   password: string;
   userId: string;
   username: string;
-  birth: string;
+  birth: IBirth;
   gender: GenderType;
   userRole: UserRoleType;
   country: string;
@@ -122,7 +128,7 @@ interface IUserInput {
   password: string;
   userId: string;
   username: string;
-  birth: string;
+  birth: IBirth;
   gender: GenderType;
   country: string;
   ip: string;
@@ -139,4 +145,5 @@ export type {
   UserRoleType,
   SocialType,
   IUserInput,
+  IBirth,
 };

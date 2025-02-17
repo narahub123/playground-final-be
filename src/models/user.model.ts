@@ -53,10 +53,22 @@ const UserSchema = new mongoose.Schema<IUser>(
     },
     // 생년월일
     birth: {
-      type: String,
-      required: true,
-      trim: true,
-      match: birthRegExp, // YYYYMMDD 형식의 생년월일
+      year: {
+        type: Number,
+        required: true,
+      },
+      month: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 12,
+      },
+      date: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 31,
+      },
     },
     // 성별: 남성 여성 중성 양성
     gender: {
