@@ -13,15 +13,6 @@ import combineBirth from "./combineBirth";
 import extractCountryFromLanguage from "./extractCountryFromLanguage";
 import verifyAccountLock from "./verifyAccountLock";
 
-import {
-  findUserByIdentifier,
-  saveLoginFailure,
-  lockAccount,
-  createSessionAndTokens,
-  saveLoginRecord,
-  deleteLoginFailures,
-} from "./loginUtils";
-
 export {
   connectDB,
   createHashedPassword,
@@ -35,13 +26,6 @@ export {
   createAccessToken,
   combineBirth,
   extractCountryFromLanguage,
-  // loginUtils
-  findUserByIdentifier,
-  saveLoginFailure,
-  lockAccount,
-  createSessionAndTokens,
-  saveLoginRecord,
-  deleteLoginFailures,
   mongoDBErrorHandler,
   verifyAccountLock,
 };
