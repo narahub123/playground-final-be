@@ -117,6 +117,7 @@ interface IUser extends Document {
   profileImage: string;
   profileCoverImage: string;
   intro: string;
+  accountGroup: string[];
   followings: string[];
   followers: string[];
   isAuthorized: boolean;

@@ -156,6 +156,12 @@ const UserSchema = new mongoose.Schema<IUser>(
       type: [{ type: String, ref: "User" }],
       default: [],
     },
+
+    accountGroup: {
+      type: [String],
+      default: [],
+    },
+
     // 유료 개정 여부
     isAuthorized: {
       type: Boolean,
