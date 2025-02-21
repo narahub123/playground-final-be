@@ -19,6 +19,7 @@ import {
   ILoginRecordInput,
   ILoginRecord,
   ILogoutInfo,
+  LogoutReasonType,
 } from "./login-record.type";
 import { IVerification, IVerificationInput } from "./verification.type";
 import {
@@ -97,6 +98,7 @@ export {
   ILoginRecordInput,
   ILoginRecord,
   ILogoutInfo,
+  LogoutReasonType,
 
   // verification
   IVerification,

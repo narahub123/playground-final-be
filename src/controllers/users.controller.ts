@@ -177,33 +177,34 @@ const getCurrentUser = asyncWrapper(
   "User not found. (사용자를 찾을 수 없음)",
   "USER_NOT_FOUND",
   async (req: Request, res: Response) => {
-    const userId = "test1234";
+    const user = req.user;
 
     const { emails, phones } = await userService.getContactsByIdentifier(
-      userId
+      user.userId
     );
 
     const userInfo = {
+      ...user,
       emails: emails.map((item) => item.email),
       phones: phones.map((item) => item.phone),
     };
 
-    const display = await displayService.getDisplayByUserId(userId);
+    const display = await displayService.getDisplayByUserId(user.userId);
 
-    const security = await securityService.getSecurityByUserId(userId);
+    const security = await securityService.getSecurityByUserId(user.userId);
 
-    const privacy = await privacyService.getPrivacyByUserId(userId);
+    const privacy = await privacyService.getPrivacyByUserId(user.userId);
 
     const notification = await notificationService.getNotificationByUserId(
-      userId
+      user.userId
     );
 
     const activeSessions = await activeSessionService.getActiveSessionsByUserId(
-      userId
+      user.userId
     );
 
     const loginRecords = await loginRecordService.getLoginRecordsByUserId(
-      userId
+      user.userId
     );
 
     const securityInfo = {

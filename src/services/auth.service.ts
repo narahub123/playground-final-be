@@ -7,6 +7,7 @@ import {
   INotificationInput,
   IPhoneInput,
   IUserInput,
+  LogoutReasonType,
 } from "@types";
 import { comparePassword } from "@utils";
 import loginFailureService from "./login-failure.service";
@@ -113,13 +114,16 @@ class AuthService {
   }
 
   // 로그아웃
-  async logout(refreshToken: string): Promise<void> {
+  async logout(
+    refreshToken: string,
+    logoutReason: LogoutReasonType
+  ): Promise<void> {
     // 활성 세션 삭제
     await activeSessionService.deleteActiveSessionByRefreshToken(refreshToken);
 
     const logoutInfo: ILogoutInfo = {
       loggedOutAt: new Date(),
-      reason: "SESSION_EXPIRED",
+      reason: logoutReason,
     };
     // 로그아웃 기록 업데이트
     await loginRecordService.updateLogoutInfo(refreshToken, logoutInfo);
