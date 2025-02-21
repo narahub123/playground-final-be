@@ -8,6 +8,7 @@ import {
   extractCountryFromLanguage,
   uploadImages,
   handleLogout,
+  clearRefreshTokenCookie,
 } from "@utils";
 import {
   activeSessionService,
@@ -423,4 +424,42 @@ const logoutAccount = asyncWrapper(
   }
 );
 
-export { signupUser, loginUser, logoutAccount };
+// 전체 로그아웃
+const logoutAllAccounts = asyncWrapper(
+  "logoutAllAccounts",
+  "All accounts logout failed. (로그 아웃 실패)",
+  "ALL_ACCOUNTS_LOGOUT_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const accountGroup = user.accountGroup;
+
+    for (const userId of accountGroup) {
+      // 에러 처리는 service에서 완료
+      const activeSessions =
+        await activeSessionService.getActiveSessionsByUserId(userId);
+
+      const refreshTokens = activeSessions.map(
+        (session) => session.refreshToken
+      );
+
+      for (const refresh of refreshTokens) {
+        // 에러 처리는 service에서 완료
+        await authService.logout(refresh, "USER_LOGOUT");
+        clearRefreshTokenCookie(res);
+      }
+    }
+
+    const response = {
+      success: true,
+      message:
+        "You have been logged out from all the accounts successfully. (단체 로그 아웃 성공)",
+      code: "ALL_ACCOUNTS_LOGOUT_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
+export { signupUser, loginUser, logoutAccount, logoutAllAccounts };

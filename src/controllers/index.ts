@@ -6,7 +6,12 @@ import {
   getCurrentUser,
 } from "./users.controller";
 
-import { signupUser, loginUser, logoutAccount } from "./auth.controller";
+import {
+  signupUser,
+  loginUser,
+  logoutAccount,
+  logoutAllAccounts,
+} from "./auth.controller";
 
 import {
   requestLoginVerificationCode,
@@ -27,6 +32,7 @@ export {
   loginUser,
   signupUser,
   logoutAccount,
+  logoutAllAccounts,
 
   // oauth
   oauthCallback,
