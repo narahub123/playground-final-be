@@ -1,7 +1,7 @@
 import { LoginRecord } from "@models";
 import { ILoginRecord, ILoginRecordInput, ILogoutInfo } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import { UpdateResult } from "mongoose";
+import { Types, UpdateResult } from "mongoose";
 
 class LoginRecordRepository {
   /**
@@ -45,22 +45,21 @@ class LoginRecordRepository {
 
   // loginRecord 업데이트
   async updateLogoutInfo(
-    refreshToken: string,
+    activeSessionId: Types.ObjectId,
     logoutInfo: ILogoutInfo
   ): Promise<UpdateResult | undefined> {
     try {
       const loginRecord = await LoginRecord.updateOne(
         {
-          refreshToken,
-          logoutInfo: { $exists: false },
+          activeSessionId,
+          $or: [{ logoutInfo: { $exists: false } }, { logoutInfo: null }],
         },
         { $set: { logoutInfo } }
       );
-
       return loginRecord;
     } catch (error) {
       mongoDBErrorHandler("createLoginRecord", error, {
-        refreshToken,
+        activeSessionId,
         logoutInfo,
       });
     }

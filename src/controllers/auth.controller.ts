@@ -414,9 +414,10 @@ const logoutAccount = asyncWrapper(
   "LOGOUT_FAILED",
   async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refresh;
+    const activeSessionId = req.activeSessionId;
 
     await handleLogout(
-      refreshToken,
+      activeSessionId,
       res,
       "You have successfully logged out. (로그 아웃 성공)",
       "LOGOUT_SUCCEEDED",
@@ -441,13 +442,11 @@ const logoutAllAccounts = asyncWrapper(
       const activeSessions =
         await activeSessionService.getActiveSessionsByUserId(userId);
 
-      const refreshTokens = activeSessions.map(
-        (session) => session.refreshToken
-      );
+      const activeSessionIds = activeSessions.map((session) => session._id);
 
-      for (const refresh of refreshTokens) {
+      for (const activeSessionId of activeSessionIds) {
         // 에러 처리는 service에서 완료
-        await authService.logout(refresh, "USER_LOGOUT");
+        await authService.logout(activeSessionId, "USER_LOGOUT");
         clearRefreshTokenCookie(res);
       }
     }

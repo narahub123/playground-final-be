@@ -1,6 +1,7 @@
 import { ActiveSession } from "@models";
 import { IActiveSession, IDevice, ILocation, UserRoleType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
+import { Types } from "mongoose";
 
 class ActiveSessionRepository {
   /**
@@ -77,6 +78,19 @@ class ActiveSessionRepository {
     }
   }
 
+  async getActiveSessionById(
+    id: Types.ObjectId
+  ): Promise<IActiveSession | null> {
+    try {
+      const activeSession = await ActiveSession.findOne({ _id: id });
+
+      return activeSession;
+    } catch (error) {
+      mongoDBErrorHandler("getActiveSessionsByUserId", error, { id });
+      return null;
+    }
+  }
+
   async getActiveSessionByRefreshToken(
     refreshToken: string
   ): Promise<IActiveSession | null> {
@@ -90,19 +104,20 @@ class ActiveSessionRepository {
     }
   }
 
-  // 활성 섹션 삭제하기
-  async deleteActiveSessionByRefreshToken(
-    refreshToken: string
+  async deleteActiveSessionById(
+    id: Types.ObjectId
   ): Promise<IActiveSession | null> {
     try {
       const activeSession = await ActiveSession.findOneAndDelete({
-        refreshToken,
+        _id: id,
       });
+
+      console.log(activeSession);
 
       return activeSession;
     } catch (error) {
       mongoDBErrorHandler("deleteActiveSessionByRefreshToken", error, {
-        refreshToken,
+        id,
       });
       return null;
     }

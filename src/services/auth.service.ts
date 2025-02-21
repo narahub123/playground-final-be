@@ -12,7 +12,7 @@ import {
 import { comparePassword } from "@utils";
 import loginFailureService from "./login-failure.service";
 import { UnauthorizedError } from "@errors";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import {
   displayRepository,
   emailRepository,
@@ -115,18 +115,24 @@ class AuthService {
 
   // 로그아웃
   async logout(
-    refreshToken: string,
+    activeSessionId: Types.ObjectId,
     logoutReason: LogoutReasonType
   ): Promise<void> {
-    // 활성 세션 삭제
-    await activeSessionService.deleteActiveSessionByRefreshToken(refreshToken);
+    const activeSession = await activeSessionService.getActiveSessionsById(
+      activeSessionId
+    );
+
+    if (activeSession) {
+      // 활성 세션 삭제
+      await activeSessionService.deleteActiveSessionById(activeSessionId);
+    }
 
     const logoutInfo: ILogoutInfo = {
       loggedOutAt: new Date(),
       reason: logoutReason,
     };
     // 로그아웃 기록 업데이트
-    await loginRecordService.updateLogoutInfo(refreshToken, logoutInfo);
+    await loginRecordService.updateLogoutInfo(activeSessionId, logoutInfo);
   }
 }
 

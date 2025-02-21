@@ -1,22 +1,19 @@
-import { authService } from "@services";
+import { activeSessionService, authService } from "@services";
 import clearRefreshTokenCookie from "./clearRefreshTokenCookie";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { LogoutReasonType } from "@types";
+import { Types } from "mongoose";
 
 // refresh token 쿠키 삭제 및 로그아웃 처리
 const handleLogout = async (
-  refresh: string | undefined,
+  activeSessionId: Types.ObjectId,
   res: Response,
   message: string,
   code: string,
   logoutReason: LogoutReasonType,
-  statusCode: number = 401
+  statusCode: number
 ) => {
-  if (refresh) {
-    await authService.logout(refresh, logoutReason);
-  } else {
-    
-  }
+  await authService.logout(activeSessionId, logoutReason);
 
   clearRefreshTokenCookie(res);
 
@@ -38,4 +35,23 @@ const handleLogout = async (
   return res.status(statusCode).json(response);
 };
 
-export default handleLogout;
+const handleTokenExpirationLogout = async (
+  req: Request,
+  res: Response,
+  message: string,
+  code: string
+) => {
+  const sessionId = req.headers[`x-active-session-id`] as string;
+  const activeSessionId = new Types.ObjectId(sessionId);
+
+  await handleLogout(
+    activeSessionId,
+    res,
+    message,
+    code,
+    "SESSION_EXPIRED",
+    401
+  );
+};
+
+export { handleLogout, handleTokenExpirationLogout };

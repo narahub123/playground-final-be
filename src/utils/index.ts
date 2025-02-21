@@ -12,7 +12,7 @@ import mongoDBErrorHandler from "./mongoDBErrorHandler";
 import extractCountryFromLanguage from "./extractCountryFromLanguage";
 import verifyAccountLock from "./verifyAccountLock";
 import clearRefreshTokenCookie from "./clearRefreshTokenCookie";
-import handleLogout from "./handleLogout";
+import { handleLogout, handleTokenExpirationLogout } from "./handleLogout";
 
 export {
   connectDB,

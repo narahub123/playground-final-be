@@ -7,6 +7,7 @@ import {
 } from "@types";
 import { loginRecordRepository } from "@repositories";
 import { ConflictError, InternalServerError, NotFoundError } from "@errors";
+import { Types } from "mongoose";
 
 class LoginRecordService {
   /**
@@ -132,11 +133,11 @@ class LoginRecordService {
   }
 
   async updateLogoutInfo(
-    refreshToken: string,
+    activeSesionId: Types.ObjectId,
     logoutInfo: ILogoutInfo
   ): Promise<void> {
     const result = await loginRecordRepository.updateLogoutInfo(
-      refreshToken,
+      activeSesionId,
       logoutInfo
     );
 

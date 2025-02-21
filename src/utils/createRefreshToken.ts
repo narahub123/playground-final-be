@@ -17,10 +17,19 @@ const createRefreshToken = (userId: string, expiresIn: number): string => {
     throw new Error("유효하지 사용자 아이디 제공");
   }
 
+  const payload = {
+    userId,
+    type: "refresh",
+  };
+
   // 유효 기간이 제공되지 않으면 에러 발생
   if (!expiresIn) {
     throw new Error("유효 기간은 반드시 제공되어야 함");
   }
+
+  const options = {
+    expiresIn,
+  };
 
   // JWT 암호화에 사용할 비밀 키를 환경 변수에서 읽음
   const secret = process.env.JWT_SECRET_KEY;
@@ -31,7 +40,7 @@ const createRefreshToken = (userId: string, expiresIn: number): string => {
   }
 
   // Refresh Token을 생성 후 반환
-  return jwt.sign({ userId }, secret, { expiresIn });
+  return jwt.sign(payload, secret, options);
 };
 
 export default createRefreshToken;

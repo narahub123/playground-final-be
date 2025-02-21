@@ -88,7 +88,6 @@ class ActiveSessionService {
 
     // access 토큰 생성
     const accessToken = createAccessToken(
-      activeSession._id,
       userId,
       userRole,
       Number(process.env.ACESSTOKEN_EXPIRES) || ACCESSTOKEN_EXPIRES
@@ -115,6 +114,16 @@ class ActiveSessionService {
     return activeSessions;
   }
 
+  async getActiveSessionsById(
+    id: Types.ObjectId
+  ): Promise<IActiveSession | null> {
+    const activeSession = await activeSessionRepository.getActiveSessionById(
+      id
+    );
+
+    return activeSession;
+  }
+
   async getActiveSessionByRefreshToken(
     refreshToken: string
   ): Promise<IActiveSession | null> {
@@ -126,12 +135,11 @@ class ActiveSessionService {
     return activeSession;
   }
 
-  // refresh 토큰으로 활성 섹션 삭제하기
-  async deleteActiveSessionByRefreshToken(refreshToken: string) {
-    const activeSession =
-      await activeSessionRepository.deleteActiveSessionByRefreshToken(
-        refreshToken
-      );
+  // Id로 토큰으로 활성 섹션 삭제하기
+  async deleteActiveSessionById(id: Types.ObjectId) {
+    const activeSession = await activeSessionRepository.deleteActiveSessionById(
+      id
+    );
 
     if (activeSession === null) {
       throw new NotFoundError(

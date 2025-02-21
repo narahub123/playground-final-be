@@ -13,16 +13,15 @@ import mongoose from "mongoose";
  * @throws {Error} - JWT_SECRET_KEY가 정의되어 있지 않으면 에러를 던짐
  */
 const createAccessToken = (
-  activeSessionId: mongoose.Types.ObjectId,
   userId: string,
   role: string,
   expiresIn: number
 ): string => {
   // 토큰에 포함할 payload 객체
   const payload = {
-    activeSessionId, // 활성 세션 ID
     userId, // 사용자 ID
     role, // 사용자 역할
+    type: "access",
   };
 
   // JWT 암호화에 사용할 비밀 키를 환경 변수에서 읽음
