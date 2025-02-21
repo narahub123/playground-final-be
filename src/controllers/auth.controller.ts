@@ -7,6 +7,7 @@ import {
   deleteImages,
   extractCountryFromLanguage,
   uploadImages,
+  handleLogout,
 } from "@utils";
 import {
   activeSessionService,
@@ -403,4 +404,23 @@ const loginUser = asyncWrapper(
   }
 );
 
-export { signupUser, loginUser };
+// 개별 로그아웃
+const logoutAccount = asyncWrapper(
+  "logoutAccount",
+  "Logout failed. (로그 아웃 실패)",
+  "LOGOUT_FAILED",
+  async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refresh;
+
+    await handleLogout(
+      refreshToken,
+      res,
+      "You have successfully logged out. (로그 아웃 성공)",
+      "LOGOUT_SUCCEEDED",
+      "USER_LOGOUT",
+      200
+    );
+  }
+);
+
+export { signupUser, loginUser, logoutAccount };
