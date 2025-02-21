@@ -12,15 +12,26 @@ const handleLogout = async (
   logoutReason: LogoutReasonType,
   statusCode: number = 401
 ) => {
-  if (!refresh) return;
+  if (refresh) {
+    await authService.logout(refresh, logoutReason);
+  } else {
+    
+  }
 
-  await authService.logout(refresh, logoutReason);
   clearRefreshTokenCookie(res);
 
   const response = {
     success: statusCode === 200,
     message: message,
-    code: code,
+    code: statusCode === 200 ? code : "LOGOUT",
+    error:
+      statusCode === 200
+        ? null
+        : {
+            details: {
+              accessToken: code,
+            },
+          },
     timestamp: new Date().toISOString(),
   };
 
