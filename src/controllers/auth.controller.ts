@@ -395,6 +395,7 @@ const loginUser = asyncWrapper(
       timestamp: new Date().toISOString(),
       data: {
         accessToken,
+        activeSessionId,
       },
       meta: {
         newLoginAttempt: {
