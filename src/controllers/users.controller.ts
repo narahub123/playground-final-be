@@ -179,12 +179,40 @@ const getCurrentUser = asyncWrapper(
   async (req: Request, res: Response) => {
     const user = req.user;
 
+    const userData = user.toObject();
+    
+    let newAccountGroup = [];
+
+    for (const userId of user.accountGroup) {
+      const account = await userService.getUserByUserId(userId);
+
+      if (!account) {
+        throw new NotFoundError(
+          "User not Found. (사용자 조회 실패)",
+          "NOT_FOUND",
+          {
+            userId: "USER_NOT_FOUND",
+          }
+        );
+      }
+
+      const { username, profileImage, intro } = account;
+
+      newAccountGroup.push({
+        userId,
+        username,
+        profileImage,
+        intro,
+      });
+    }
+
     const { emails, phones } = await userService.getContactsByIdentifier(
       user.userId
     );
 
     const userInfo = {
-      ...user,
+      ...userData,
+      accountGroup: newAccountGroup,
       emails: emails.map((item) => item.email),
       phones: phones.map((item) => item.phone),
     };
