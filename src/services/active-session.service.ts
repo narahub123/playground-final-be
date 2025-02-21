@@ -3,6 +3,7 @@ import { IActiveSession, IDevice, ILocation, UserRoleType } from "@types";
 import { activeSessionRepository } from "@repositories";
 import { createAccessToken, createRefreshToken } from "@utils";
 import { ACCESSTOKEN_EXPIRES, REFRESHTOKEN_EXPIRES } from "@constants";
+import { Types } from "mongoose";
 
 class ActiveSessionService {
   /**
@@ -45,7 +46,11 @@ class ActiveSessionService {
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
     userRole: UserRoleType; // 사용자의 역할 (예: 'admin', 'user' 등)
-  }): Promise<{ refreshToken: string; accessToken: string }> {
+  }): Promise<{
+    refreshToken: string;
+    accessToken: string;
+    activeSessionId: Types.ObjectId;
+  }> {
     // 반환 값: 리프레시 토큰과 액세스 토큰 객체
     const { userId, device, ip, location, userRole } = info;
 
@@ -90,7 +95,7 @@ class ActiveSessionService {
     );
 
     // 리프레시 토큰과 액세스 토큰을 반환
-    return { refreshToken, accessToken };
+    return { refreshToken, accessToken, activeSessionId: activeSession._id };
   }
 
   async getActiveSessionsByUserId(userId: string): Promise<IActiveSession[]> {

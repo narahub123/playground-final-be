@@ -311,7 +311,7 @@ const loginUser = asyncWrapper(
       });
 
     // 새로운 세션 생성 및 토큰 발급
-    const { refreshToken, accessToken } =
+    const { refreshToken, accessToken, activeSessionId } =
       await activeSessionService.createSessionAndIssueTokens({
         userId: user.userId,
         device,
@@ -354,6 +354,7 @@ const loginUser = asyncWrapper(
     // 로그인 기록을 저장
     await loginRecordService.createLoginRecord({
       userId: user.userId,
+      activeSessionId,
       device,
       ip,
       location,
