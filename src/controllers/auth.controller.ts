@@ -413,7 +413,6 @@ const logoutAccount = asyncWrapper(
   "Logout failed. (로그 아웃 실패)",
   "LOGOUT_FAILED",
   async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refresh;
     const activeSessionId = req.activeSessionId;
 
     await handleLogout(
