@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { IDevice, ILocation } from "@types";
 
 /**
@@ -7,6 +7,9 @@ import { IDevice, ILocation } from "@types";
 interface ILoginRecordInput {
   /** 사용자 ID */
   userId: string;
+
+  /** 활성 세션 ID */
+  activeSessionId: Types.ObjectId;
 
   /** 사용자 IP 주소 */
   ip: string;
@@ -45,6 +48,9 @@ interface ILogoutInfo {
  * 로그인 기록을 나타내는 인터페이스
  */
 interface ILoginRecord extends Document {
+  /** 활성 세션 ID*/
+  activeSessionId: Types.ObjectId;
+
   /** 사용자 ID */
   userId: string;
 

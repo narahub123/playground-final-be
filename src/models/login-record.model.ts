@@ -1,10 +1,15 @@
 import { LOGINRECORD_EXPIRES } from "@constants";
 import { ipRegExp } from "@data";
 import { ILoginRecord } from "@types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const LoginRecordSchema = new mongoose.Schema<ILoginRecord>(
   {
+    activeSessionId: {
+      type: Schema.Types.ObjectId,
+      ref: "ActiveSession",
+      required: true,
+    },
     userId: {
       type: String,
       ref: "User",
