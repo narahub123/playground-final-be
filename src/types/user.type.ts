@@ -135,6 +135,7 @@ interface IUserInput {
   ip: string;
   location: ILocation;
   profileImage: string;
+  accountGroup: string[];
 }
 
 export type {

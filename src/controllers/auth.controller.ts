@@ -170,6 +170,7 @@ const signupUser = asyncWrapper(
         ip,
         location,
         profileImage: uploadedProfileImage[0]?.secure_url || "",
+        accountGroup: [userId],
       };
 
       const newNotification: INotificationInput = {
