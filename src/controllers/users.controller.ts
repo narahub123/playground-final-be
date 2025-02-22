@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "@errors";
+import {
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   activeSessionService,
@@ -12,6 +17,7 @@ import {
   userService,
 } from "@services";
 import { IApiSuccessResponse } from "@types";
+import { comparePassword } from "@utils";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -180,7 +186,7 @@ const getCurrentUser = asyncWrapper(
     const user = req.user;
 
     const userData = user.toObject();
-    
+
     let newAccountGroup = [];
 
     for (const userId of user.accountGroup) {
@@ -260,10 +266,109 @@ const getCurrentUser = asyncWrapper(
   }
 );
 
+const addCountGroup = asyncWrapper(
+  "addCountGroup",
+  "Adding an account failed. (계정 추가 실패)",
+  "ADD_ACCOUNT_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const { userId, email, phone, password } = req.body;
+    console.log(userId, email, phone, password);
+
+    // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
+    if (!password) {
+      throw new BadRequestError(
+        "Password is required. (비밀번호 필수)",
+        "MISSING_PASSWORD",
+        { password: "비밀번호가 제공되지 않았습니다." }
+      );
+    }
+
+    // 이메일, 전화번호, 사용자 ID 중 하나도 제공되지 않은 경우 BadRequestError 발생
+    if (!email && !phone && !userId) {
+      throw new BadRequestError(
+        "At least one of email, phone, or userId is required. (이메일, 휴대전화 번호, 사용자 아이디 중 적어도 하나 필수)",
+        "VALIDATION_ERROR",
+        {
+          email: "MISSING_EMAIL", // 에러 세부사항
+          phone: "MISSING_PHONE", // 에러 세부사항
+          userId: "MISSING_USERID", // 에러 세부사항
+        }
+      );
+    }
+
+    // 유효성 검사
+
+    // 추가하려는 계정이 이미 존재하는 계정인지 여부 확인
+    const accountGroup = user.accountGroup;
+    if (accountGroup.includes(userId)) {
+      throw new ConflictError(
+        "The account already exists in the group. (이미 계정이 그룹에 존재합니다.)",
+        "DUPLICATE_ERROR",
+        {
+          account: "ACCOUNT_ALREADY_EXISTS",
+        }
+      );
+    }
+
+    // 계정 존재 여부 확인
+    const account = await userService.findUserByIdentifier(
+      email,
+      phone,
+      userId
+    );
+
+    // 비밀번호 검증
+    const isValid = await comparePassword(password, account.password);
+
+    if (!isValid) {
+      // 비밀번호가 일치하지 않으면 UnauthorizedError 예외를 던짐
+      throw new UnauthorizedError(
+        "Incorrect password. (비밀번호 불일치)",
+        "AUTHENTICATION_FAILED",
+        {
+          password: "PASSWORD_UNMATCHED",
+        }
+      );
+    }
+
+    // 계정 추가
+    await userService.addAccountGroup(user.userId, account.userId);
+
+    const newAccountGroup = [
+      {
+        userId: user.userId,
+        username: user.username,
+        profileImage: user.profileImage,
+        intro: user.intro,
+      },
+      {
+        userId: account.userId,
+        username: account.username,
+        profileImage: account.profileImage,
+        intro: account.intro,
+      },
+    ];
+
+    const response: IApiSuccessResponse<{ accountGroup: any }> = {
+      success: true,
+      message: "A new account is added successfully. (계정 추가 성공)",
+      code: "ADD_ACCOUNT_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+      data: {
+        accountGroup: newAccountGroup,
+      },
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
   checkUserIdDuplication,
   getContactsBeforeLogin,
   getCurrentUser,
+  addCountGroup,
 };

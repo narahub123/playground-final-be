@@ -4,6 +4,7 @@ import {
   checkUserIdDuplication,
   getContactsBeforeLogin,
   getCurrentUser,
+  addCountGroup,
 } from "./users.controller";
 
 import {
@@ -27,6 +28,7 @@ export {
   checkUserIdDuplication,
   getContactsBeforeLogin,
   getCurrentUser,
+  addCountGroup,
 
   // auth
   loginUser,

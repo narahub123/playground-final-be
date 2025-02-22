@@ -1,4 +1,4 @@
-import { LockedError, NotFoundError } from "@errors";
+import { InternalServerError, LockedError, NotFoundError } from "@errors";
 import { IEmail, IPhone, IUser, LockReasonType } from "@types";
 import {
   emailRepository,
@@ -179,6 +179,32 @@ class UserService {
 
     // 이메일과 전화번호가 있을 경우 반환합니다.
     return { emails, phones };
+  }
+
+  async addAccountGroup(userId: string, newAccountId: string) {
+    const result = await userRepository.addAccountGroup(userId, newAccountId);
+
+    if (result && result.matchedCount === 0) {
+      // 조건에 맞는 문서가 없을 때
+      throw new NotFoundError(
+        "The user does not exist. (사용자를 찾을 수 없습니다.)",
+        "NOT_FOUND",
+        {
+          userId: "USER_NOT_FOUND",
+        }
+      );
+    }
+
+    // 만약 성공적으로 업데이트되지 않았다면, 내부 오류로 처리
+    if (result && result.modifiedCount === 0) {
+      throw new InternalServerError(
+        "An error occurred during adding an account. (처리 도중 에러 발생)",
+        "INTERNAL_SERVER_ERROR",
+        {
+          accountGroup: "ADD_ACCOUNT_FAILED",
+        }
+      );
+    }
   }
 }
 

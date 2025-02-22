@@ -4,6 +4,7 @@ import {
   checkUserIdDuplication,
   getContactsBeforeLogin,
   getCurrentUser,
+  addCountGroup,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 import { Router } from "express";
@@ -14,4 +15,5 @@ export default (router: Router) => {
   router.post("/users/check-duplication/userid", checkUserIdDuplication);
   router.post("/users/contacts", getContactsBeforeLogin);
   router.get("/users/me", authTokenMiddleware, getCurrentUser);
+  router.post("/users/account-group", authTokenMiddleware, addCountGroup);
 };

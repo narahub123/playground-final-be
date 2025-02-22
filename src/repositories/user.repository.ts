@@ -115,6 +115,24 @@ class UserRepository {
       return undefined;
     }
   }
+
+  async addAccountGroup(
+    userId: string,
+    newAccountId: string
+  ): Promise<UpdateWriteOpResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { userId },
+        { $push: { accountGroup: newAccountId } }
+      );
+
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("addAccountGroup", error, { userId, newAccountId });
+      return undefined;
+    }
+  }
 }
 
 export default new UserRepository();
