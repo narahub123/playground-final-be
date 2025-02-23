@@ -336,19 +336,20 @@ const addCountGroup = asyncWrapper(
     // 추가된 계정
     await userService.addAccountGroup(account.userId, user.userId);
 
-    const newAccountGroup = {
+    const newAccount = {
       userId: account.userId,
       username: account.username,
       profileImage: account.profileImage,
       intro: account.intro,
     };
-    const response: IApiSuccessResponse<{ accountGroup: any }> = {
+    
+    const response: IApiSuccessResponse<{ newAccount: any }> = {
       success: true,
       message: "A new account is added successfully. (계정 추가 성공)",
       code: "ADD_ACCOUNT_SUCCEEDED",
       timestamp: new Date().toISOString(),
       data: {
-        accountGroup: newAccountGroup,
+        newAccount,
       },
     };
 
