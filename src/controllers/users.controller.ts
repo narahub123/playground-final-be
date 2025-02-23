@@ -297,8 +297,6 @@ const addCountGroup = asyncWrapper(
       );
     }
 
-    // 유효성 검사
-
     // 추가하려는 계정이 이미 존재하는 계정인지 여부 확인
     const accountGroup = user.accountGroup;
     if (accountGroup.includes(userId)) {
@@ -333,23 +331,17 @@ const addCountGroup = asyncWrapper(
     }
 
     // 계정 추가
+    // 현재 계정
     await userService.addAccountGroup(user.userId, account.userId);
+    // 추가된 계정
+    await userService.addAccountGroup(account.userId, user.userId);
 
-    const newAccountGroup = [
-      {
-        userId: user.userId,
-        username: user.username,
-        profileImage: user.profileImage,
-        intro: user.intro,
-      },
-      {
-        userId: account.userId,
-        username: account.username,
-        profileImage: account.profileImage,
-        intro: account.intro,
-      },
-    ];
-
+    const newAccountGroup = {
+      userId: account.userId,
+      username: account.username,
+      profileImage: account.profileImage,
+      intro: account.intro,
+    };
     const response: IApiSuccessResponse<{ accountGroup: any }> = {
       success: true,
       message: "A new account is added successfully. (계정 추가 성공)",
