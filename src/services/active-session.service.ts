@@ -27,6 +27,18 @@ class ActiveSessionService {
     return !!existingSession;
   }
 
+  async findActiveSessionIdBySessionInfo(sessionInfo: {
+    userId: string;
+    device: IDevice;
+    ip: string;
+    location: ILocation;
+  }): Promise<Types.ObjectId | null> {
+    const activeSession = await activeSessionRepository.getActiveSessionByInfo(
+      sessionInfo
+    );
+    return activeSession ? activeSession._id : null;
+  }
+
   /**
    * 새로운 활성 세션을 생성하고, 리프레시 토큰 및 액세스 토큰을 발급합니다.
    *

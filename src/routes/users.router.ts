@@ -5,6 +5,7 @@ import {
   getContactsBeforeLogin,
   getCurrentUser,
   addCountGroup,
+  swtichAccount,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 import { Router } from "express";
@@ -16,4 +17,5 @@ export default (router: Router) => {
   router.post("/users/contacts", getContactsBeforeLogin);
   router.get("/users/me", authTokenMiddleware, getCurrentUser);
   router.post("/users/account-group", authTokenMiddleware, addCountGroup);
+  router.post("/users/switch", authTokenMiddleware, swtichAccount);
 };

@@ -16,8 +16,9 @@ import {
   securityService,
   userService,
 } from "@services";
-import { IApiSuccessResponse } from "@types";
-import { comparePassword } from "@utils";
+import { IApiSuccessResponse, IDevice, ILocation } from "@types";
+import { comparePassword, setRefreshTokenCookie } from "@utils";
+import { REFRESHTOKEN_EXPIRES } from "@constants";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -273,7 +274,6 @@ const addCountGroup = asyncWrapper(
   async (req: Request, res: Response) => {
     const user = req.user;
     const { userId, email, phone, password } = req.body;
-    console.log(userId, email, phone, password);
 
     // 비밀번호가 제공되지 않은 경우 BadRequestError 발생
     if (!password) {
@@ -342,7 +342,7 @@ const addCountGroup = asyncWrapper(
       profileImage: account.profileImage,
       intro: account.intro,
     };
-    
+
     const response: IApiSuccessResponse<{ newAccount: any }> = {
       success: true,
       message: "A new account is added successfully. (계정 추가 성공)",
@@ -357,6 +357,150 @@ const addCountGroup = asyncWrapper(
   }
 );
 
+const swtichAccount = asyncWrapper(
+  "swtichAccount",
+  "Account switch failed. (계정 전환 실패)",
+  "ACCOUNT_SWITCH_FAILED",
+  async (req: Request, res: Response) => {
+    const { targetUserId } = req.body;
+    const user = req.user;
+    const currentSessionId = req.activeSessionId;
+
+    // 유효성 검사
+    if (!targetUserId) {
+      throw new BadRequestError(
+        "Target userId is required. (변경할 계정 사용자 아이디 필수)",
+        "VALIDATION_ERROR",
+        { userId: "MISSING_TARGET_USERID" }
+      );
+    }
+
+    // 이미 로그인한 사용자와 동일한 targetUserId인지 확인
+    if (user.userId === targetUserId) {
+      throw new ConflictError(
+        "Target userId is the same as current userId. (계정 전환 계정과 현재 계정과 일치)",
+        "ACCOUNT_CONFLICT",
+        {
+          targetUserId: "USER_ALREADY_LOGGED_IN",
+        }
+      );
+    }
+
+    // 전환 가능 계정인지 확인
+    if (!user.accountGroup.includes(targetUserId)) {
+      throw new UnauthorizedError(
+        "Account switch to the target user is not authorized. (계정 전환 불허용)",
+        "ACCOUNT_NOT_AUTHORIZED",
+        { targetUserId: "USER_NOT_IN_ACCOUNT_GROUP" }
+      );
+    }
+
+    // 계정 유효성 검사
+    const target = await userService.getUserByUserId(targetUserId);
+
+    if (!target) {
+      throw new NotFoundError(
+        "Target account is not Found (변경할 계정 조회 실패)",
+        "ACCOUNT_NOT_FOUND",
+        {
+          targetUserId: "USER_ACCOUNT_NOT_FOUND",
+        }
+      );
+    }
+
+    // 변경할 계정이 비활성 계정인지 여부 확인하기
+    if (user.lockStatus.isLocked) {
+      throw new BadRequestError(
+        "The account is inactive and cannot be used for account switching. (비활성화된 계정으로는 계정 전환이 불가능합니다.)",
+        "ACCOUNT_INACTIVE",
+        { status: "INACTIVE_ACCOUNT" }
+      );
+    }
+
+    // activeSessionId를 통해서 현재 세션의 device, ip, location 정보 가져오기
+    const activeSession = await activeSessionService.getActiveSessionsById(
+      currentSessionId
+    );
+
+    if (!activeSession) {
+      throw new NotFoundError(
+        "No active session found for the current account. (현재 계정의 활성 세션 조회 실패)",
+        "NOT_FOUND",
+        {
+          currentSessionId: "ACTIVE_SESSION_NOT_FOUND",
+        }
+      );
+    }
+
+    const { device, ip, location } = activeSession;
+
+    const newActiveSession = {
+      userId: targetUserId,
+      device: device as IDevice,
+      ip: ip as string,
+      location: location as ILocation,
+    };
+
+    // 기존 세션 확인하기
+    const existingActiveSessionId =
+      await activeSessionService.findActiveSessionIdBySessionInfo(
+        newActiveSession
+      );
+
+    // 새로운 세션 생성 및 토큰 발급
+    const { refreshToken, accessToken, activeSessionId } =
+      await activeSessionService.createSessionAndIssueTokens({
+        userId: targetUserId,
+        device: device as IDevice,
+        ip: ip as string,
+        location: location as ILocation,
+        userRole: target.userRole,
+      });
+
+    // 기존 세션이 있으면 바로 로그인 성공 응답 반환
+    if (existingActiveSessionId) {
+      // refresh token을 쿠키에 저장 (보안 설정 포함)
+      setRefreshTokenCookie(res, refreshToken);
+
+      return res.status(200).json({
+        success: true,
+        message: "Account switch successful. (계정 전환 성공)",
+        code: "ACCOUNT_SWITCH_SUCCEEDED",
+        timestamp: new Date().toISOString(),
+        data: {
+          accessToken,
+          activeSessionId: existingActiveSessionId,
+        },
+      });
+    } else {
+      // 기존 세션이 없는 경우
+      // 로그인 기록을 저장
+      await loginRecordService.createLoginRecord({
+        userId: targetUserId,
+        activeSessionId,
+        device: device as IDevice,
+        ip: ip as string,
+        location: location as ILocation,
+      });
+
+      // refresh token을 쿠키에 저장 (보안 설정 포함)
+      setRefreshTokenCookie(res, refreshToken);
+
+      // 계정 전환 성공 응답
+      res.status(201).json({
+        success: true,
+        message: "Account switch successful. (계정 전환 성공)",
+        code: "ACCOUNT_SWITCH_SUCCEEDED",
+        timestamp: new Date().toISOString(),
+        data: {
+          accessToken,
+          activeSessionId,
+        },
+      });
+    }
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
@@ -364,4 +508,5 @@ export {
   getContactsBeforeLogin,
   getCurrentUser,
   addCountGroup,
+  swtichAccount,
 };

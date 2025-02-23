@@ -13,6 +13,7 @@ import extractCountryFromLanguage from "./extractCountryFromLanguage";
 import verifyAccountLock from "./verifyAccountLock";
 import clearRefreshTokenCookie from "./clearRefreshTokenCookie";
 import { handleLogout, handleTokenExpirationLogout } from "./handleLogout";
+import setRefreshTokenCookie from "./setRefreshTokenCookie";
 
 export {
   connectDB,
@@ -30,4 +31,6 @@ export {
   verifyAccountLock,
   clearRefreshTokenCookie,
   handleLogout,
+  handleTokenExpirationLogout,
+  setRefreshTokenCookie,
 };

@@ -5,6 +5,7 @@ import {
   getContactsBeforeLogin,
   getCurrentUser,
   addCountGroup,
+  swtichAccount,
 } from "./users.controller";
 
 import {
@@ -29,6 +30,7 @@ export {
   getContactsBeforeLogin,
   getCurrentUser,
   addCountGroup,
+  swtichAccount,
 
   // auth
   loginUser,
