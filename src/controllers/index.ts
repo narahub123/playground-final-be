@@ -13,6 +13,7 @@ import {
   loginUser,
   logoutAccount,
   logoutAllAccounts,
+  verifyPassword,
 } from "./auth.controller";
 
 import {
@@ -37,6 +38,7 @@ export {
   signupUser,
   logoutAccount,
   logoutAllAccounts,
+  verifyPassword,
 
   // oauth
   oauthCallback,

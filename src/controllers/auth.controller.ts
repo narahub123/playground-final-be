@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { BadRequestError, CustomAPIError, InternalServerError } from "@errors";
+import {
+  BadRequestError,
+  CustomAPIError,
+  InternalServerError,
+  UnauthorizedError,
+} from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   verifyAccountLock,
@@ -10,6 +15,7 @@ import {
   handleLogout,
   clearRefreshTokenCookie,
   setRefreshTokenCookie,
+  comparePassword,
 } from "@utils";
 import {
   activeSessionService,
@@ -19,7 +25,6 @@ import {
 } from "@services";
 import { UploadApiResponse } from "cloudinary";
 import mongoose from "mongoose";
-import { REFRESHTOKEN_EXPIRES } from "@constants";
 import {
   IApiSuccessResponse,
   IEmailInput,
@@ -454,4 +459,51 @@ const logoutAllAccounts = asyncWrapper(
   }
 );
 
-export { signupUser, loginUser, logoutAccount, logoutAllAccounts };
+// 비밀번호 인증
+const verifyPassword = asyncWrapper(
+  "verifyPassword",
+  "Password verification failed. (비밀번호 인증 실패)",
+  "VERIFY_PASSWORD_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const { password } = req.body;
+
+    // 유효성 검사
+    if (!password) {
+      throw new BadRequestError(
+        "Password is required. (비밀번호 필수)",
+        "MISSING_PASSWORD",
+        { password: "비밀번호가 제공되지 않았습니다." }
+      );
+    }
+
+    // 비밀번호 검증
+    const isValid = await comparePassword(password, user.password);
+
+    if (!isValid) {
+      throw new UnauthorizedError(
+        "Incorrect password. (비밀번호 불일치)",
+        "AUTHENTICATION_FAILED",
+        {
+          password: "PASSWORD_UNMATCHED",
+        }
+      );
+    }
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Password verification succeeded. (비밀번호 인증 성공)",
+      code: "VERIFY_PASSWORD_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+    res.status(200).json(response);
+  }
+);
+
+export {
+  signupUser,
+  loginUser,
+  logoutAccount,
+  logoutAllAccounts,
+  verifyPassword,
+};
