@@ -133,6 +133,28 @@ class UserRepository {
       return undefined;
     }
   }
+
+  // 비밀번호 변경
+  async changePassword(
+    userId: string,
+    newPassword: string
+  ): Promise<UpdateWriteOpResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { userId },
+        {
+          $set: {
+            password: newPassword,
+          },
+        }
+      );
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("changePassword", error, { userId, newPassword });
+      return undefined;
+    }
+  }
 }
 
 export default new UserRepository();

@@ -17,7 +17,11 @@ import {
   userService,
 } from "@services";
 import { IApiSuccessResponse, IDevice, ILocation } from "@types";
-import { comparePassword, setRefreshTokenCookie } from "@utils";
+import {
+  comparePassword,
+  createHashedPassword,
+  setRefreshTokenCookie,
+} from "@utils";
 import { REFRESHTOKEN_EXPIRES } from "@constants";
 
 const checkEmailDuplication = asyncWrapper(
@@ -501,6 +505,75 @@ const swtichAccount = asyncWrapper(
   }
 );
 
+const changePassword = asyncWrapper(
+  "changePassword",
+  "Password change failed. (비밀번호 변경 실패)",
+  "PASSWORD_CHANGE_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const { password, newPassword } = req.body;
+
+    // 유효성 검사
+    if (!password) {
+      throw new BadRequestError(
+        `Password is not Found. (비밀번호 필수)`,
+        "VALIDATION_ERROR",
+        {
+          password: `PASSWORD_MISSING`,
+        }
+      );
+    }
+
+    if (!newPassword) {
+      throw new BadRequestError(
+        `New password is not Found. (새 비밀번호 필수)`,
+        "VALIDATION_ERROR",
+        {
+          newPassword: `NEW_PASSWORD_MISSING`,
+        }
+      );
+    }
+
+    // 비밀번호 인증
+    const isValid = await comparePassword(password, user.password);
+
+    if (!isValid) {
+      throw new UnauthorizedError(
+        "Incorrect password. (비밀번호 불일치)",
+        "AUTHENTICATION_FAILED",
+        {
+          password: "PASSWORD_UNMATCHED",
+        }
+      );
+    }
+
+    // 기존 비밀번호와 동일한지 확인
+    const isSamePassword = await comparePassword(newPassword, user.password);
+
+    if (isSamePassword) {
+      throw new BadRequestError(
+        "New password must be different from the current password. (기존 비밀번호와 동일)",
+        "SAME_PASSWORD",
+        { newPassword: "PASSWORD_UNCHANGED" }
+      );
+    }
+
+    // 비밀번호 해싱
+    const hashedPassword = await createHashedPassword(newPassword);
+
+    await userService.changePassword(user.userId, hashedPassword);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Password has changed successfully. (비밀번호 변경 성공)",
+      code: "PASSWORD_CHANGE_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
@@ -509,4 +582,5 @@ export {
   getCurrentUser,
   addCountGroup,
   swtichAccount,
+  changePassword,
 };

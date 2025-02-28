@@ -6,6 +6,7 @@ import {
   getCurrentUser,
   addCountGroup,
   swtichAccount,
+  changePassword,
 } from "./users.controller";
 
 import {
@@ -32,6 +33,7 @@ export {
   getCurrentUser,
   addCountGroup,
   swtichAccount,
+  changePassword,
 
   // auth
   loginUser,
