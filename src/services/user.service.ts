@@ -227,7 +227,7 @@ class UserService {
         "An error occurred during password change. (비밀번호 변경 도중 에러 발생)",
         "INTERNAL_SERVER_ERROR",
         {
-          newPassword: "CHANGE_PASSWORD_FAILED",
+          newPassword: "PASSWORD_CHANGE_FAILED",
         }
       );
     }
