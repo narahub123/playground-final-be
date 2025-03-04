@@ -68,6 +68,47 @@ const requestLoginVerificationCode = asyncWrapper(
   }
 );
 
+const requestVerificationCode = asyncWrapper(
+  "requestVerificationCode",
+  "Failed to send verification code. (인증 코드 전송 실패)",
+  "VERIFICATION_CODE_SEND_FAILED", // 인증 코드 전송 실패
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const { email } = req.body;
+
+    // 이메일이 제공되지 않음 경우
+    if (!email) {
+      throw new BadRequestError(
+        "Email is required. (이메일 필수)", // 에러 메시지
+        "VALIDATION_ERROR",
+        {
+          email: "MISSING_EMAIL", // 에러 세부사항
+        }
+      );
+    }
+
+    // 이메일로 인증 코드 전송
+    // 해당 사용자에 대한 인증 코드 존재 유무를 확인하고 있다면 삭제
+    await verificationService.deleteExistingVerificationCode(user.userId);
+
+    // 새로운 인증 코드 생성하고 이메일로 전송하기
+    await verificationService.sendVerificationCode(email, user.userId);
+
+    const response: IApiSuccessResponse<{}> = {
+      success: true,
+      message: `Verification code sent successfully to the email. (인증 코드가 이메일로 성공적으로 전송되었습니다.)`,
+      code: "VERIFICATION_CODE_SENT",
+      timestamp: new Date().toISOString(),
+      data: {
+        email,
+      },
+    };
+
+    // 인증 코드 요청 성공 응답
+    res.status(200).json(response);
+  }
+);
+
 // 인증 코드 확인 핸들러
 const checkLoginVerificationCode = asyncWrapper(
   "checkLoginVerificationCode",
@@ -128,4 +169,8 @@ const checkLoginVerificationCode = asyncWrapper(
   }
 );
 
-export { requestLoginVerificationCode, checkLoginVerificationCode };
+export {
+  requestLoginVerificationCode,
+  requestVerificationCode,
+  checkLoginVerificationCode,
+};
