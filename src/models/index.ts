@@ -9,6 +9,7 @@ import LoginFailure from "./login-failure.model";
 import LoginRecord from "./login-record.model";
 import Email from "./email.model";
 import Phone from "./phone.model";
+import Post from "./post.model";
 
 export {
   User,
@@ -22,4 +23,5 @@ export {
   LoginRecord,
   Email,
   Phone,
+  Post,
 };
