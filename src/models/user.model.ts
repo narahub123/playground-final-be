@@ -1,15 +1,9 @@
 import mongoose from "mongoose";
-import {
-  birthRegExp,
-  emailRegExp,
-  ipRegExp,
-  phoneRegExp,
-  userIdRegExp,
-  usernameRegExp,
-} from "@data";
+import { ipRegExp, userIdRegExp, usernameRegExp } from "@data";
 import {
   COUNTRY_DEFAULT,
   INTRO_MAX,
+  RECENT_EMOJIS_MAX,
   USERID_MAX,
   USERID_MIN,
   USERNAME_MAX,
@@ -201,6 +195,20 @@ const UserSchema = new mongoose.Schema<IUser>(
         },
         default: null, // 기본값은 null, 잠금되지 않은 경우에는 null로 설정
       },
+    },
+    skintoneType: {
+      type: String,
+      default: "default",
+      enum: ["default", "light", "mediumLight", "medium", "mediumDark", "dark"],
+    },
+    recentEmojis: {
+      type: [String],
+      validate: {
+        validator: function (arr: string[]) {
+          return arr.length <= RECENT_EMOJIS_MAX;
+        },
+      },
+      default: [],
     },
   },
   {

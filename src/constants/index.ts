@@ -29,6 +29,7 @@ const BRUTE_FORCE_THRESHOLD = 5; // BruteForce 판별 기준 (최근 특정 시�
 const ACCOUNT_LOCK_THRESHOLD = 5; // 계정 잠금 기준 (전체 실패 횟수)
 const LOGIN_FAILURE_TIME_WINDOW_MS = 60 * 60 * 1000; // 로그인 실패 시간 범위 (1시간)
 const API_CALL_TIMEOUT = 30 * 1000;
+const RECENT_EMOJIS_MAX = 20;
 
 export {
   COUNTRY_DEFAULT,
@@ -59,4 +60,5 @@ export {
   ACCOUNT_LOCK_THRESHOLD,
   LOGIN_FAILURE_TIME_WINDOW_MS,
   API_CALL_TIMEOUT,
+  RECENT_EMOJIS_MAX,
 };

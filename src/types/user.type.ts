@@ -103,6 +103,14 @@ interface IBirth {
   date: number;
 }
 
+type SkintoneType =
+  | "default"
+  | "light"
+  | "mediumLight"
+  | "medium"
+  | "mediumDark"
+  | "dark";
+
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
   password: string;
@@ -123,6 +131,8 @@ interface IUser extends Document {
   isAuthorized: boolean;
   isAuthenticated: boolean;
   lockStatus: ILockStatus;
+  skintoneType: SkintoneType;
+  recentEmojis: string[];
 }
 
 interface IUserInput {
