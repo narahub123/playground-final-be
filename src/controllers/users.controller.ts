@@ -16,13 +16,12 @@ import {
   securityService,
   userService,
 } from "@services";
-import { IApiSuccessResponse, IDevice, ILocation } from "@types";
+import { IApiSuccessResponse, IDevice, ILocation, UserDTO } from "@types";
 import {
   comparePassword,
   createHashedPassword,
   setRefreshTokenCookie,
 } from "@utils";
-import { REFRESHTOKEN_EXPIRES } from "@constants";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -574,6 +573,29 @@ const changePassword = asyncWrapper(
   }
 );
 
+const updateMe = asyncWrapper(
+  "updateMe",
+  "Updating user failed. (유저 정보 업데이트 실패)",
+  "USER_UPDATE_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const body: UserDTO = req.body;
+
+    if (body.skintoneType) {
+      await userService.updateSkintoneType(user.userId, body.skintoneType);
+    }
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "User has been updated successfully. (유저 정보 업데이트 성공)",
+      code: "USER_UPDATE_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
@@ -583,4 +605,5 @@ export {
   addCountGroup,
   swtichAccount,
   changePassword,
+  updateMe,
 };

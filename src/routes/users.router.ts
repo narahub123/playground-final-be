@@ -7,6 +7,7 @@ import {
   addCountGroup,
   swtichAccount,
   changePassword,
+  updateMe,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 import { Router } from "express";
@@ -20,4 +21,5 @@ export default (router: Router) => {
   router.post("/users/account-group", authTokenMiddleware, addCountGroup);
   router.post("/users/switch", authTokenMiddleware, swtichAccount);
   router.patch("/users/password", authTokenMiddleware, changePassword);
+  router.patch("/users/me", authTokenMiddleware, updateMe);
 };

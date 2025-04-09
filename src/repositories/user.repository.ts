@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { UpdateResult } from "mongoose";
 import { User } from "@models";
-import { ILockStatus, IUser, IUserInput } from "@types";
+import { ILockStatus, IUser, IUserInput, SkintoneType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import { UpdateWriteOpResult } from "mongoose";
 
@@ -152,6 +152,30 @@ class UserRepository {
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
       mongoDBErrorHandler("changePassword", error, { userId, newPassword });
+      return undefined;
+    }
+  }
+
+  async updateSkintoneType(
+    userId: string,
+    skintoneType: SkintoneType
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { userId },
+        {
+          $set: {
+            skintoneType,
+          },
+        }
+      );
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("updateSkintoneType", error, {
+        userId,
+        skintoneType,
+      });
       return undefined;
     }
   }

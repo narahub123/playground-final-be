@@ -1,5 +1,5 @@
 import { InternalServerError, LockedError, NotFoundError } from "@errors";
-import { IEmail, IPhone, IUser, LockReasonType } from "@types";
+import { IEmail, IPhone, IUser, LockReasonType, SkintoneType } from "@types";
 import {
   emailRepository,
   phoneRepository,
@@ -228,6 +228,38 @@ class UserService {
         "INTERNAL_SERVER_ERROR",
         {
           newPassword: "PASSWORD_CHANGE_FAILED",
+        }
+      );
+    }
+  }
+
+  async updateSkintoneType(
+    userId: string,
+    skintoneType: SkintoneType
+  ): Promise<void> {
+    const result = await userRepository.updateSkintoneType(
+      userId,
+      skintoneType
+    );
+
+    if (result && result.matchedCount === 0) {
+      // 조건에 맞는 문서가 없을 때
+      throw new NotFoundError(
+        "The user does not exist. (사용자를 찾을 수 없습니다.)",
+        "NOT_FOUND",
+        {
+          userId: "USER_NOT_FOUND",
+        }
+      );
+    }
+
+    // 만약 성공적으로 업데이트되지 않았다면, 내부 오류로 처리
+    if (result && result.modifiedCount === 0) {
+      throw new InternalServerError(
+        "An error occurred during updating skintoneType. (스킨톤 변경 도중 에러 발생)",
+        "INTERNAL_SERVER_ERROR",
+        {
+          skintoneType: "UPDATE_SKINTONE_FAILED",
         }
       );
     }

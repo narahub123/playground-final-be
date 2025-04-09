@@ -7,6 +7,8 @@ import {
   UserRoleType,
   IUserInput,
   IBirth,
+  SkintoneType,
+  UserDTO,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { IActiveSession, IDevice } from "./active-session.type";
@@ -80,6 +82,8 @@ export {
   UserRoleType,
   IUserInput,
   IBirth,
+  SkintoneType,
+  UserDTO,
 
   // oauth
   OauthType,

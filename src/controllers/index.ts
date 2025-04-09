@@ -7,6 +7,7 @@ import {
   addCountGroup,
   swtichAccount,
   changePassword,
+  updateMe,
 } from "./users.controller";
 
 import {
@@ -36,6 +37,7 @@ export {
   addCountGroup,
   swtichAccount,
   changePassword,
+  updateMe,
 
   // auth
   loginUser,

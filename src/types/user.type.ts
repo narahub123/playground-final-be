@@ -154,6 +154,10 @@ interface IUserInput {
   accountGroup: string[];
 }
 
+interface UserDTO {
+  skintoneType: SkintoneType;
+}
+
 export type {
   IUser,
   LockReasonType,
@@ -164,4 +168,6 @@ export type {
   SocialType,
   IUserInput,
   IBirth,
+  SkintoneType,
+  UserDTO,
 };
