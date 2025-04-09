@@ -12,6 +12,7 @@ import {
   duplicateDetectionService,
   loginRecordService,
   notificationService,
+  postService,
   privacyService,
   securityService,
   userService,
@@ -258,6 +259,8 @@ const getCurrentUser = asyncWrapper(
       loginRecords,
     };
 
+    const posts = await postService.getPostsByUserId(user.userId);
+
     const response = {
       success: true,
       message:
@@ -270,6 +273,7 @@ const getCurrentUser = asyncWrapper(
         privacy,
         notification,
         display,
+        posts,
       },
     };
 

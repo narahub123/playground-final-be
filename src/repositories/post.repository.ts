@@ -16,6 +16,16 @@ class PostRepository {
       mongoDBErrorHandler("createPost", error, { post });
     }
   }
+
+  async getPostsByUserId(userId: string): Promise<IPost[] | undefined> {
+    try {
+      const posts = Post.find({ userId });
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsByUserId", error, { userId });
+    }
+  }
 }
 
 export default new PostRepository();

@@ -22,6 +22,10 @@ class PostService {
 
     return newPost;
   }
+
+  async getPostsByUserId(userId: string) {
+    return await postRepository.getPostsByUserId(userId);
+  }
 }
 
 export default new PostService();
