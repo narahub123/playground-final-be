@@ -111,6 +111,12 @@ type SkintoneType =
   | "mediumDark"
   | "dark";
 
+interface IEmoji {
+  char: string;
+  name: string;
+  skintone?: string[];
+}
+
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
   password: string;
@@ -132,7 +138,7 @@ interface IUser extends Document {
   isAuthenticated: boolean;
   lockStatus: ILockStatus;
   skintoneType: SkintoneType;
-  recentEmojis: string[];
+  recentEmojis: IEmoji[];
 }
 
 interface IUserInput {

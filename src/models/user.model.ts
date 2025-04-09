@@ -201,10 +201,18 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: "default",
       enum: ["default", "light", "mediumLight", "medium", "mediumDark", "dark"],
     },
+
     recentEmojis: {
-      type: [String],
+      type: [
+        {
+          char: { type: String, required: true },
+          name: { type: String, required: true },
+          skintone: { type: [String], required: false, default: undefined },
+          _id: false, // 배열 안에 객체에 자동으로 생성되는 _id 생략
+        },
+      ],
       validate: {
-        validator: function (arr: string[]) {
+        validator: function (arr: any[]) {
           return arr.length <= RECENT_EMOJIS_MAX;
         },
       },
