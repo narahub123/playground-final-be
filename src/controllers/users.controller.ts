@@ -623,6 +623,26 @@ const updateMe = asyncWrapper(
   }
 );
 
+const clearRecentEmojis = asyncWrapper(
+  "clearRecentEmojis",
+  "Clearing recentEmojis failed(최근 이모지 비우기 실패)",
+  "CLEAR_RECENT_EMOJIS_FAILED",
+  async (req: Request, res: Response) => {
+    const { userId } = req.user;
+
+    await userService.updateRecentEmojis(userId, []);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "RecentEmojis are clear successfully. (최근 이모지 비우기 성공)",
+      code: "CLEAR_RECENT_EMOJIS_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
@@ -633,4 +653,5 @@ export {
   swtichAccount,
   changePassword,
   updateMe,
+  clearRecentEmojis,
 };

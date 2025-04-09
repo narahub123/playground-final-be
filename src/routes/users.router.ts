@@ -8,6 +8,7 @@ import {
   swtichAccount,
   changePassword,
   updateMe,
+  clearRecentEmojis,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 import { Router } from "express";
@@ -22,4 +23,5 @@ export default (router: Router) => {
   router.post("/users/switch", authTokenMiddleware, swtichAccount);
   router.patch("/users/password", authTokenMiddleware, changePassword);
   router.patch("/users/me", authTokenMiddleware, updateMe);
+  router.delete("/users/recent-emojis", authTokenMiddleware, clearRecentEmojis);
 };

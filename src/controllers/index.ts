@@ -8,6 +8,7 @@ import {
   swtichAccount,
   changePassword,
   updateMe,
+  clearRecentEmojis,
 } from "./users.controller";
 
 import {
@@ -38,6 +39,7 @@ export {
   swtichAccount,
   changePassword,
   updateMe,
+  clearRecentEmojis,
 
   // auth
   loginUser,
