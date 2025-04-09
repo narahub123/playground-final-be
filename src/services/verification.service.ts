@@ -50,6 +50,7 @@ class VerificationService {
   async sendVerificationCode(email: string, userId: string) {
     // 새로운 인증 코드 생성
     const verificationCode = generateAuthCode();
+    console.log("인증 코드: ", verificationCode);
 
     // 인증 코드 이메일 제목 및 내용 설정
     const subject = "인증코드";

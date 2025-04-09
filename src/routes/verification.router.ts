@@ -3,6 +3,7 @@ import {
   checkLoginVerificationCode,
   requestLoginVerificationCode,
   requestVerificationCode,
+  checkVerificationCode,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 
@@ -14,4 +15,9 @@ export default (router: Router) => {
     requestVerificationCode
   );
   router.post("/verification/verify", checkLoginVerificationCode);
+  router.post(
+    "/verification/me/verify",
+    authTokenMiddleware,
+    checkVerificationCode
+  );
 };

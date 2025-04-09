@@ -21,6 +21,7 @@ import {
   requestLoginVerificationCode,
   checkLoginVerificationCode,
   requestVerificationCode,
+  checkVerificationCode,
 } from "./verification.controller";
 
 import { oauthCallback } from "./oauth.controller";
@@ -50,4 +51,5 @@ export {
   requestLoginVerificationCode,
   checkLoginVerificationCode,
   requestVerificationCode,
+  checkVerificationCode,
 };

@@ -169,8 +169,56 @@ const checkLoginVerificationCode = asyncWrapper(
   }
 );
 
+const checkVerificationCode = asyncWrapper(
+  "checkVerificationCode",
+  "Verification code verification failed (인증 코드 인증 실패)",
+  "VERIFICATION_CODE_VERIFICATION_FAILED", // 인증 코드 인증 실패
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    console.log("유저 아이디", user.userId);
+
+    const { verificationCode } = req.body;
+    if (!verificationCode) {
+      throw new BadRequestError(
+        "verification code is required. (인증 코드 필수)", // 에러 메시지
+        "VALIDATION_ERROR",
+        {
+          verification_code: "MISSING_VERIFICATION_CODE", // 에러 코드
+        }
+      );
+    }
+
+    // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
+    const isVerified = await verificationService.verifyVerificationCode(
+      user.userId,
+      verificationCode
+    );
+
+    // 인증 코드 일치 여부 확인
+    if (isVerified) {
+      const response: IApiSuccessResponse = {
+        success: true,
+        message:
+          "Verification code successfully verified. (인증 코드 인증 성공)",
+        code: "VERIFICATION_CODE_VERIFIED", // 인증 코드가 인증 성공한 경우의 응답 코드
+        timestamp: new Date().toISOString(),
+      };
+      return res.status(200).json(response);
+    } else {
+      throw new UnauthorizedError(
+        "The verification code is incorrect. (인증 코드 인증 코드 불일치)",
+        "VERIFICATION_ERROR",
+        {
+          verification_code: "VERIFICATION_CODE_MISMATCH",
+        }
+      );
+    }
+  }
+);
+
 export {
   requestLoginVerificationCode,
   requestVerificationCode,
   checkLoginVerificationCode,
+  checkVerificationCode,
 };
