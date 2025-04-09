@@ -156,6 +156,7 @@ interface IUserInput {
 
 interface UserDTO {
   skintoneType: SkintoneType;
+  recentEmoji: IEmoji;
 }
 
 export type {
@@ -168,6 +169,7 @@ export type {
   SocialType,
   IUserInput,
   IBirth,
+  IEmoji,
   SkintoneType,
   UserDTO,
 };

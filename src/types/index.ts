@@ -7,6 +7,7 @@ import {
   UserRoleType,
   IUserInput,
   IBirth,
+  IEmoji,
   SkintoneType,
   UserDTO,
 } from "./user.type";
@@ -82,6 +83,7 @@ export {
   UserRoleType,
   IUserInput,
   IBirth,
+  IEmoji,
   SkintoneType,
   UserDTO,
 

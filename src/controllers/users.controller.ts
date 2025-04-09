@@ -16,12 +16,19 @@ import {
   securityService,
   userService,
 } from "@services";
-import { IApiSuccessResponse, IDevice, ILocation, UserDTO } from "@types";
+import {
+  IApiSuccessResponse,
+  IDevice,
+  IEmoji,
+  ILocation,
+  UserDTO,
+} from "@types";
 import {
   comparePassword,
   createHashedPassword,
   setRefreshTokenCookie,
 } from "@utils";
+import { RECENT_EMOJIS_MAX } from "@constants";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -583,6 +590,26 @@ const updateMe = asyncWrapper(
 
     if (body.skintoneType) {
       await userService.updateSkintoneType(user.userId, body.skintoneType);
+    }
+
+    if (body.recentEmoji) {
+      const prevRecentEmojis: IEmoji[] = user.recentEmojis;
+
+      // 이미 있는 이모지 제거
+      const filtered = prevRecentEmojis.filter(
+        (emoji) => emoji.char !== body.recentEmoji.char
+      );
+
+      // 새로운 이모지를 최근 이모지 앞에 추가
+      const newRecentEmojis: IEmoji[] = [body.recentEmoji, ...filtered];
+
+      // 최근 이모지의 개수 제한
+      const limitedRecentEmojis: IEmoji[] = newRecentEmojis.slice(
+        0,
+        RECENT_EMOJIS_MAX
+      );
+
+      await userService.updateRecentEmojis(user.userId, limitedRecentEmojis);
     }
 
     const response: IApiSuccessResponse = {
