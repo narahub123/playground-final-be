@@ -28,6 +28,8 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
+import { creatNewPost } from "./post.controller";
+
 export {
   // user
   checkEmailDuplication,
@@ -56,4 +58,7 @@ export {
   checkLoginVerificationCode,
   requestVerificationCode,
   checkVerificationCode,
+
+  // post
+  creatNewPost,
 };

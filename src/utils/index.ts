@@ -14,6 +14,13 @@ import verifyAccountLock from "./verifyAccountLock";
 import clearRefreshTokenCookie from "./clearRefreshTokenCookie";
 import { handleLogout, handleTokenExpirationLogout } from "./handleLogout";
 import setRefreshTokenCookie from "./setRefreshTokenCookie";
+import uploadVideo from "./uploadVideo";
+import uploadImage from "./uploadImage";
+import uploadMedia from "./uploadMedia";
+import modifyVote from "./modifyVote";
+import deleteImage from "./deleteImage";
+import deleteVideo from "./deleteVideo";
+import deleteMedia from "./deleteMedia";
 
 export {
   connectDB,
@@ -33,4 +40,11 @@ export {
   handleLogout,
   handleTokenExpirationLogout,
   setRefreshTokenCookie,
+  uploadVideo,
+  uploadImage,
+  uploadMedia,
+  modifyVote,
+  deleteImage,
+  deleteVideo,
+  deleteMedia,
 };

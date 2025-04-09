@@ -34,10 +34,10 @@ app.use(
 );
 
 // JSON 데이터 파싱 미들웨어 (요청 본문에 JSON 데이터가 있을 때 처리)
-app.use(express.json({ limit: "10mb" })); // 요청 본문의 JSON 데이터를 파싱, 크기 제한은 10MB
+app.use(express.json({ limit: "100mb" })); // 요청 본문의 JSON 데이터를 파싱, 크기 제한은 10MB
 
 // URL-encoded 데이터 파싱 미들웨어 (폼 데이터 처리용)
-app.use(express.urlencoded({ limit: "10mb", extended: true })); // URL-encoded 데이터를 파싱, 객체 형식 허용
+app.use(express.urlencoded({ limit: "100mb", extended: true })); // URL-encoded 데이터를 파싱, 객체 형식 허용
 
 // 응답 데이터 압축 미들웨어 (클라이언트로 보내는 응답 데이터를 압축)
 app.use(compression()); // 클라이언트로 보내는 응답 데이터를 gzip으로 압축하여 성능 향상

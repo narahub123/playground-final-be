@@ -10,6 +10,7 @@ import displayService from "./display.service";
 import notificationService from "./notification.service";
 import privacyService from "./privacy.service";
 import securityService from "./security.service";
+import postService from "./post.service";
 
 export {
   // email
@@ -47,4 +48,7 @@ export {
 
   // security
   securityService,
+
+  // post
+  postService,
 };

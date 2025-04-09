@@ -9,6 +9,7 @@ import activeSessionRepository from "./active-session.repository";
 import loginRecordRepository from "./login-record.repository";
 import emailRepository from "./email.repository";
 import phoneRepository from "./phone.repository";
+import postRepository from "./post.repository";
 
 export {
   userRepository,
@@ -22,4 +23,5 @@ export {
   loginRecordRepository,
   emailRepository,
   phoneRepository,
+  postRepository,
 };
