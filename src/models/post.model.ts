@@ -16,7 +16,12 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
       default: [],
     },
     reposts: {
-      type: [String],
+      type: [
+        {
+          userId: { type: String, required: true },
+          username: { type: String, required: true },
+        },
+      ],
       default: [],
     },
     likes: {
