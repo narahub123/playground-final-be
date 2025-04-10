@@ -1,4 +1,4 @@
-import { IPost, IVoteOption } from "@types";
+import { IPost, IPostActions, IVoteOption } from "@types";
 import mongoose from "mongoose";
 
 const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
@@ -6,7 +6,29 @@ const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
     option: { type: String, required: true },
     count: { type: Number, default: 0 },
   },
-  { _id: false }
+  { _id: false, versionKey: false }
+);
+
+const PostActionsSchema = new mongoose.Schema<IPostActions>(
+  {
+    comments: {
+      type: [String],
+      default: [],
+    },
+    reposts: {
+      type: [String],
+      default: [],
+    },
+    likes: {
+      type: [String],
+      default: [],
+    },
+    views: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { _id: false, versionKey: false }
 );
 
 const PostSchema = new mongoose.Schema<IPost>(
@@ -42,6 +64,16 @@ const PostSchema = new mongoose.Schema<IPost>(
         { _id: false }
       ),
       required: false,
+    },
+    actions: {
+      type: PostActionsSchema,
+      required: true,
+      default: () => ({
+        comments: [],
+        reposts: [],
+        likes: [],
+        views: 0,
+      }),
     },
   },
   {
