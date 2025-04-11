@@ -79,6 +79,8 @@ import {
   IVote,
   IPostRequestDto,
   IPostActions,
+  IAuthor,
+  IPostResponseDto,
 } from "./post.type";
 
 export {
@@ -172,4 +174,6 @@ export {
   IVote,
   IPostRequestDto,
   IPostActions,
+  IAuthor,
+  IPostResponseDto, 
 };

@@ -23,8 +23,8 @@ class PostService {
     return newPost;
   }
 
-  async getPostsByUserId(userId: string) {
-    return await postRepository.getPostsByUserId(userId);
+  async getPostsByAuthor(author: mongoose.Types.ObjectId) {
+    return await postRepository.getPostsByAuthor(author);
   }
 }
 

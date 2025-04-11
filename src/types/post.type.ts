@@ -26,6 +26,7 @@ interface IPostActions {
 }
 
 interface IPost extends Document {
+  _id: mongoose.Types.ObjectId;
   author: mongoose.Types.ObjectId;
   text?: string;
   media?: string[];
@@ -36,4 +37,31 @@ interface IPost extends Document {
   updatedAt?: Date;
 }
 
-export type { IPost, IVoteOption, IVote, IPostRequestDto, IPostActions };
+interface IAuthor {
+  _id: mongoose.Types.ObjectId;
+  userId: string;
+  username: string;
+  profileImage: string;
+}
+
+interface IPostResponseDto {
+  _id: mongoose.Types.ObjectId;
+  author: IAuthor;
+  text?: string;
+  media?: string[];
+  schedule?: Date;
+  vote?: IVote;
+  actions: IPostActions;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export type {
+  IPost,
+  IVoteOption,
+  IVote,
+  IPostRequestDto,
+  IPostActions,
+  IAuthor,
+  IPostResponseDto,
+};

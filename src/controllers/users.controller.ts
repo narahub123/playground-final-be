@@ -259,7 +259,7 @@ const getCurrentUser = asyncWrapper(
       loginRecords,
     };
 
-    const posts = await postService.getPostsByUserId(user.userId);
+    const posts = await postService.getPostsByAuthor(user._id);
 
     const response = {
       success: true,

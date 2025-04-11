@@ -1,6 +1,12 @@
 import { Post } from "@models";
-import { IPost, IPostRequestDto } from "@types";
-import { mongoDBErrorHandler } from "@utils";
+import {
+  IAuthor,
+  IPost,
+  IPostRequestDto,
+  IPostResponseDto,
+  IUser,
+} from "@types";
+import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
 import mongoose from "mongoose";
 
 class PostRepository {
@@ -17,13 +23,23 @@ class PostRepository {
     }
   }
 
-  async getPostsByUserId(userId: string): Promise<IPost[] | undefined> {
+  async getPostsByAuthor(
+    author: mongoose.Types.ObjectId
+  ): Promise<IPostResponseDto[]> {
     try {
-      const posts = Post.find({ userId });
+      const posts = await Post.find({ author }).populate(
+        "author",
+        "userId username profileImage"
+      );
 
-      return posts;
+      return posts.map((post) =>
+        mapPostToIPostResponseDto(
+          post as unknown as IPost & { author: IAuthor }
+        )
+      );
     } catch (error) {
-      mongoDBErrorHandler("getPostsByUserId", error, { userId });
+      mongoDBErrorHandler("getPostsByAuthor", error, { author });
+      return [];
     }
   }
 }

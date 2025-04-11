@@ -21,6 +21,7 @@ import modifyVote from "./modifyVote";
 import deleteImage from "./deleteImage";
 import deleteVideo from "./deleteVideo";
 import deleteMedia from "./deleteMedia";
+import mapPostToIPostResponseDto from "./mapPostToIPostResponseDto";
 
 export {
   connectDB,
@@ -47,4 +48,5 @@ export {
   deleteImage,
   deleteVideo,
   deleteMedia,
+  mapPostToIPostResponseDto,
 };
