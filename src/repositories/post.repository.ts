@@ -1,11 +1,11 @@
 import { Post } from "@models";
-import { IPost, PostDTO } from "@types";
+import { IPost, IPostRequestDto } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import mongoose from "mongoose";
 
 class PostRepository {
   async createPost(
-    post: PostDTO,
+    post: IPostRequestDto,
     options?: { session: mongoose.ClientSession }
   ): Promise<IPost | undefined> {
     try {

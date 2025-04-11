@@ -1,11 +1,11 @@
 import { InternalServerError } from "@errors";
 import { postRepository } from "@repositories";
-import { IPost, PostDTO } from "@types";
+import { IPost, IPostRequestDto } from "@types";
 import mongoose from "mongoose";
 
 class PostService {
   async createPost(
-    post: PostDTO,
+    post: IPostRequestDto,
     session: mongoose.ClientSession
   ): Promise<IPost> {
     const newPost = await postRepository.createPost(post, { session });

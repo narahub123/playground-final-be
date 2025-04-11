@@ -10,8 +10,8 @@ interface IVote {
   duration: Date;
 }
 
-interface PostDTO {
-  userId: string;
+interface IPostRequestDto {
+  author: mongoose.Types.ObjectId;
   text?: string;
   media?: string[];
   schedule?: Date;
@@ -36,4 +36,4 @@ interface IPost extends Document {
   updatedAt?: Date;
 }
 
-export type { IPost, IVoteOption, IVote, PostDTO, IPostActions };
+export type { IPost, IVoteOption, IVote, IPostRequestDto, IPostActions };

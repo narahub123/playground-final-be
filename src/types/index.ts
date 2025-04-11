@@ -73,7 +73,13 @@ import { IEmail, SocialType, IEmailInput } from "./email.type";
 
 import { IPhone, IPhoneInput } from "./phone.type";
 
-import { IPost, IVoteOption, IVote, PostDTO, IPostActions } from "./post.type";
+import {
+  IPost,
+  IVoteOption,
+  IVote,
+  IPostRequestDto,
+  IPostActions,
+} from "./post.type";
 
 export {
   // user
@@ -164,6 +170,6 @@ export {
   IPost,
   IVoteOption,
   IVote,
-  PostDTO,
+  IPostRequestDto,
   IPostActions,
 };

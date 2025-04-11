@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
 import mongoose from "mongoose";
 import { deleteMedia, modifyVote, uploadMedia } from "@utils";
-import { IApiSuccessResponse, IPost, IVote, PostDTO } from "@types";
+import { IApiSuccessResponse, IPost, IVote, IPostRequestDto } from "@types";
 import { postService } from "@services";
 
 const creatNewPost = asyncWrapper(
@@ -23,8 +23,8 @@ const creatNewPost = asyncWrapper(
     try {
       // 투표 처리하기
 
-      const newPost: PostDTO = {
-        userId: user.userId,
+      const newPost: IPostRequestDto = {
+        author: user._id,
         text,
         media:
           newMedia.length === 0 ? undefined : newMedia.map((m) => m.secure_url),
@@ -32,6 +32,7 @@ const creatNewPost = asyncWrapper(
         vote: newVote,
       };
 
+      // 이 부분 나중에 변경해야 할지도 모름
       const post = await postService.createPost(newPost, session);
 
       await session.commitTransaction();
