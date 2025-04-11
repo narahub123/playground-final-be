@@ -1,5 +1,5 @@
 import { IPost, IPostActions, IVoteOption } from "@types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
   {
@@ -38,8 +38,8 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
 
 const PostSchema = new mongoose.Schema<IPost>(
   {
-    userId: {
-      type: String,
+    author: {
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },

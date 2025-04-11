@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 interface IVoteOption {
   option: string;
   count: number;
@@ -24,7 +26,7 @@ interface IPostActions {
 }
 
 interface IPost extends Document {
-  userId: string;
+  author: mongoose.Types.ObjectId;
   text?: string;
   media?: string[];
   schedule?: Date;
