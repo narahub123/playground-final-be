@@ -42,6 +42,9 @@ interface IAuthor {
   userId: string;
   username: string;
   profileImage: string;
+  intro: string;
+  followings: string[];
+  followers: string[];
 }
 
 interface IPostResponseDto {

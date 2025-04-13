@@ -29,7 +29,7 @@ class PostRepository {
     try {
       const posts = await Post.find({ author }).populate(
         "author",
-        "userId username profileImage"
+        "userId username profileImage intro followings followers"
       );
 
       return posts.map((post) =>
