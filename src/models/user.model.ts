@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { ipRegExp, userIdRegExp, usernameRegExp } from "@data";
 import {
   COUNTRY_DEFAULT,
@@ -142,12 +142,24 @@ const UserSchema = new mongoose.Schema<IUser>(
     },
     // 팔로잉 목록
     followings: {
-      type: [{ type: String, ref: "User" }],
+      type: [
+        {
+          user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+          followedAt: { type: Date, default: Date.now, required: true },
+          _id: false,
+        },
+      ],
       default: [],
     },
     // 팔로워 목록
     followers: {
-      type: [{ type: String, ref: "User" }],
+      type: [
+        {
+          user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+          followedAt: { type: Date, default: Date.now, required: true },
+          _id: false,
+        },
+      ],
       default: [],
     },
 

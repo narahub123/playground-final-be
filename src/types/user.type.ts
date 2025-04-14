@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 /**
  * 성별을 나타내는 타입입니다.
@@ -117,6 +117,16 @@ interface IEmoji {
   skintone?: string[];
 }
 
+interface IFollower {
+  user: mongoose.Types.ObjectId;
+  followedAt: Date;
+}
+
+interface IFollowing {
+  user: mongoose.Types.ObjectId;
+  followedAt: Date;
+}
+
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
   password: string;
@@ -132,8 +142,8 @@ interface IUser extends Document {
   profileCoverImage: string;
   intro: string;
   accountGroup: string[];
-  followings: string[];
-  followers: string[];
+  followings: IFollower[];
+  followers: IFollowing[];
   isAuthorized: boolean;
   isAuthenticated: boolean;
   lockStatus: ILockStatus;
