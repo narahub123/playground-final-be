@@ -10,6 +10,7 @@ import LoginRecord from "./login-record.model";
 import Email from "./email.model";
 import Phone from "./phone.model";
 import Post from "./post.model";
+import Repost from "./repost.model";
 
 export {
   User,
@@ -24,4 +25,5 @@ export {
   Email,
   Phone,
   Post,
+  Repost,
 };
