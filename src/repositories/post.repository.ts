@@ -7,7 +7,7 @@ import {
   IUser,
 } from "@types";
 import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
-import mongoose from "mongoose";
+import mongoose, { Types, UpdateWriteOpResult } from "mongoose";
 
 class PostRepository {
   async createPost(
@@ -27,10 +27,12 @@ class PostRepository {
     author: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {
     try {
-      const posts = await Post.find({ author }).populate(
-        "author",
-        "userId username profileImage intro followings followers"
-      );
+      const posts = await Post.find({ author })
+        .populate(
+          "author",
+          "userId username profileImage intro followings followers"
+        )
+        .sort({ createdAt: -1 });
 
       return posts.map((post) =>
         mapPostToIPostResponseDto(
@@ -40,6 +42,39 @@ class PostRepository {
     } catch (error) {
       mongoDBErrorHandler("getPostsByAuthor", error, { author });
       return [];
+    }
+  }
+
+  async getPostById(_id: Types.ObjectId): Promise<IPost | null> {
+    try {
+      const post = await Post.findById(_id);
+
+      return post;
+    } catch (error) {
+      mongoDBErrorHandler("getPostById", error, { _id });
+      return null;
+    }
+  }
+
+  async updatePostVoteWithUserId(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    optionIndex: number
+  ): Promise<UpdateWriteOpResult | null> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { $addToSet: { [`vote.options.${optionIndex}.voters`]: userId } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updatePostVoteWithUserId", error, {
+        postId,
+        userId,
+        optionIndex,
+      });
+      return null;
     }
   }
 }

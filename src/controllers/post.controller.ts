@@ -5,6 +5,7 @@ import { deleteMedia, modifyVote, uploadMedia } from "@utils";
 import { IApiSuccessResponse, IPost, IVote, IPostRequestDto } from "@types";
 import { postService } from "@services";
 import { JSDOM } from "jsdom";
+import { BadRequestError, ConflictError, NotFoundError } from "@errors";
 
 const creatNewPost = asyncWrapper(
   "creatNewPost",
@@ -111,4 +112,63 @@ const getPostPreview = asyncWrapper(
   }
 );
 
-export { creatNewPost, getPostPreview };
+const updatePostVote = asyncWrapper(
+  "updatePostVote",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { _id: user } = req.user;
+    const { postId, optionIndex } = req.params;
+
+    const post_id = new mongoose.Types.ObjectId(postId);
+    const user_id = new mongoose.Types.ObjectId(user);
+    const index = Number(optionIndex);
+
+    const post = await postService.getPostById(post_id);
+
+    // 포스트가 존재하지 않는 경우
+    if (!post) {
+      throw new NotFoundError(
+        "Not found the post. (포스트 검색 실패)",
+        "NOT_FOUND",
+        { post: "POST_NOT_FOUND" }
+      );
+    } else if (!post.vote) {
+      // 포스트에 투표가 존재하지 않는 경우
+      throw new BadRequestError("진행 중인 투표가 없습니다.");
+    } else if (post.vote.options.length - 1 < Number(optionIndex)) {
+      // 옵션 인덱스가 실제 옵션 개수보다 큰 경우
+      throw new BadRequestError("유효하지 않은 옵션");
+    } else if (
+      post.vote.options.some((option) => option.voters.includes(user))
+    ) {
+      // 이미 투표를 한 경우
+      throw new ConflictError("중복 투표");
+    }
+
+    // 업데이트
+    const result = await postService.updatePostVoteWithUserId(
+      post_id,
+      user_id,
+      index
+    );
+
+    if (result) {
+      const posts = await postService.getPostsByAuthor(user_id);
+
+      const response = {
+        success: true,
+        message: "Voting is done successfully. (투표 성공)",
+        code: "VOTING_SUCCEEDED",
+        timestamp: new Date().toISOString(),
+        data: {
+          posts,
+        },
+      };
+
+      res.status(200).json(response);
+    }
+  }
+);
+
+export { creatNewPost, getPostPreview, updatePostVote };

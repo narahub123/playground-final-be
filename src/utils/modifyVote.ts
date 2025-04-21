@@ -7,7 +7,7 @@ const modifyVote = (vote: any): IVote | undefined => {
     const newOptions: IVoteOption[] = (vote.options as string[]).map(
       (option) => ({
         option,
-        count: 0,
+        voters: [],
       })
     );
 
