@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 interface IVoteOption {
   option: string;
@@ -47,6 +47,13 @@ interface IAuthor {
   followers: string[];
 }
 
+interface IRepostUser {
+  _id: Types.ObjectId;
+  userId: string;
+  username: string;
+  repostId: Types.ObjectId;
+}
+
 interface IPostResponseDto {
   _id: mongoose.Types.ObjectId;
   author: IAuthor;
@@ -57,6 +64,7 @@ interface IPostResponseDto {
   actions: IPostActions;
   createdAt?: Date;
   updatedAt?: Date;
+  repostUser?: IRepostUser;
 }
 
 export type {

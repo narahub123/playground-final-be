@@ -33,6 +33,7 @@ import {
   creatNewPost,
   getPostPreview,
   updatePostVote,
+  addRepost,
 } from "./post.controller";
 
 export {
@@ -69,4 +70,5 @@ export {
   creatNewPost,
   getPostPreview,
   updatePostVote,
+  addRepost,
 };

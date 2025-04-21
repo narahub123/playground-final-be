@@ -1,11 +1,22 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import { deleteMedia, modifyVote, uploadMedia } from "@utils";
-import { IApiSuccessResponse, IPost, IVote, IPostRequestDto } from "@types";
-import { postService } from "@services";
+import {
+  IApiSuccessResponse,
+  IPost,
+  IVote,
+  IPostRequestDto,
+  IPostResponseDto,
+} from "@types";
+import { postService, repostService } from "@services";
 import { JSDOM } from "jsdom";
-import { BadRequestError, ConflictError, NotFoundError } from "@errors";
+import {
+  BadRequestError,
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
+} from "@errors";
 
 const creatNewPost = asyncWrapper(
   "creatNewPost",
@@ -171,4 +182,35 @@ const updatePostVote = asyncWrapper(
   }
 );
 
-export { creatNewPost, getPostPreview, updatePostVote };
+const addRepost = asyncWrapper(
+  "addRepost",
+  "Adding repost failed (재게시 실패)",
+  "ADD_REPOST_FAILED",
+  async (req: Request, res: Response) => {
+    const { postId } = req.params;
+    const { text } = req.body;
+    const { _id: user } = req.user;
+
+    const postid = new mongoose.Types.ObjectId(postId);
+
+    const post = await repostService.addRepost(postid, user, text);
+
+    if (!post) {
+      throw new InternalServerError("재게시 도중 에러 발생");
+    }
+
+    const response: IApiSuccessResponse<{
+      post: IPostResponseDto;
+    }> = {
+      success: true,
+      message: "Adding repost has succeeded.(재게시 성공)",
+      code: "ADD_REPOST_SUCCEEDED",
+      data: { post },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(201).json(response);
+  }
+);
+
+export { creatNewPost, getPostPreview, updatePostVote, addRepost };
