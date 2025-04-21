@@ -230,6 +230,12 @@ const UserSchema = new mongoose.Schema<IUser>(
       },
       default: [],
     },
+
+    bookmarks: {
+      type: [Schema.Types.ObjectId],
+      ref: "Post",
+      default: [],
+    },
   },
   {
     timestamps: true,

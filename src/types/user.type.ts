@@ -149,6 +149,7 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
   skintoneType: SkintoneType;
   recentEmojis: IEmoji[];
+  bookmarks: Types.ObjectId[];
 }
 
 interface IUserInput {
