@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 interface IVoteOption {
   option: string;
-  count: number;
+  voters: mongoose.Types.ObjectId[];
 }
 
 interface IVote {

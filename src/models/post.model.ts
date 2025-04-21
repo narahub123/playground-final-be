@@ -4,7 +4,7 @@ import mongoose, { Schema } from "mongoose";
 const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
   {
     option: { type: String, required: true },
-    count: { type: Number, default: 0 },
+    voters: { type: [Schema.Types.ObjectId], default: [] },
   },
   { _id: false, versionKey: false }
 );
