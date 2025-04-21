@@ -22,6 +22,7 @@ import {
   IDevice,
   IEmoji,
   ILocation,
+  IUser,
   UserDTO,
 } from "@types";
 import {
@@ -647,6 +648,31 @@ const clearRecentEmojis = asyncWrapper(
   }
 );
 
+const getUserInfo = asyncWrapper(
+  "getUserInfo",
+  "Getting user info failed(사용자 정보 가져오기 실패)",
+  "GET_USER_INFO_FAILED",
+  async (req: Request, res: Response) => {
+    const { userId } = req.params;
+
+    if (!userId) {
+      throw new BadRequestError("");
+    }
+
+    const user = await userService.getUserByUserId(userId);
+
+    const response: IApiSuccessResponse<{ user: IUser | null }> = {
+      success: true,
+      message: "Getting user info is successful.(사용자 정보 가져오기 성공)",
+      code: "GET_USER_INFO_SUCCEEDED",
+      data: { user },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   checkEmailDuplication,
   checkPhoneDuplication,
@@ -658,4 +684,5 @@ export {
   changePassword,
   updateMe,
   clearRecentEmojis,
+  getUserInfo,
 };

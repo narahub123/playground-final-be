@@ -9,6 +9,7 @@ import {
   changePassword,
   updateMe,
   clearRecentEmojis,
+  getUserInfo,
 } from "./users.controller";
 
 import {
@@ -42,6 +43,7 @@ export {
   changePassword,
   updateMe,
   clearRecentEmojis,
+  getUserInfo,
 
   // auth
   loginUser,
