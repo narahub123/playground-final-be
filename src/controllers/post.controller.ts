@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { deleteMedia, modifyVote, uploadMedia } from "@utils";
 import { IApiSuccessResponse, IPost, IVote, IPostRequestDto } from "@types";
 import { postService } from "@services";
+import { JSDOM } from "jsdom";
 
 const creatNewPost = asyncWrapper(
   "creatNewPost",
@@ -58,4 +59,56 @@ const creatNewPost = asyncWrapper(
   }
 );
 
-export { creatNewPost };
+const getPostPreview = asyncWrapper(
+  "getLinkPreview",
+  "Getting post preview failed(포스트 미리보기 실패)",
+  "POST_PREVIEW_FAILED",
+  async (req: Request, res: Response) => {
+    const { url } = req.query;
+
+    let link = url as string;
+
+    if (!/^https?:\/\//.test(link)) {
+      link = "https://" + link;
+    }
+
+    const resp = await fetch(link);
+    const html = await resp.text();
+
+    const dom = new JSDOM(html);
+
+    const doc = dom.window.document;
+
+    const image =
+      doc.querySelector('meta[property="og:image"]')?.getAttribute("content") ||
+      "";
+    const desc =
+      doc
+        .querySelector('meta[property="og:description"]')
+        ?.getAttribute("content") || "";
+    const title =
+      doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ||
+      "";
+    const address =
+      doc.querySelector('meta[property="og:url"]')?.getAttribute("content") ||
+      "";
+
+    const response: IApiSuccessResponse<{
+      image: string;
+      desc: string;
+      title: string;
+      url: string;
+    }> = {
+      success: true,
+      message:
+        "Getting link preview has succeeded.(링크 미리보기 가져오기 성공)",
+      code: "POST_PREVIEW_SUCCEEDED",
+      data: { image, desc, title, url: address },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
+export { creatNewPost, getPostPreview };

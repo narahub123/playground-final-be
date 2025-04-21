@@ -29,7 +29,7 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
-import { creatNewPost } from "./post.controller";
+import { creatNewPost, getPostPreview } from "./post.controller";
 
 export {
   // user
@@ -63,4 +63,5 @@ export {
 
   // post
   creatNewPost,
+  getPostPreview,
 };
