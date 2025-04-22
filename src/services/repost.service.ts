@@ -8,13 +8,57 @@ class RepostService {
     userId: Types.ObjectId,
     text?: string
   ) {
-    const result = await repostRepository.addRepost(postId, userId, text);
+    const post = await repostRepository.addRepost(postId, userId, text);
 
-    return result;
+    if (!post) return null;
+
+    const count = await repostRepository.getRepostCountByPostId(postId);
+
+    return {
+      ...post,
+      actions: {
+        ...post.actions,
+        reposts: {
+          count,
+          isReposted: true,
+        },
+      },
+    };
   }
 
   async getRepostsByUser(userId: Types.ObjectId): Promise<IPostResponseDto[]> {
-    return await repostRepository.getRepostsByUser(userId);
+    const reposts = await repostRepository.getRepostsByUser(userId);
+
+    const modified = await Promise.all(
+      reposts.map(async (post) => ({
+        ...post,
+        actions: {
+          ...post.actions,
+          reposts: {
+            count: await repostRepository.getRepostCountByPostId(post._id),
+            isReposted: await this.IsRepostedByUser(userId, post._id),
+          },
+        },
+      }))
+    );
+
+    return modified;
+  }
+
+  async getRepostCountByPostId(postId: Types.ObjectId): Promise<number> {
+    return await repostRepository.getRepostCountByPostId(postId);
+  }
+
+  async IsRepostedByUser(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<boolean> {
+    const result = await repostRepository.findRepostByUserIdAnPostId(
+      userId,
+      postId
+    );
+
+    return result ? true : false;
   }
 }
 

@@ -20,7 +20,6 @@ interface IPostRequestDto {
 
 interface IPostActions {
   comments: string[];
-  reposts: string[];
   likes: Types.ObjectId[];
   views: number;
 }
@@ -55,6 +54,18 @@ interface IRepostUser {
   repostedAt: Date;
 }
 
+interface IPostActionRepost {
+  count: number;
+  isReposted: boolean;
+}
+
+interface IPostResponseActions {
+  comments: string[];
+  reposts: IPostActionRepost;
+  likes: Types.ObjectId[];
+  views: number;
+}
+
 interface IPostResponseDto {
   _id: mongoose.Types.ObjectId;
   author: IAuthor;
@@ -62,7 +73,7 @@ interface IPostResponseDto {
   media?: string[];
   schedule?: Date;
   vote?: IVote;
-  actions: IPostActions;
+  actions: IPostResponseActions;
   createdAt?: Date;
   updatedAt?: Date;
   repostUser?: IRepostUser;

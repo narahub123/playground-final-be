@@ -1,5 +1,5 @@
 import { Post, Repost } from "@models";
-import { IAuthor, IPostResponseDto } from "@types";
+import { IAuthor, IPostResponseDto, IRepost } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import { Types } from "mongoose";
 
@@ -148,6 +148,30 @@ class RepostRepository {
     } catch (error) {
       mongoDBErrorHandler("getRepostsByUser", error, { _id: userId });
       return [];
+    }
+  }
+
+  async getRepostCountByPostId(postId: Types.ObjectId): Promise<number> {
+    try {
+      return await Repost.countDocuments({ post: postId });
+    } catch (error) {
+      mongoDBErrorHandler("getRepostsByUser", error, { _id: postId });
+      return 0;
+    }
+  }
+
+  async findRepostByUserIdAnPostId(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<IRepost | null> {
+    try {
+      return await Repost.findOne({ user: userId, post: postId });
+    } catch (error) {
+      mongoDBErrorHandler("findRepostByUserIdAnPostId", error, {
+        userId,
+        postId,
+      });
+      return null;
     }
   }
 }

@@ -7,12 +7,7 @@ import {
   IUser,
 } from "@types";
 import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
-import mongoose, {
-  ClientSession,
-  Types,
-  UpdateResult,
-  UpdateWriteOpResult,
-} from "mongoose";
+import mongoose, { Types, UpdateResult, UpdateWriteOpResult } from "mongoose";
 
 class PostRepository {
   async createPost(
@@ -41,7 +36,7 @@ class PostRepository {
 
       return posts.map((post) =>
         mapPostToIPostResponseDto(
-          post as unknown as IPost & { author: IAuthor }
+          post.toObject() as unknown as IPost & { author: IAuthor }
         )
       );
     } catch (error) {
