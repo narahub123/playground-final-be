@@ -1,5 +1,6 @@
+import { InternalServerError } from "@errors";
 import { repostRepository } from "@repositories";
-import { IPostResponseDto } from "@types";
+import { IPostResponseDto, IRepost } from "@types";
 import { Types } from "mongoose";
 
 class RepostService {
@@ -59,6 +60,24 @@ class RepostService {
     );
 
     return result ? true : false;
+  }
+
+  async findRepostById(repostId: Types.ObjectId): Promise<IRepost | null> {
+    const repost = await repostRepository.findRepostById(repostId);
+
+    return repost;
+  }
+
+  async deleteRepost(repostId: Types.ObjectId) {
+    const result = await repostRepository.deleteRepost(repostId);
+
+    if (!result) {
+      throw new InternalServerError("재게시 삭제 도중 에러 발생");
+    }
+
+    if (result.deletedCount === 0) {
+      throw new InternalServerError("재게시 삭제 도중 에러 발생");
+    }
   }
 }
 

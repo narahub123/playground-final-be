@@ -38,6 +38,8 @@ import {
   deletePost,
 } from "./post.controller";
 
+import { deleteRepost } from "./repost.controller";
+
 export {
   // user
   checkEmailDuplication,
@@ -75,4 +77,7 @@ export {
   addRepost,
   updateLikes,
   deletePost,
+
+  // repost
+  deleteRepost,
 };

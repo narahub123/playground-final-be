@@ -1,7 +1,7 @@
 import { Post, Repost } from "@models";
 import { IAuthor, IPostResponseDto, IRepost } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import { Types } from "mongoose";
+import { DeleteResult, Types } from "mongoose";
 
 class RepostRepository {
   async addRepost(
@@ -172,6 +172,30 @@ class RepostRepository {
         postId,
       });
       return null;
+    }
+  }
+
+  async findRepostById(repostId: Types.ObjectId): Promise<IRepost | null> {
+    try {
+      return await Repost.findById(repostId);
+    } catch (error) {
+      mongoDBErrorHandler("deleteRepost", error, {
+        repostId,
+      });
+      return null;
+    }
+  }
+
+  async deleteRepost(
+    repostId: Types.ObjectId
+  ): Promise<DeleteResult | undefined> {
+    try {
+      return await Repost.deleteOne(repostId);
+    } catch (error) {
+      mongoDBErrorHandler("deleteRepost", error, {
+        repostId,
+      });
+      return undefined;
     }
   }
 }
