@@ -160,6 +160,17 @@ class RepostRepository {
     }
   }
 
+  async getRepostsByPostId(postId: Types.ObjectId): Promise<IRepost[]> {
+    try {
+      const reposts = await Repost.find({ post: postId });
+
+      return reposts;
+    } catch (error) {
+      mongoDBErrorHandler("getRepostsByUser", error, { _id: postId });
+      return [];
+    }
+  }
+
   async findRepostByUserIdAnPostId(
     userId: Types.ObjectId,
     postId: Types.ObjectId

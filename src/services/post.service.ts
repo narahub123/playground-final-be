@@ -116,6 +116,15 @@ class PostService {
     if (result.deletedCount === 0) {
       throw new InternalServerError("포스트 삭제 도중 에러 발생");
     }
+
+    // 해당 게시물을 재게시한 것들을 전부 삭제
+    const reposts = await repostRepository.getRepostsByPostId(postId);
+
+    await Promise.all(
+      reposts.map(
+        async (repost) => await repostRepository.deleteRepost(repost._id)
+      )
+    );
   }
 }
 
