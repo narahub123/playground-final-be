@@ -1,10 +1,10 @@
-import { UserType } from "@types";
+import { IUser } from "@types";
 import { Types } from "mongoose";
 
 declare global {
   namespace Express {
     interface Request {
-      user: UserType;
+      user: IUser;
       activeSessionId: Types.ObjectId;
     }
   }

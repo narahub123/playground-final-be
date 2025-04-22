@@ -3,6 +3,7 @@ import { authTokenMiddleware } from "@middlewares";
 import {
   addRepost,
   creatNewPost,
+  deletePost,
   getPostPreview,
   updateLikes,
   updatePostVote,
@@ -18,4 +19,5 @@ export default (router: Router) => {
     authTokenMiddleware,
     updatePostVote
   );
+  router.delete("/posts/:postId", authTokenMiddleware, deletePost);
 };

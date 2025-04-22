@@ -16,6 +16,7 @@ import {
   ConflictError,
   InternalServerError,
   NotFoundError,
+  UnauthorizedError,
 } from "@errors";
 
 const creatNewPost = asyncWrapper(
@@ -262,4 +263,47 @@ const updateLikes = asyncWrapper(
   }
 );
 
-export { creatNewPost, getPostPreview, updatePostVote, addRepost, updateLikes };
+const deletePost = asyncWrapper(
+  "deletePost",
+  "Deleting post failed.(포스트 삭제 실패)",
+  "DELETE_POST_FAILED",
+  async (req: Request, res: Response) => {
+    const { postId } = req.params;
+    const { _id: user_id } = req.user;
+
+    const postid = new mongoose.Types.ObjectId(postId);
+
+    const post = await postService.getPostById(postid);
+
+    if (!post) {
+      throw new BadRequestError("포스트 조회 실패");
+    }
+
+    const { author } = post;
+
+    // 사용자가 작성한 포스트가 아닌 경우
+    if (!author._id.equals(user_id)) {
+      throw new UnauthorizedError("삭제할 권한이 없습니다.");
+    }
+
+    await postService.deletePost(postid);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Post is deleted successfully.(포스트 삭제 성공)",
+      code: "DELETE_POST_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
+export {
+  creatNewPost,
+  getPostPreview,
+  updatePostVote,
+  addRepost,
+  updateLikes,
+  deletePost,
+};

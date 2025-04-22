@@ -7,7 +7,12 @@ import {
   IUser,
 } from "@types";
 import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
-import mongoose, { Types, UpdateResult, UpdateWriteOpResult } from "mongoose";
+import mongoose, {
+  DeleteResult,
+  Types,
+  UpdateResult,
+  UpdateWriteOpResult,
+} from "mongoose";
 
 class PostRepository {
   async createPost(
@@ -113,6 +118,19 @@ class PostRepository {
       mongoDBErrorHandler("deleteLike", error, {
         postId,
         userId,
+      });
+      return undefined;
+    }
+  }
+
+  async deletePost(postId: Types.ObjectId): Promise<DeleteResult | undefined> {
+    try {
+      const result = await Post.deleteOne({ _id: postId });
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteLike", error, {
+        postId,
       });
       return undefined;
     }

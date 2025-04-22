@@ -129,6 +129,7 @@ interface IFollowing {
 
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
+  _id: Types.ObjectId;
   password: string;
   userId: string;
   username: string;
@@ -151,6 +152,8 @@ interface IUser extends Document {
   recentEmojis: IEmoji[];
   bookmarks: Types.ObjectId[];
   likes: Types.ObjectId[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IUserInput {

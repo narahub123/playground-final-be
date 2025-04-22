@@ -105,6 +105,18 @@ class PostService {
 
     return alreadyLike ? false : true;
   }
+
+  async deletePost(postId: Types.ObjectId) {
+    const result = await postRepository.deletePost(postId);
+
+    if (!result) {
+      throw new InternalServerError("포스트 삭제 도중 에러 발생");
+    }
+
+    if (result.deletedCount === 0) {
+      throw new InternalServerError("포스트 삭제 도중 에러 발생");
+    }
+  }
 }
 
 export default new PostService();

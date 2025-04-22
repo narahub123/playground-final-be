@@ -35,6 +35,7 @@ import {
   updatePostVote,
   addRepost,
   updateLikes,
+  deletePost,
 } from "./post.controller";
 
 export {
@@ -73,4 +74,5 @@ export {
   updatePostVote,
   addRepost,
   updateLikes,
+  deletePost,
 };
