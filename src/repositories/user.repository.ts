@@ -251,6 +251,46 @@ class UserRepository {
       return undefined;
     }
   }
+
+  async addBookmark(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      return await User.updateOne(
+        { _id: userId },
+        {
+          $addToSet: {
+            [`bookmarks`]: postId,
+          },
+        }
+      );
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("addBookmark", error, { userId, postId });
+      return undefined;
+    }
+  }
+
+  async removeBookmark(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      return await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            [`bookmarks`]: postId,
+          },
+        }
+      );
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("removeBookmark", error, { userId, postId });
+      return undefined;
+    }
+  }
 }
 
 export default new UserRepository();

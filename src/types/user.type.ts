@@ -169,6 +169,7 @@ interface IUserInput {
 interface UserDTO {
   skintoneType: SkintoneType;
   recentEmoji: IEmoji;
+  bookmarks: string;
 }
 
 export type {

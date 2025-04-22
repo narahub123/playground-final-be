@@ -31,6 +31,7 @@ import {
   setRefreshTokenCookie,
 } from "@utils";
 import { RECENT_EMOJIS_MAX } from "@constants";
+import mongoose from "mongoose";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -615,6 +616,11 @@ const updateMe = asyncWrapper(
       );
 
       await userService.updateRecentEmojis(user.userId, limitedRecentEmojis);
+    }
+
+    if (body.bookmarks) {
+      const postId = new mongoose.Types.ObjectId(body.bookmarks);
+      await userService.updateBookmarks(user._id, postId);
     }
 
     const response: IApiSuccessResponse = {

@@ -335,6 +335,46 @@ class UserService {
 
     return alreadyLike ? false : true;
   }
+
+  async updateBookmarks(userId: Types.ObjectId, postId: Types.ObjectId) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError(
+        "User not found. (사용자를 찾을 수 없습니다.)",
+        "USER_NOT_FOUND",
+        {
+          userId,
+        }
+      );
+    }
+
+    const hasBookmark = user.bookmarks.includes(postId);
+
+    const result = hasBookmark
+      ? await userRepository.addBookmark(userId, postId)
+      : await userRepository.removeBookmark(userId, postId);
+
+    if (!result) {
+      throw new InternalServerError("북마크 업데이트 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError(
+        "User not found. (사용자를 찾을 수 없습니다.)",
+        "USER_NOT_FOUND",
+        {
+          userId,
+        }
+      );
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("북마크 업데이트 도중 에러 발생");
+    }
+
+    return hasBookmark ? false : true;
+  }
 }
 
 export default new UserService();
