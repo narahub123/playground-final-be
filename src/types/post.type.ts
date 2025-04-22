@@ -52,6 +52,7 @@ interface IRepostUser {
   userId: string;
   username: string;
   repostId: Types.ObjectId;
+  repostedAt: Date;
 }
 
 interface IPostResponseDto {
