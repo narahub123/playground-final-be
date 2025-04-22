@@ -1,4 +1,4 @@
-import mongoose, { UpdateResult } from "mongoose";
+import mongoose, { Types, UpdateResult } from "mongoose";
 import { User } from "@models";
 import { IEmoji, ILockStatus, IUser, IUserInput, SkintoneType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
@@ -200,6 +200,54 @@ class UserRepository {
         userId,
         recentEmojis,
       });
+      return undefined;
+    }
+  }
+
+  async getUserById(userId: Types.ObjectId): Promise<IUser | null> {
+    try {
+      const user = await User.findById(userId);
+
+      return user;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("getUserById", error, { userId });
+      return null;
+    }
+  }
+
+  async addLike(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        { $addToSet: { [`likes`]: postId } }
+      );
+
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("addLike", error, { userId, postId });
+      return undefined;
+    }
+  }
+
+  async deleteLike(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        { $pull: { [`likes`]: postId } }
+      );
+
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("deleteLike", error, { userId, postId });
       return undefined;
     }
   }

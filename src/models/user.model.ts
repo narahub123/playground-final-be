@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { ipRegExp, userIdRegExp, usernameRegExp } from "@data";
 import {
   COUNTRY_DEFAULT,
@@ -235,6 +235,19 @@ const UserSchema = new mongoose.Schema<IUser>(
       type: [Schema.Types.ObjectId],
       ref: "Post",
       default: [],
+    },
+
+    likes: {
+      type: [Schema.Types.ObjectId],
+      ref: "Post",
+      default: [],
+      validate: {
+        validator: function (v: Types.ObjectId[]) {
+          // likes 배열에 중복이 없도록 처리 (예: 애플리케이션 레벨에서)
+          return v.every((val, index, self) => self.indexOf(val) === index);
+        },
+        message: "중복된 좋아요는 허용되지 않습니다.",
+      },
     },
   },
   {

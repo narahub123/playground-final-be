@@ -150,6 +150,7 @@ interface IUser extends Document {
   skintoneType: SkintoneType;
   recentEmojis: IEmoji[];
   bookmarks: Types.ObjectId[];
+  likes: Types.ObjectId[];
 }
 
 interface IUserInput {

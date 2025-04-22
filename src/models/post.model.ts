@@ -25,7 +25,7 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
       default: [],
     },
     likes: {
-      type: [String],
+      type: [Schema.Types.ObjectId],
       default: [],
     },
     views: {

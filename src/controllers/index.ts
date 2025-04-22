@@ -34,6 +34,7 @@ import {
   getPostPreview,
   updatePostVote,
   addRepost,
+  updateLikes,
 } from "./post.controller";
 
 export {
@@ -71,4 +72,5 @@ export {
   getPostPreview,
   updatePostVote,
   addRepost,
+  updateLikes,
 };

@@ -13,6 +13,7 @@ import {
   userRepository,
 } from "@repositories";
 import { Email } from "@models";
+import { Types } from "mongoose";
 
 class UserService {
   /**
@@ -302,6 +303,37 @@ class UserService {
         }
       );
     }
+  }
+
+  async updateLikes(userId: Types.ObjectId, postId: Types.ObjectId) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.", "USER_NOT_FOUND");
+    }
+
+    const alreadyLike = user.likes.includes(postId);
+
+    const result = alreadyLike
+      ? await userRepository.deleteLike(userId, postId)
+      : await userRepository.addLike(userId, postId);
+
+    if (!result) {
+      throw new InternalServerError("좋아요 업데이트 중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError(
+        "조건에 맞는 사용자를 찾지 못함",
+        "USER_NOT_MATCHED"
+      );
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("유저의 좋아요 업데이트 실패");
+    }
+
+    return alreadyLike ? false : true;
   }
 }
 

@@ -21,7 +21,7 @@ interface IPostRequestDto {
 interface IPostActions {
   comments: string[];
   reposts: string[];
-  likes: string[];
+  likes: Types.ObjectId[];
   views: number;
 }
 

@@ -9,7 +9,7 @@ import {
   IPostRequestDto,
   IPostResponseDto,
 } from "@types";
-import { postService, repostService } from "@services";
+import { postService, repostService, userService } from "@services";
 import { JSDOM } from "jsdom";
 import {
   BadRequestError,
@@ -213,4 +213,53 @@ const addRepost = asyncWrapper(
   }
 );
 
-export { creatNewPost, getPostPreview, updatePostVote, addRepost };
+const updateLikes = asyncWrapper(
+  "updateLikes",
+  "Updating likes failed. (좋아요 업데이트 실패)",
+  "UPDATE_LIKES_FAILED",
+  async (req: Request, res: Response) => {
+    const { postId } = req.params;
+    const { _id: user } = req.user;
+
+    if (!postId) {
+      throw new BadRequestError("포스트 아이디 없음");
+    }
+
+    const postid = new mongoose.Types.ObjectId(postId);
+
+    // 포스트에서 좋아요 추가 혹은 삭제
+    const postLike = await postService.updateLikes(postid, user);
+
+    // 유저에서 좋아요 추가 혹은 삭제
+    const userLike = await userService.updateLikes(user, postid);
+
+    if (postLike !== userLike) {
+      throw new InternalServerError(
+        "포스트와 유저의 좋아요 상태가 일치하지 않습니다.",
+        "LIKES_STATE_MISMATCH",
+        {
+          postLike,
+          userLike,
+          postId,
+          userId: user,
+        }
+      );
+    }
+
+    // 포스트 좋아요 추가 혹은 삭제와 유저의 좋아요 추가 혹은 삭제가 일치하는 경우
+    const response: IApiSuccessResponse<{
+      likes: boolean;
+    }> = {
+      success: true,
+      message:
+        "ㅣikes of Post and user updated successfully.(좋아요 업데이트 성공)",
+      code: "UPDATE_LIKES_SUCCEEDED",
+      data: { likes: postLike },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
+export { creatNewPost, getPostPreview, updatePostVote, addRepost, updateLikes };

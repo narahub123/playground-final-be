@@ -7,7 +7,12 @@ import {
   IUser,
 } from "@types";
 import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
-import mongoose, { Types, UpdateWriteOpResult } from "mongoose";
+import mongoose, {
+  ClientSession,
+  Types,
+  UpdateResult,
+  UpdateWriteOpResult,
+} from "mongoose";
 
 class PostRepository {
   async createPost(
@@ -75,6 +80,46 @@ class PostRepository {
         optionIndex,
       });
       return null;
+    }
+  }
+
+  async addLike(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { $addToSet: { [`actions.likes`]: userId } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addLike", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
+
+  async deleteLike(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { $pull: { [`actions.likes`]: userId } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteLike", error, {
+        postId,
+        userId,
+      });
+      return undefined;
     }
   }
 }
