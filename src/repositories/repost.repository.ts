@@ -53,6 +53,7 @@ class RepostRepository {
             schedule: "$post.schedule",
             vote: "$post.vote",
             actions: "$post.actions",
+            pin: "$pin",
             createdAt: "$post.createdAt",
             updatedAt: "$post.updatedAt",
             author: {
@@ -120,6 +121,7 @@ class RepostRepository {
             schedule: "$post.schedule",
             vote: "$post.vote",
             actions: "$post.actions",
+            pin: "$pin",
             createdAt: "$post.createdAt",
             updatedAt: "$post.updatedAt",
             author: {
