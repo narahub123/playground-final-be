@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncWrapper } from "@middlewares";
-import mongoose, { mongo } from "mongoose";
+import mongoose, { mongo, Types } from "mongoose";
 import { deleteMedia, modifyVote, uploadMedia } from "@utils";
 import {
   IApiSuccessResponse,
@@ -296,12 +296,15 @@ const deletePost = asyncWrapper(
       throw new UnauthorizedError("삭제할 권한이 없습니다.");
     }
 
-    await postService.deletePost(postid, user_id);
+    const postIds = await postService.deletePost(postid, user_id);
 
-    const response: IApiSuccessResponse = {
+    const response: IApiSuccessResponse<{ postIds: Types.ObjectId[] }> = {
       success: true,
       message: "Post is deleted successfully.(포스트 삭제 성공)",
       code: "DELETE_POST_SUCCEEDED",
+      data: {
+        postIds,
+      },
       timestamp: new Date().toISOString(),
     };
 

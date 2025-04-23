@@ -148,12 +148,15 @@ class PostService {
     session.startTransaction();
 
     try {
+      let removedPostIds: Types.ObjectId[] = [];
+
       const post = await postRepository.deletePost(postId, session);
 
       if (!post) {
         throw new InternalServerError("포스트 삭제 도중 에러 발생");
       }
 
+      removedPostIds.push(postId);
       if (post.type === "repost") {
         const result = await postRepository.removeRepost(
           post.originalPostId!,
@@ -173,14 +176,21 @@ class PostService {
         const reposts = await postRepository.getRepostsByOriginalPostId(postId);
 
         await Promise.all(
-          reposts.map(
-            async (repost) =>
-              await postRepository.deletePost(repost._id, session)
-          )
+          reposts.map(async (repost) => {
+            const post = await postRepository.deletePost(repost._id, session);
+
+            if (!post) {
+              throw new InternalServerError("포스트 삭제 도중 에러 발생");
+            }
+          })
         );
+
+        removedPostIds.push(...reposts.map((repost) => repost._id));
       }
 
       await session.commitTransaction();
+
+      return removedPostIds;
     } catch (error) {
       session.abortTransaction();
       throw error;
