@@ -35,89 +35,92 @@ class PostRepository {
     try {
       const newPost = await Post.create([post], { session });
 
-      const posts = await Post.aggregate<IPostResponseDto>([
-        { $match: { _id: newPost[0]?._id } },
+      const posts = await Post.aggregate<IPostResponseDto>(
+        [
+          { $match: { _id: newPost[0]?._id } },
 
-        // 1. 작성자 정보
-        {
-          $lookup: {
-            from: "users",
-            localField: "author",
-            foreignField: "_id",
-            as: "postAuthor",
+          // 1. 작성자 정보
+          {
+            $lookup: {
+              from: "users",
+              localField: "author",
+              foreignField: "_id",
+              as: "postAuthor",
+            },
           },
-        },
-        { $unwind: "$postAuthor" },
+          { $unwind: "$postAuthor" },
 
-        // 2. originalPost가 있는 경우에만 연결
-        {
-          $lookup: {
-            from: "posts",
-            let: { originalId: "$originalPostId" },
-            pipeline: [
-              { $match: { $expr: { $eq: ["$_id", "$$originalId"] } } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "author",
-                  foreignField: "_id",
-                  as: "originalPostAuthor",
-                },
-              },
-              { $unwind: "$originalPostAuthor" },
-              {
-                $project: {
-                  _id: 1,
-                  type: 1,
-                  text: 1,
-                  media: 1,
-                  schedule: 1,
-                  vote: 1,
-                  actions: 1,
-                  pin: 1,
-                  createdAt: 1,
-                  updatedAt: 1,
-                  author: {
-                    _id: "$originalPostAuthor._id",
-                    userId: "$originalPostAuthor.userId",
-                    username: "$originalPostAuthor.username",
-                    profileImage: "$originalPostAuthor.profileImage",
+          // 2. originalPost가 있는 경우에만 연결
+          {
+            $lookup: {
+              from: "posts",
+              let: { originalId: "$originalPostId" },
+              pipeline: [
+                { $match: { $expr: { $eq: ["$_id", "$$originalId"] } } },
+                {
+                  $lookup: {
+                    from: "users",
+                    localField: "author",
+                    foreignField: "_id",
+                    as: "originalPostAuthor",
                   },
                 },
-              },
-            ],
-            as: "originalPost",
-          },
-        },
-        {
-          $addFields: {
-            originalPost: { $arrayElemAt: ["$originalPost", 0] }, // optional 처리
-          },
-        },
-
-        // 3. 최종 결과 구성
-        {
-          $project: {
-            _id: 1,
-            type: 1,
-            text: 1,
-            media: 1,
-            schedule: 1,
-            vote: 1,
-            actions: 1,
-            pin: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            author: {
-              _id: "$postAuthor._id",
-              userId: "$postAuthor.userId",
-              username: "$postAuthor.username",
-              profileImage: "$postAuthor.profileImage",
+                { $unwind: "$originalPostAuthor" },
+                {
+                  $project: {
+                    _id: 1,
+                    type: 1,
+                    text: 1,
+                    media: 1,
+                    schedule: 1,
+                    vote: 1,
+                    actions: 1,
+                    pin: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    author: {
+                      _id: "$originalPostAuthor._id",
+                      userId: "$originalPostAuthor.userId",
+                      username: "$originalPostAuthor.username",
+                      profileImage: "$originalPostAuthor.profileImage",
+                    },
+                  },
+                },
+              ],
+              as: "originalPost",
             },
-            originalPost: 1, // 없으면 null
           },
-        },
-      ]);
+          {
+            $addFields: {
+              originalPost: { $arrayElemAt: ["$originalPost", 0] }, // optional 처리
+            },
+          },
+
+          // 3. 최종 결과 구성
+          {
+            $project: {
+              _id: 1,
+              type: 1,
+              text: 1,
+              media: 1,
+              schedule: 1,
+              vote: 1,
+              actions: 1,
+              pin: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              author: {
+                _id: "$postAuthor._id",
+                userId: "$postAuthor.userId",
+                username: "$postAuthor.username",
+                profileImage: "$postAuthor.profileImage",
+              },
+              originalPost: 1, // 없으면 null
+            },
+          },
+        ],
+        { session }
+      );
 
       return posts[0] || null;
     } catch (error) {
