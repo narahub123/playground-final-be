@@ -82,6 +82,7 @@ import {
   IAuthor,
   IPostResponseDto,
   IRepostRequestDto,
+  PostType,
 } from "./post.type";
 
 import { IRepost } from "./repost.type";
@@ -180,6 +181,7 @@ export {
   IAuthor,
   IPostResponseDto,
   IRepostRequestDto,
+  PostType,
 
   // repost
   IRepost,

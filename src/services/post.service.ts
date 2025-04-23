@@ -5,6 +5,7 @@ import {
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
+  PostType,
 } from "@types";
 import mongoose, { Types } from "mongoose";
 
@@ -142,25 +143,50 @@ class PostService {
     return alreadyLike ? false : true;
   }
 
-  async deletePost(postId: Types.ObjectId) {
-    const result = await postRepository.deletePost(postId);
+  async deletePost(postId: Types.ObjectId, userId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (!result) {
-      throw new InternalServerError("포스트 삭제 도중 에러 발생");
+    try {
+      const post = await postRepository.deletePost(postId, session);
+
+      if (!post) {
+        throw new InternalServerError("포스트 삭제 도중 에러 발생");
+      }
+
+      if (post.type === "repost") {
+        const result = await postRepository.removeRepost(
+          post.originalPostId!,
+          userId,
+          session
+        );
+
+        if (!result) {
+          throw new InternalServerError("포스트 삭제 도중 에러 발생");
+        }
+
+        if (result.modifiedCount === 0) {
+          throw new InternalServerError("포스트 삭제 도중 에러 발생");
+        }
+      } else {
+        // 해당 게시물을 재게시한 것들을 전부 삭제
+        const reposts = await postRepository.getRepostsByOriginalPostId(postId);
+
+        await Promise.all(
+          reposts.map(
+            async (repost) =>
+              await postRepository.deletePost(repost._id, session)
+          )
+        );
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    if (result.deletedCount === 0) {
-      throw new InternalServerError("포스트 삭제 도중 에러 발생");
-    }
-
-    // 해당 게시물을 재게시한 것들을 전부 삭제
-    const reposts = await repostRepository.getRepostsByPostId(postId);
-
-    await Promise.all(
-      reposts.map(
-        async (repost) => await repostRepository.deleteRepost(repost._id)
-      )
-    );
   }
 
   async updatePin(postId: Types.ObjectId) {

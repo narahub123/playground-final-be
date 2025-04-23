@@ -303,16 +303,21 @@ class PostRepository {
     }
   }
 
-  async deletePost(postId: Types.ObjectId): Promise<DeleteResult | undefined> {
+  async deletePost(
+    postId: Types.ObjectId,
+    session: ClientSession
+  ): Promise<IPost | null> {
     try {
-      const result = await Post.deleteOne({ _id: postId });
+      const post = await Post.findOneAndDelete({ _id: postId }).session(
+        session
+      );
 
-      return result;
+      return post;
     } catch (error) {
       mongoDBErrorHandler("deleteLike", error, {
         postId,
       });
-      return undefined;
+      return null;
     }
   }
 
@@ -354,13 +359,14 @@ class PostRepository {
 
   async removeRepost(
     postId: Types.ObjectId,
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
+    session: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
       const result = await Post.updateOne(
         { _id: postId },
         { $pull: { [`actions.reposts`]: userId } }
-      );
+      ).session(session);
 
       return result;
     } catch (error) {
@@ -369,6 +375,24 @@ class PostRepository {
         userId,
       });
       return undefined;
+    }
+  }
+
+  async getRepostsByOriginalPostId(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPost[]> {
+    try {
+      const reposts = session
+        ? await Post.find({ originalPostId: postId }).session(session)
+        : await Post.find({ originalPostId: postId });
+
+      return reposts;
+    } catch (error) {
+      mongoDBErrorHandler("getRepostsByOriginalPostId", error, {
+        postId,
+      });
+      return [];
     }
   }
 }

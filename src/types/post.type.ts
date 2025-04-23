@@ -101,4 +101,5 @@ export type {
   IAuthor,
   IPostResponseDto,
   IRepostRequestDto,
+  PostType,
 };
