@@ -1,4 +1,9 @@
-import mongoose, { DeleteResult, Types, UpdateResult } from "mongoose";
+import mongoose, {
+  ClientSession,
+  DeleteResult,
+  Types,
+  UpdateResult,
+} from "mongoose";
 import { User } from "@models";
 import { IEmoji, ILockStatus, IUser, IUserInput, SkintoneType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
@@ -310,12 +315,20 @@ class UserRepository {
     }
   }
 
-  async removePinnedPost(userId: Types.ObjectId): Promise<UpdateResult | null> {
+  async removePinnedPost(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | null> {
     try {
-      const result = await User.updateOne(
-        { _id: userId },
-        { $unset: { pinnedPost: 1 } } // 필드 제거
-      );
+      const result = session
+        ? await User.updateOne(
+            { _id: userId },
+            { $unset: { pinnedPost: 1 } } // 필드 제거
+          ).session(session)
+        : await User.updateOne(
+            { _id: userId },
+            { $unset: { pinnedPost: 1 } } // 필드 제거
+          );
 
       return result;
     } catch (error) {

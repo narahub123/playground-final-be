@@ -205,6 +205,7 @@ class PostService {
       }
 
       removedPostIds.push(postId);
+
       if (post.type === "repost") {
         const result = await postRepository.removeRepost(
           post.originalPostId!,
@@ -234,6 +235,23 @@ class PostService {
         );
 
         removedPostIds.push(...reposts.map((repost) => repost._id));
+      }
+
+      // 해당 포스트가 pinnedPost 인 경우 pinnedPost 제거하기
+      const user = await userRepository.getUserById(userId);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      if (Boolean(user.pinnedPost) && user.pinnedPost.equals(postId)) {
+        const result = await userRepository.removePinnedPost(user._id, session);
+
+        if (!result || result.modifiedCount === 0)
+          throw new InternalServerError("핀포스트 삭제 중 에러 발생");
+
+        if (result.matchedCount === 0)
+          throw new NotFoundError("사용자 조회 실패");
       }
 
       await session.commitTransaction();
