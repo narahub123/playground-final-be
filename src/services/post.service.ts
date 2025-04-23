@@ -28,12 +28,28 @@ class PostService {
     return newPost;
   }
 
-  async createRepost(post: IRepostRequestDto) {
+  async createRepost(repost: IRepostRequestDto) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const newPost = await postRepository.createRepost(post, session);
+      const originalPost = await postRepository.getPostById(
+        repost.originalPostId
+      );
+
+      if (!originalPost) {
+        throw new NotFoundError("original 포스트 조회 실패");
+      }
+
+      const { originalPostId, _id } = originalPost;
+
+      const modified: IRepostRequestDto = {
+        type: "repost",
+        author: repost.author,
+        originalPostId: originalPostId ? originalPostId : repost.originalPostId,
+      };
+
+      const newPost = await postRepository.createRepost(modified, session);
 
       if (!newPost) {
         throw new InternalServerError(
@@ -45,22 +61,27 @@ class PostService {
         );
       }
 
-      const result = await postRepository.addRepost(
-        post.originalPostId,
-        post.author,
-        session
-      );
+      for (const postId of [repost.originalPostId, originalPostId]) {
 
-      if (!result) {
-        throw new InternalServerError("리포스트 추가 도중 에러 발생");
-      }
+        if (!postId) continue;
 
-      if (result?.matchedCount === 0) {
-        throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
-      }
+        const result = await postRepository.addRepost(
+          postId,
+          modified.author,
+          session
+        );
 
-      if (result?.modifiedCount === 0) {
-        throw new InternalServerError("리포스트 추가 도중 에러 발생");
+        if (!result) {
+          throw new InternalServerError("리포스트 추가 도중 에러 발생");
+        }
+
+        if (result?.matchedCount === 0) {
+          throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
+        }
+
+        if (result?.modifiedCount === 0) {
+          throw new InternalServerError("리포스트 추가 도중 에러 발생");
+        }
       }
 
       await session.commitTransaction();
