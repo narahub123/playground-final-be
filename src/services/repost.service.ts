@@ -43,7 +43,7 @@ class RepostService {
       }))
     );
 
-    return modified;
+    return reposts;
   }
 
   async getRepostCountByPostId(postId: Types.ObjectId): Promise<number> {

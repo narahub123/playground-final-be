@@ -1,8 +1,7 @@
 import { InternalServerError, NotFoundError } from "@errors";
 import { postRepository, repostRepository } from "@repositories";
 import { IPost, IPostRequestDto, IPostResponseDto } from "@types";
-import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
-import repostService from "./repost.service";
+import mongoose, { Types } from "mongoose";
 
 class PostService {
   async createPost(
@@ -29,20 +28,7 @@ class PostService {
   ): Promise<IPostResponseDto[]> {
     const posts = await postRepository.getPostsByAuthor(author);
 
-    const modified = await Promise.all(
-      posts.map(async (post) => ({
-        ...post,
-        actions: {
-          ...post.actions,
-          reposts: {
-            count: await repostRepository.getRepostCountByPostId(post._id),
-            isReposted: await repostService.IsRepostedByUser(author, post._id),
-          },
-        },
-      }))
-    );
-
-    return modified;
+    return posts;
   }
 
   async getPostById(postId: Types.ObjectId): Promise<IPost | null> {

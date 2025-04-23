@@ -264,18 +264,6 @@ const getCurrentUser = asyncWrapper(
 
     const posts = await postService.getPostsByAuthor(user._id);
 
-    const reposts = await repostService.getRepostsByUser(user._id);
-
-    const sorted = [...posts, ...reposts].sort((a, b) => {
-      const dateA = a.repostUser?.repostedAt ?? a.createdAt;
-      const dateB = b.repostUser?.repostedAt ?? b.createdAt;
-
-      const timeA = dateA ? new Date(dateA).getTime() : 0;
-      const timeB = dateB ? new Date(dateB).getTime() : 0;
-
-      return timeB - timeA;
-    });
-
     const response = {
       success: true,
       message:
@@ -288,7 +276,7 @@ const getCurrentUser = asyncWrapper(
         privacy,
         notification,
         display,
-        posts: sorted,
+        posts,
       },
     };
 

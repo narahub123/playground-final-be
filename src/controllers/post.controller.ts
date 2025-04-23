@@ -206,7 +206,7 @@ const addRepost = asyncWrapper(
       success: true,
       message: "Adding repost has succeeded.(재게시 성공)",
       code: "ADD_REPOST_SUCCEEDED",
-      data: { post },
+      // data: { post },
       timestamp: new Date().toISOString(),
     };
 

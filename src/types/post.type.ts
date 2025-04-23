@@ -68,37 +68,21 @@ interface IAuthor {
   followers: string[];
 }
 
-interface IRepostUser {
-  _id: Types.ObjectId;
-  userId: string;
-  username: string;
-  repostId: Types.ObjectId;
-  repostedAt: Date;
-}
-
-interface IPostActionRepost {
-  count: number;
-  isReposted: boolean;
-}
-
-interface IPostResponseActions {
-  comments: string[];
-  reposts: IPostActionRepost;
-  likes: Types.ObjectId[];
-  views: number;
-}
-
 interface IPostResponseDto {
   _id: mongoose.Types.ObjectId;
+  type: PostType;
   author: IAuthor;
   text?: string;
   media?: string[];
   schedule?: Date;
   vote?: IVote;
-  actions: IPostResponseActions;
+  actions: IPostActions;
+  originalPost?: IPostResponseDto;
+  repostedAt?: Date;
+  quotedAt?: Date;
+  commentedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  repostUser?: IRepostUser;
   pin: boolean;
 }
 
