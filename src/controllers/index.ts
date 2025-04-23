@@ -39,8 +39,6 @@ import {
   updatePin,
 } from "./post.controller";
 
-import { deleteRepost, updateRepostPin } from "./repost.controller";
-
 export {
   // user
   checkEmailDuplication,
@@ -79,8 +77,4 @@ export {
   updateLikes,
   deletePost,
   updatePin,
-
-  // repost
-  deleteRepost,
-  updateRepostPin,
 };

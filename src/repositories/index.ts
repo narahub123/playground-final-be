@@ -10,7 +10,6 @@ import loginRecordRepository from "./login-record.repository";
 import emailRepository from "./email.repository";
 import phoneRepository from "./phone.repository";
 import postRepository from "./post.repository";
-import repostRepository from "./repost.repository";
 
 export {
   userRepository,
@@ -25,5 +24,4 @@ export {
   emailRepository,
   phoneRepository,
   postRepository,
-  repostRepository,
 };

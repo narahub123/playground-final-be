@@ -1,11 +1,10 @@
 import { InternalServerError, NotFoundError } from "@errors";
-import { postRepository, repostRepository } from "@repositories";
+import { postRepository } from "@repositories";
 import {
   IPost,
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
-  PostType,
 } from "@types";
 import mongoose, { Types } from "mongoose";
 

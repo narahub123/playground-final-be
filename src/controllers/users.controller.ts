@@ -14,7 +14,6 @@ import {
   notificationService,
   postService,
   privacyService,
-  repostService,
   securityService,
   userService,
 } from "@services";

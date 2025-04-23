@@ -10,7 +10,7 @@ import {
   IPostResponseDto,
   IRepostRequestDto,
 } from "@types";
-import { postService, repostService, userService } from "@services";
+import { postService, userService } from "@services";
 import { JSDOM } from "jsdom";
 import {
   BadRequestError,
