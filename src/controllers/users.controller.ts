@@ -623,6 +623,12 @@ const updateMe = asyncWrapper(
       await userService.updateBookmarks(user._id, postId);
     }
 
+    if (body.pinnedPost) {
+      const pinnedPostId = new mongoose.Types.ObjectId(body.pinnedPost);
+
+      await userService.updatePinnedPost(user._id, pinnedPostId);
+    }
+
     const response: IApiSuccessResponse = {
       success: true,
       message: "User has been updated successfully. (유저 정보 업데이트 성공)",

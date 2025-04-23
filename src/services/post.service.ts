@@ -1,5 +1,5 @@
 import { InternalServerError, NotFoundError } from "@errors";
-import { postRepository } from "@repositories";
+import { postRepository, userRepository } from "@repositories";
 import {
   IPost,
   IPostRequestDto,
@@ -62,7 +62,6 @@ class PostService {
       }
 
       for (const postId of [repost.originalPostId, originalPostId]) {
-
         if (!postId) continue;
 
         const result = await postRepository.addRepost(
@@ -92,6 +91,35 @@ class PostService {
     } finally {
       session.endSession();
     }
+  }
+
+  async getPostsForProfilePage(
+    author: mongoose.Types.ObjectId
+  ): Promise<IPostResponseDto[]> {
+    const posts = await postRepository.getPostsByAuthor(author);
+
+    const user = await userRepository.getUserById(author);
+
+    if (!user) {
+      throw new NotFoundError("사용자를 찾을 수 없습니다.");
+    }
+    const { pinnedPost: pinId } = user;
+
+    if (pinId) {
+      const pinnedPost = posts.find((post) => post._id === pinId);
+
+      if (!pinnedPost) {
+        throw new InternalServerError("포스트 조회 실패");
+      }
+
+      const postsWithoutPin = posts.filter((post) => post._id !== pinId);
+
+      const modified = [pinnedPost, ...postsWithoutPin];
+
+      return modified;
+    }
+
+    return posts;
   }
 
   async getPostsByAuthor(

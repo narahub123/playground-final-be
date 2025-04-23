@@ -152,6 +152,7 @@ interface IUser extends Document {
   recentEmojis: IEmoji[];
   bookmarks: Types.ObjectId[];
   likes: Types.ObjectId[];
+  pinnedPost: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -173,6 +174,7 @@ interface UserDTO {
   skintoneType: SkintoneType;
   recentEmoji: IEmoji;
   bookmarks: string;
+  pinnedPost: string;
 }
 
 export type {

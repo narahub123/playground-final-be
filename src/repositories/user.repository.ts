@@ -1,4 +1,4 @@
-import mongoose, { Types, UpdateResult } from "mongoose";
+import mongoose, { DeleteResult, Types, UpdateResult } from "mongoose";
 import { User } from "@models";
 import { IEmoji, ILockStatus, IUser, IUserInput, SkintoneType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
@@ -289,6 +289,39 @@ class UserRepository {
       // 에러 발생 시, 에러 처리 핸들러 호출
       mongoDBErrorHandler("removeBookmark", error, { userId, postId });
       return undefined;
+    }
+  }
+
+  async addPinnedPost(
+    userId: Types.ObjectId,
+    pinnedPost: Types.ObjectId
+  ): Promise<UpdateResult | null> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        { $set: { pinnedPost } }
+      );
+
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("removeBookmark", error, { userId, pinnedPost });
+      return null;
+    }
+  }
+
+  async removePinnedPost(userId: Types.ObjectId): Promise<UpdateResult | null> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        { $unset: { pinnedPost: 1 } } // 필드 제거
+      );
+
+      return result;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("removeBookmark", error, { userId });
+      return null;
     }
   }
 }

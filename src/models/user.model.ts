@@ -249,6 +249,11 @@ const UserSchema = new mongoose.Schema<IUser>(
         message: "중복된 좋아요는 허용되지 않습니다.",
       },
     },
+    pinnedPost: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: false,
+    },
   },
   {
     timestamps: true,

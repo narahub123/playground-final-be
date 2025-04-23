@@ -13,7 +13,7 @@ import {
   userRepository,
 } from "@repositories";
 import { Email } from "@models";
-import { Types } from "mongoose";
+import { Types, UpdateResult } from "mongoose";
 
 class UserService {
   /**
@@ -374,6 +374,33 @@ class UserService {
     }
 
     return hasBookmark ? false : true;
+  }
+
+  async updatePinnedPost(
+    userId: Types.ObjectId,
+    pinnedPost: Types.ObjectId
+  ): Promise<void> {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    const result = user.pinnedPost?.equals(pinnedPost)
+      ? await userRepository.removePinnedPost(userId)
+      : await userRepository.addPinnedPost(userId, pinnedPost);
+
+    if (!result) {
+      throw new InternalServerError("핀포스트 삭제 처리 중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("핀포스트 삭제 처리 중 에러 발생");
+    }
   }
 }
 
