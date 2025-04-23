@@ -39,7 +39,7 @@ import {
   updatePin,
 } from "./post.controller";
 
-import { deleteRepost } from "./repost.controller";
+import { deleteRepost, updateRepostPin } from "./repost.controller";
 
 export {
   // user
@@ -82,4 +82,5 @@ export {
 
   // repost
   deleteRepost,
+  updateRepostPin,
 };

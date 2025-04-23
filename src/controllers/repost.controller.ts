@@ -42,4 +42,41 @@ const deleteRepost = asyncWrapper(
   }
 );
 
-export { deleteRepost };
+const updateRepostPin = asyncWrapper(
+  "updateRepostPin",
+  "Updating pin failed. (포스트 핀 업데이트 실패)",
+  "UPDATE_PIN_FAILED",
+  async (req: Request, res: Response) => {
+    const { repostid } = req.params;
+    const { _id } = req.user;
+
+    if (!repostid) {
+      throw new BadRequestError("repostid 필요");
+    }
+
+    const repostId = new mongoose.Types.ObjectId(repostid);
+
+    const repost = await repostService.findRepostById(repostId);
+
+    if (!repost) {
+      throw new NotFoundError("재게재 조회 실패");
+    }
+
+    if (!repost.user.equals(_id)) {
+      throw new UnauthorizedError("핀 업데이트 권한 없음");
+    }
+
+    await repostService.updatePin(repostId);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Pin updated successfully.(포스트 핀 업데이트 성공)",
+      code: "UPDATE_PIN_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
+export { deleteRepost, updateRepostPin };

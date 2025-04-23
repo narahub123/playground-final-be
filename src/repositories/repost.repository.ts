@@ -1,7 +1,7 @@
 import { Post, Repost } from "@models";
 import { IAuthor, IPostResponseDto, IRepost } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import { DeleteResult, Types } from "mongoose";
+import { DeleteResult, Types, UpdateResult } from "mongoose";
 
 class RepostRepository {
   async addRepost(
@@ -72,8 +72,6 @@ class RepostRepository {
           },
         },
       ]);
-
-      console.log("result", result[0]);
 
       return result[0] || null;
     } catch (error) {
@@ -208,6 +206,26 @@ class RepostRepository {
       mongoDBErrorHandler("deleteRepost", error, {
         repostId,
       });
+      return undefined;
+    }
+  }
+
+  async updatePin(repostId: Types.ObjectId): Promise<UpdateResult | undefined> {
+    try {
+      return await Repost.updateOne({ _id: repostId }, [
+        {
+          $set: {
+            pin: {
+              $not: "$pin",
+            },
+          },
+        },
+      ]);
+    } catch (error) {
+      mongoDBErrorHandler("updatePin", error, {
+        repostId,
+      });
+
       return undefined;
     }
   }

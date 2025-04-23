@@ -1,4 +1,4 @@
-import { InternalServerError } from "@errors";
+import { InternalServerError, NotFoundError } from "@errors";
 import { repostRepository } from "@repositories";
 import { IPostResponseDto, IRepost } from "@types";
 import { Types } from "mongoose";
@@ -77,6 +77,26 @@ class RepostService {
 
     if (result.deletedCount === 0) {
       throw new InternalServerError("재게시 삭제 도중 에러 발생");
+    }
+  }
+
+  async updatePin(repostId: Types.ObjectId): Promise<void> {
+    const repost = await repostRepository.findRepostById(repostId);
+
+    if (!repost) {
+      throw new NotFoundError("리포스트 조회 실패");
+    }
+
+    const result = await repostRepository.updatePin(repostId);
+
+    if (!result) {
+      throw new InternalServerError("핀 업데이트 중 에러 발생");
+    }
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("리포스트 조회 실패");
+    }
+    if (result.matchedCount === 0) {
+      throw new InternalServerError("핀 업데이트 중 에러 발생");
     }
   }
 }
