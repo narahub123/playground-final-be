@@ -71,6 +71,11 @@ const PostSchema = new mongoose.Schema<IPost>(
         views: 0,
       }),
     },
+    pin: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     timestamps: true,

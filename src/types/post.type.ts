@@ -32,6 +32,7 @@ interface IPost extends Document {
   schedule?: Date;
   vote?: IVote;
   actions: IPostActions;
+  pin: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -77,6 +78,7 @@ interface IPostResponseDto {
   createdAt?: Date;
   updatedAt?: Date;
   repostUser?: IRepostUser;
+  pin: boolean;
 }
 
 export type {
