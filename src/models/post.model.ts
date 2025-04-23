@@ -15,6 +15,10 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
       type: [String],
       default: [],
     },
+    reposts: {
+      type: [Schema.Types.ObjectId],
+      default: [],
+    },
     likes: {
       type: [Schema.Types.ObjectId],
       default: [],
@@ -29,6 +33,12 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
 
 const PostSchema = new mongoose.Schema<IPost>(
   {
+    type: {
+      type: String,
+      enum: ["post", "repost", "quote", "comment"],
+      default: "post",
+      required: true,
+    },
     author: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -36,9 +46,11 @@ const PostSchema = new mongoose.Schema<IPost>(
     },
     text: {
       type: String,
+      required: false,
     },
     media: {
       type: [String],
+      required: false,
     },
     schedule: {
       type: Date,
@@ -61,6 +73,7 @@ const PostSchema = new mongoose.Schema<IPost>(
       ),
       required: false,
     },
+
     actions: {
       type: PostActionsSchema,
       required: true,
@@ -71,6 +84,51 @@ const PostSchema = new mongoose.Schema<IPost>(
         views: 0,
       }),
     },
+
+    originalPostId: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: function (this: IPost) {
+        return this.type !== "post";
+      },
+    },
+
+    repostedAt: {
+      type: Date,
+      required: function (this: IPost) {
+        return this.type === "repost" && !!this.originalPostId;
+      },
+      default: function (this: IPost) {
+        return this.type === "repost" && !!this.originalPostId
+          ? new Date()
+          : undefined;
+      },
+    },
+
+    quotedAt: {
+      type: Date,
+      required: function (this: IPost) {
+        return this.type === "quote" && !!this.originalPostId;
+      },
+      default: function (this: IPost) {
+        return this.type === "quote" && !!this.originalPostId
+          ? new Date()
+          : undefined;
+      },
+    },
+
+    commentedAt: {
+      type: Date,
+      required: function (this: IPost) {
+        return this.type === "comment" && !!this.originalPostId;
+      },
+      default: function (this: IPost) {
+        return this.type === "comment" && !!this.originalPostId
+          ? new Date()
+          : undefined;
+      },
+    },
+
     pin: {
       type: Boolean,
       default: false,

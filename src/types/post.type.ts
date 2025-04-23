@@ -20,21 +20,42 @@ interface IPostRequestDto {
 
 interface IPostActions {
   comments: string[];
+  reposts: Types.ObjectId[];
   likes: Types.ObjectId[];
   views: number;
 }
 
+type PostType = "post" | "repost" | "quote" | "comment";
+
 interface IPost extends Document {
-  _id: mongoose.Types.ObjectId;
-  author: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
+
+  type: PostType;
+
+  author: Types.ObjectId;
+
   text?: string;
   media?: string[];
   schedule?: Date;
   vote?: IVote;
+
   actions: IPostActions;
-  pin: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+
+  originalPostId?: Types.ObjectId;
+
+  // repost인 경우
+  repostedAt?: Date;
+
+  // quote인 경우
+  quotedAt?: Date;
+
+  // comment인 경우
+  commentedAt?: Date;
+
+  pin: boolean; // 전체 고정을 하는 경우
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface IAuthor {
