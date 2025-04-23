@@ -135,6 +135,17 @@ class PostRepository {
       return undefined;
     }
   }
+
+  async updatePin(postId: Types.ObjectId): Promise<UpdateResult | undefined> {
+    try {
+      return await Post.updateOne({ _id: postId }, [
+        { $set: { pin: { $not: "$pin" } } },
+      ]);
+    } catch (error) {
+      mongoDBErrorHandler("updatePin", error, { postId });
+      return undefined;
+    }
+  }
 }
 
 export default new PostRepository();

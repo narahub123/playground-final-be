@@ -6,6 +6,7 @@ import {
   deletePost,
   getPostPreview,
   updateLikes,
+  updatePin,
   updatePostVote,
 } from "@controllers";
 
@@ -14,6 +15,7 @@ export default (router: Router) => {
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.post("/posts/:postId/repost", authTokenMiddleware, addRepost);
   router.patch("/posts/:postId/likes", authTokenMiddleware, updateLikes);
+  router.patch("/posts/:postid/pin", authTokenMiddleware, updatePin);
   router.post(
     `/posts/:postId/:optionIndex`,
     authTokenMiddleware,

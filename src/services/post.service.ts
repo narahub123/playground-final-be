@@ -126,6 +126,28 @@ class PostService {
       )
     );
   }
+
+  async updatePin(postId: Types.ObjectId) {
+    const post = await this.getPostById(postId);
+
+    if (!post) {
+      throw new NotFoundError("포스트를 찾을 수 없습니다.");
+    }
+
+    const result = await postRepository.updatePin(postId);
+
+    if (!result) {
+      throw new InternalServerError("핀 처리 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("포스트를 찾을 수 없습니다.");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("핀 처리 도중 에러 발생");
+    }
+  }
 }
 
 export default new PostService();

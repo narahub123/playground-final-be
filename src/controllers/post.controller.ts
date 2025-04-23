@@ -299,6 +299,46 @@ const deletePost = asyncWrapper(
   }
 );
 
+const updatePin = asyncWrapper(
+  "updatePin",
+  "Updating pin failed. (포스트 핀 업데이트 실패)",
+  "UPDATE_PIN_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const user = req.user;
+
+    if (!postid) {
+      throw new BadRequestError("postid 필요");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const post = await postService.getPostById(postId);
+
+    if (!post) {
+      throw new NotFoundError("포스트를 찾을 수 없음");
+    }
+
+    const user_id = post.author._id;
+
+    // 사용자 _id와 작성자 _id가 일치하지 않는 경우
+    if (!user._id.equals(user_id)) {
+      throw new UnauthorizedError("권한 없음");
+    }
+
+    await postService.updatePin(postId);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Pin updated successfully.(포스트 핀 업데이트 성공)",
+      code: "UPDATE_PIN_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -306,4 +346,5 @@ export {
   addRepost,
   updateLikes,
   deletePost,
+  updatePin,
 };
