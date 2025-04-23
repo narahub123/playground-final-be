@@ -212,6 +212,12 @@ class PostRepository {
             originalPost: 1, // 없으면 null
           },
         },
+
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
       ]);
 
       return posts;
