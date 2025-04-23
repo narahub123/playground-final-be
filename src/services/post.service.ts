@@ -1,6 +1,11 @@
 import { InternalServerError, NotFoundError } from "@errors";
 import { postRepository, repostRepository } from "@repositories";
-import { IPost, IPostRequestDto, IPostResponseDto } from "@types";
+import {
+  IPost,
+  IPostRequestDto,
+  IPostResponseDto,
+  IRepostRequestDto,
+} from "@types";
 import mongoose, { Types } from "mongoose";
 
 class PostService {
@@ -16,6 +21,22 @@ class PostService {
         "POST_CREATION_ERROR",
         {
           session: "POST_CREATION_FAILED",
+        }
+      );
+    }
+
+    return newPost;
+  }
+
+  async createRepost(post: IRepostRequestDto) {
+    const newPost = await postRepository.createRepost(post);
+
+    if (!newPost) {
+      throw new InternalServerError(
+        "Failed to create repost. (리포스트 생성 실패)",
+        "REPOST_CREATION_ERROR",
+        {
+          repost: "REPOST_CREATION_FAILED",
         }
       );
     }

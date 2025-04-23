@@ -8,6 +8,7 @@ import {
   IVote,
   IPostRequestDto,
   IPostResponseDto,
+  IRepostRequestDto,
 } from "@types";
 import { postService, repostService, userService } from "@services";
 import { JSDOM } from "jsdom";
@@ -188,15 +189,24 @@ const addRepost = asyncWrapper(
   "Adding repost failed (재게시 실패)",
   "ADD_REPOST_FAILED",
   async (req: Request, res: Response) => {
-    const { postId } = req.params;
-    const { text } = req.body;
-    const { _id: user } = req.user;
+    const { postid } = req.params;
+    const user = req.user;
 
-    const postid = new mongoose.Types.ObjectId(postId);
+    if (!postid) {
+      throw new BadRequestError("postid 필수");
+    }
 
-    const post = await repostService.addRepost(postid, user, text);
+    const postId = new mongoose.Types.ObjectId(postid);
 
-    if (!post) {
+    const repost: IRepostRequestDto = {
+      type: "repost",
+      author: user._id,
+      originalPostId: postId,
+    };
+
+    const newPost = await postService.createRepost(repost);
+
+    if (!newPost) {
       throw new InternalServerError("재게시 도중 에러 발생");
     }
 
@@ -206,7 +216,7 @@ const addRepost = asyncWrapper(
       success: true,
       message: "Adding repost has succeeded.(재게시 성공)",
       code: "ADD_REPOST_SUCCEEDED",
-      // data: { post },
+      data: { post: newPost },
       timestamp: new Date().toISOString(),
     };
 

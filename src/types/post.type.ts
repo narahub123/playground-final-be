@@ -18,6 +18,12 @@ interface IPostRequestDto {
   vote?: IVote;
 }
 
+interface IRepostRequestDto {
+  type: "repost";
+  author: Types.ObjectId;
+  originalPostId: Types.ObjectId;
+}
+
 interface IPostActions {
   comments: string[];
   reposts: Types.ObjectId[];
@@ -94,4 +100,5 @@ export type {
   IPostActions,
   IAuthor,
   IPostResponseDto,
+  IRepostRequestDto,
 };

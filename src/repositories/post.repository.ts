@@ -4,9 +4,10 @@ import {
   IPost,
   IPostRequestDto,
   IPostResponseDto,
+  IRepostRequestDto,
   IUser,
 } from "@types";
-import { mapPostToIPostResponseDto, mongoDBErrorHandler } from "@utils";
+import { mongoDBErrorHandler } from "@utils";
 import mongoose, {
   DeleteResult,
   Types,
@@ -25,6 +26,100 @@ class PostRepository {
       return newPost[0] || undefined;
     } catch (error) {
       mongoDBErrorHandler("createPost", error, { post });
+    }
+  }
+
+  async createRepost(
+    post: IRepostRequestDto
+  ): Promise<IPostResponseDto | null> {
+    try {
+      const newPost = await Post.create(post);
+
+      const posts = await Post.aggregate<IPostResponseDto>([
+        { $match: { _id: newPost._id } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "author",
+            foreignField: "_id",
+            as: "postAuthor",
+          },
+        },
+        {
+          $unwind: {
+            path: "$postAuthor",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "posts",
+            localField: "originalPostId",
+            foreignField: "_id",
+            as: "originalPost",
+          },
+        },
+        {
+          $unwind: { path: "$originalPost", preserveNullAndEmptyArrays: true },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "originalPost.author._id",
+            foreignField: "_id",
+            as: "originalPostAuthor",
+          },
+        },
+        {
+          $unwind: {
+            path: "$originalPostAuthor",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: "$_id",
+            type: "$type",
+            text: "$text",
+            media: "$media",
+            schedule: "$schedule",
+            vote: "$vote",
+            actions: "$actions",
+            pin: "$pin",
+            createdAt: "$createdAt",
+            updatedAt: "$updatedAt",
+            author: {
+              _id: "$postAuthor._id",
+              userId: "$postAuthor.userId",
+              username: "$postAuthor.username",
+              profileImage: "$postAuthor.profileImage",
+            },
+            originalPost: {
+              _id: "$originalPost._id",
+              type: "$originalPost.type",
+              text: "$originalPost.text",
+              media: "$originalPost.media",
+              schedule: "$originalPost.schedule",
+              vote: "$originalPost.vote",
+              actions: "$originalPost.actions",
+              pin: "$originalPost.pin",
+              createdAt: "$originalPost.createdAt",
+              updatedAt: "$originalPost.updatedAt",
+              author: {
+                _id: "$originalPostAuthor._id",
+                userId: "$originalPostAuthor.userId",
+                username: "$originalPostAuthor.username",
+                profileImage: "$originalPostAuthor.profileImage",
+              },
+            },
+          },
+        },
+      ]);
+
+      return posts[0] || null;
+    } catch (error) {
+      mongoDBErrorHandler("createRepost", error, { post });
+      return null;
     }
   }
 
