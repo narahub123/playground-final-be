@@ -5,6 +5,7 @@ interface IRepost extends Document {
   post: Types.ObjectId;
   user: Types.ObjectId;
   text?: string;
+  pin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

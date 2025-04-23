@@ -17,6 +17,11 @@ const RepostSchema = new mongoose.Schema<IRepost>(
       type: String,
       required: false,
     },
+    pin: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     versionKey: false,
