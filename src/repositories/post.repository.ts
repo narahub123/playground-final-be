@@ -1,14 +1,13 @@
 import { Post } from "@models";
 import {
-  IAuthor,
   IPost,
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
-  IUser,
 } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import mongoose, {
+  ClientSession,
   DeleteResult,
   Types,
   UpdateResult,
@@ -30,13 +29,14 @@ class PostRepository {
   }
 
   async createRepost(
-    post: IRepostRequestDto
+    post: IRepostRequestDto,
+    session: ClientSession
   ): Promise<IPostResponseDto | null> {
     try {
-      const newPost = await Post.create(post);
+      const newPost = await Post.create([post], { session });
 
       const posts = await Post.aggregate<IPostResponseDto>([
-        { $match: { _id: newPost._id } },
+        { $match: { _id: newPost[0]?._id } },
 
         // 1. 작성자 정보
         {
@@ -320,6 +320,51 @@ class PostRepository {
       ]);
     } catch (error) {
       mongoDBErrorHandler("updatePin", error, { postId });
+      return undefined;
+    }
+  }
+
+  async addRepost(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        {
+          $addToSet: {
+            ["actions.reposts"]: userId,
+          },
+        }
+      ).session(session);
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addRepost", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
+
+  async removeRepost(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { $pull: { [`actions.reposts`]: userId } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeRepost", error, {
+        postId,
+        userId,
+      });
       return undefined;
     }
   }

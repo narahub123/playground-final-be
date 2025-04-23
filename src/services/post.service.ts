@@ -29,19 +29,48 @@ class PostService {
   }
 
   async createRepost(post: IRepostRequestDto) {
-    const newPost = await postRepository.createRepost(post);
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (!newPost) {
-      throw new InternalServerError(
-        "Failed to create repost. (리포스트 생성 실패)",
-        "REPOST_CREATION_ERROR",
-        {
-          repost: "REPOST_CREATION_FAILED",
-        }
+    try {
+      const newPost = await postRepository.createRepost(post, session);
+
+      if (!newPost) {
+        throw new InternalServerError(
+          "Failed to create repost. (리포스트 생성 실패)",
+          "REPOST_CREATION_ERROR",
+          {
+            repost: "REPOST_CREATION_FAILED",
+          }
+        );
+      }
+
+      const result = await postRepository.addRepost(
+        post.originalPostId,
+        post.author,
+        session
       );
-    }
 
-    return newPost;
+      if (!result) {
+        throw new InternalServerError("리포스트 추가 도중 에러 발생");
+      }
+
+      if (result?.matchedCount === 0) {
+        throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
+      }
+
+      if (result?.modifiedCount === 0) {
+        throw new InternalServerError("리포스트 추가 도중 에러 발생");
+      }
+
+      await session.commitTransaction();
+      return newPost;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 
   async getPostsByAuthor(
