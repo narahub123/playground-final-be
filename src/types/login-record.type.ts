@@ -6,7 +6,7 @@ import { IDevice, ILocation } from "@types";
  */
 interface ILoginRecordInput {
   /** 사용자 ID */
-  userId: string;
+  userId: Types.ObjectId;
 
   /** 활성 세션 ID */
   activeSessionId: Types.ObjectId;
@@ -52,7 +52,7 @@ interface ILoginRecord extends Document {
   activeSessionId: Types.ObjectId;
 
   /** 사용자 ID */
-  userId: string;
+  userId: Types.ObjectId;
 
   /** 사용자 장치 정보 */
   device: IDevice;

@@ -10,7 +10,9 @@ class LoginRecordRepository {
    * @param {string} userId - 로그인 기록을 조회할 사용자의 ID.
    * @returns {Promise<ILoginRecord[]>} - 사용자의 로그인 기록 배열. 오류 발생 시 빈 배열을 반환.
    */
-  async getLoginRecordsByUserId(userId: string): Promise<ILoginRecord[]> {
+  async getLoginRecordsByUserId(
+    userId: Types.ObjectId
+  ): Promise<ILoginRecord[]> {
     try {
       // userId로 로그인 기록 검색
       const loginRecords = await LoginRecord.find({ userId });

@@ -252,7 +252,7 @@ const getCurrentUser = asyncWrapper(
     );
 
     const loginRecords = await loginRecordService.getLoginRecordsByUserId(
-      user.userId
+      user._id
     );
 
     const securityInfo = {

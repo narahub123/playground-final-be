@@ -28,7 +28,7 @@ class LoginRecordService {
    * - 해당 사항이 없다면, null 값이 포함된 객체 반환
    */
   async detectNewLoginAttempt(loginInfo: {
-    userId: string;
+    userId: Types.ObjectId;
     device: IDevice;
     ip: string;
     location: ILocation;
@@ -114,7 +114,9 @@ class LoginRecordService {
     }
   }
 
-  async getLoginRecordsByUserId(userId: string): Promise<ILoginRecord[]> {
+  async getLoginRecordsByUserId(
+    userId: Types.ObjectId
+  ): Promise<ILoginRecord[]> {
     const loginRecords = await loginRecordRepository.getLoginRecordsByUserId(
       userId
     );

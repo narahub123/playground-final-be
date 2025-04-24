@@ -341,7 +341,7 @@ const loginUser = asyncWrapper(
 
     // 새로운 로그인 시도 확인
     const newLoginAttempt = await loginRecordService.detectNewLoginAttempt({
-      userId: user.userId,
+      userId: user._id,
       device,
       ip,
       location,
@@ -349,7 +349,7 @@ const loginUser = asyncWrapper(
 
     // 로그인 기록을 저장
     await loginRecordService.createLoginRecord({
-      userId: user.userId,
+      userId: user._id,
       activeSessionId,
       device,
       ip,
