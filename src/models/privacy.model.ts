@@ -1,10 +1,10 @@
 import { IPrivacy } from "@types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const privacySchema = new mongoose.Schema<IPrivacy>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true,

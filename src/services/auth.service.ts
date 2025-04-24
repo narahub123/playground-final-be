@@ -11,7 +11,7 @@ import {
 } from "@types";
 import { comparePassword } from "@utils";
 import loginFailureService from "./login-failure.service";
-import { UnauthorizedError } from "@errors";
+import { InternalServerError, UnauthorizedError } from "@errors";
 import mongoose, { Types } from "mongoose";
 import {
   displayRepository,
@@ -102,7 +102,12 @@ class AuthService {
       newPhone,
       session,
     } = userInfo;
-    await userRepository.createUser(newUser, { session });
+    const user = await userRepository.createUser(newUser, { session });
+
+    if (!user) {
+      throw new InternalServerError("유저 생성 실패");
+    }
+
     if (newEmail) await emailRepository.createEmail(newEmail, { session });
     if (newPhone) await phoneRepository.createPhone(newPhone, { session });
     await securityRepository.createSecurity(userId, { session });
@@ -110,7 +115,7 @@ class AuthService {
       session,
     });
     await displayRepository.createDisplay(newDisplay, { session });
-    await privacyRepository.createPrivacy(userId, { session });
+    await privacyRepository.createPrivacy(user._id, { session });
   }
 
   // 로그아웃

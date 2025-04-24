@@ -1,9 +1,10 @@
 import { NotFoundError } from "@errors";
 import { privacyRepository } from "@repositories";
 import { IPrivacy } from "@types";
+import { Types } from "mongoose";
 
 class PrivacyService {
-  async getPrivacyByUserId(userId: string): Promise<IPrivacy> {
+  async getPrivacyByUserId(userId: Types.ObjectId): Promise<IPrivacy> {
     const privacy = await privacyRepository.getPrivacyByUserId(userId);
 
     if (privacy === null) {

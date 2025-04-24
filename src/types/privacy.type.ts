@@ -24,7 +24,7 @@ type ReplyOptionType = "all" | "followings" | "authenticated" | "mentioned";
 
 interface IPrivacy extends Document {
   _id: Types.ObjectId;
-  userId: string;
+  userId: Types.ObjectId;
   isPostPrivate: boolean;
   isVideoProtected: boolean;
   taggingSettings: ITaggingSettings;

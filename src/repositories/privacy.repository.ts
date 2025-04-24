@@ -1,11 +1,11 @@
 import { Privacy } from "@models";
 import { IPrivacy } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 class PrivacyRepository {
   async createPrivacy(
-    userId: string,
+    userId: Types.ObjectId,
     options?: { session: mongoose.ClientSession }
   ): Promise<IPrivacy | undefined> {
     try {
@@ -17,7 +17,7 @@ class PrivacyRepository {
     }
   }
 
-  async getPrivacyByUserId(userId: string): Promise<IPrivacy | null> {
+  async getPrivacyByUserId(userId: Types.ObjectId): Promise<IPrivacy | null> {
     try {
       const privacy = await Privacy.findOne({ userId });
 

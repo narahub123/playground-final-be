@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
-import {
-  BadRequestError,
-  CustomAPIError,
-  InternalServerError,
-  UnauthorizedError,
-} from "@errors";
+import { BadRequestError, UnauthorizedError } from "@errors";
 import { asyncWrapper } from "@middlewares";
 import {
   verifyAccountLock,
