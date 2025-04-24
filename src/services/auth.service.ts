@@ -44,7 +44,7 @@ class AuthService {
   async validatePasswordAndHandleLoginFailure(
     password: string,
     savedPassword: string,
-    userId: string,
+    userId: Types.ObjectId,
     device: IDevice,
     ip: string,
     location: ILocation

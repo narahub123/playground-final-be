@@ -293,7 +293,7 @@ const loginUser = asyncWrapper(
     await authService.validatePasswordAndHandleLoginFailure(
       password,
       user.password,
-      user.userId,
+      user._id,
       device,
       ip,
       location
@@ -357,7 +357,7 @@ const loginUser = asyncWrapper(
     });
 
     // 로그인 성공 시 Normal 로그인 실패 삭제
-    await loginFailureService.clearNormalLoginFailures(user.userId);
+    await loginFailureService.clearNormalLoginFailures(user._id);
 
     // refresh token을 쿠키에 저장 (보안 설정 포함)
     setRefreshTokenCookie(res, refreshToken);

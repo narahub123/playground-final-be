@@ -14,7 +14,7 @@ type LoginFailureType = "Normal" | "BruteForce";
  */
 interface ILoginFailureInput {
   /** 사용자 ID */
-  userId: string;
+  userId: Types.ObjectId;
 
   /** 사용자 장치 정보 */
   device: IDevice;
@@ -34,7 +34,7 @@ interface ILoginFailure extends Document {
   _id: Types.ObjectId;
 
   /** 사용자 ID */
-  userId: string;
+  userId: Types.ObjectId;
 
   /** 사용자 장치 정보 */
   device: IDevice;

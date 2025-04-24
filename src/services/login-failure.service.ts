@@ -20,7 +20,7 @@ class LoginFailureService {
    * @returns {Types.ObjectId[]} 특정 시간 내에 실패한 로그인 기록의 _id 배열
    */
   async getLoginFailureIdsInDuration(
-    userId: string
+    userId: Types.ObjectId
   ): Promise<Types.ObjectId[]> {
     // 사용자의 로그인 실패 기록 가져오기
     const loginFailures = await loginFailureRepository.getLoginFailuresByUserId(
@@ -79,7 +79,7 @@ class LoginFailureService {
    * @param {string} userId - 로그인 실패 기록을 확인할 사용자 ID
    * @returns {Promise<boolean>} 일반 로그인 실패 횟수가 기준을 초과하면 true, 아니면 false
    */
-  async isTooManyLoginFailures(userId: string): Promise<boolean> {
+  async isTooManyLoginFailures(userId: Types.ObjectId): Promise<boolean> {
     // 사용자의 로그인 실패 기록 가져오기
     const loginFailures = await loginFailureRepository.getLoginFailuresByUserId(
       userId
@@ -164,7 +164,7 @@ class LoginFailureService {
    *
    * @throws {CustomAPIError} 데이터베이스 오류가 발생하면 적절한 에러를 던진다.
    */
-  async clearNormalLoginFailures(userId: string): Promise<void> {
+  async clearNormalLoginFailures(userId: Types.ObjectId): Promise<void> {
     // 주어진 사용자 ID에 대한 로그인 실패 기록 가져오기
     const loginFailures = await loginFailureRepository.getLoginFailuresByUserId(
       userId

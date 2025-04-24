@@ -1,5 +1,5 @@
 import { LoginFailure } from "@models";
-import { IDevice, ILocation, ILoginFailure, ILoginFailureInput } from "@types";
+import { ILoginFailure, ILoginFailureInput } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import { UpdateWriteOpResult } from "mongoose";
 import { Types } from "mongoose";
@@ -39,7 +39,9 @@ class LoginFailureRepository {
    *          로그인 실패 기록이 없으면 빈 배열을 반환합니다.
    * @throws {Error} MongoDB 처리 중 발생하는 예외를 처리합니다.
    */
-  async getLoginFailuresByUserId(userId: string): Promise<ILoginFailure[]> {
+  async getLoginFailuresByUserId(
+    userId: Types.ObjectId
+  ): Promise<ILoginFailure[]> {
     try {
       // 사용자 ID에 해당하는 로그인 실패 기록을 조회
       const loginFailures = await LoginFailure.find({ userId });

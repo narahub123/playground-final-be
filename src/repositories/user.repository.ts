@@ -105,11 +105,14 @@ class UserRepository {
    * @throws {Error} MongoDB 처리 중 발생하는 예외를 처리합니다.
    */
   async updateLockStatus(
-    userId: string,
+    userId: Types.ObjectId,
     lockStatus: ILockStatus
   ): Promise<UpdateWriteOpResult | undefined> {
     try {
-      const result = await User.updateOne({ userId }, { $set: { lockStatus } });
+      const result = await User.updateOne(
+        { _id: userId },
+        { $set: { lockStatus } }
+      );
 
       // 업데이트 결과 반환
       return result;

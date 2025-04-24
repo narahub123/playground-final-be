@@ -139,7 +139,7 @@ class UserService {
    * @param lockReason - 계정을 잠그는 이유 (예: 비정상적인 로그인 시도, 로그인 실패 횟수 초과 등)
    * @throws {LockedError} 계정 잠금 이유에 해당하는 에러를 던집니다.
    */
-  async lockAccount(userId: string, lockReason: LockReasonType) {
+  async lockAccount(userId: Types.ObjectId, lockReason: LockReasonType) {
     // 계정 잠금 이유에 따른 에러 메시지를 설정
     const errorMessages: Record<LockReasonType, string> = {
       BRUTE_FORCE_DETECTED:
