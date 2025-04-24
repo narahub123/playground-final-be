@@ -9,7 +9,6 @@ import { connectDB } from "@utils"; // 데이터베이스 연결을 위한 유�
 import { errorHandler } from "@middlewares"; // 에러 처리 미들웨어
 import routes from "@routes"; // 라우팅 처리 모듈
 import { v2 as cloudinary } from "cloudinary";
-import { displayRepository, notificationRepository } from "@repositories";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -45,28 +44,6 @@ app.use(compression()); // 클라이언트로 보내는 응답 데이터를 gzip
 
 // 쿠키 파싱 미들웨어 (클라이언트의 쿠키를 쉽게 다루기 위해)
 app.use(cookieParser()); // 클라이언트에서 보낸 쿠키를 req.cookies 객체에 저장
-
-// ✅ 비동기 함수로 서버 시작 감싸기
-// const startServer = async () => {
-//   try {
-//     await connectDB(); // DB 먼저 연결
-
-//     await notificationRepository.updateUserIds(); // userId 마이그레이션
-
-//     app.use("/", routes()); // 라우터 설정
-//     app.use(errorHandler); // 에러 핸들러 설정
-
-//     const PORT = process.env.PORT || 3000;
-//     app.listen(PORT, () => {
-//       console.log(`서버가 포트 ${PORT}에 연결됨`);
-//     });
-//   } catch (error) {
-//     console.error("서버 시작 중 에러 발생:", error);
-//     process.exit(1); // 에러 발생 시 프로세스 종료
-//   }
-// };
-
-// startServer(); // 실행
 
 // 데이터베이스 연결 (MongoDB와 같은 데이터베이스 연결 함수)
 connectDB(); // 데이터베이스에 연결 (예: MongoDB)

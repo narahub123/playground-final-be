@@ -4,7 +4,7 @@ import { activeSessionService, userService } from "@services";
 import { createAccessToken } from "@utils";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { isValidObjectId, Types } from "mongoose";
+import mongoose, { isValidObjectId, Types } from "mongoose";
 import { handleTokenExpirationLogout } from "utils/handleLogout";
 
 // 인증 토큰 미들웨어
@@ -99,8 +99,10 @@ const authTokenMiddleware = async (
     // 액세스 토큰을 검증하여 사용자 정보 추출
     const decoded = jwt.verify(accessToken, secret) as JwtPayload;
 
+    const userId = Types.ObjectId.createFromHexString(decoded.userId);
+
     // 사용자 정보 조회
-    const user = await userService.getUserByUserId(decoded.userId);
+    const user = await userService.getUserById(userId);
 
     // 사용자가 없으면 로그아웃 처리
     if (user === null) {
