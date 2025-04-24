@@ -44,6 +44,44 @@ class PrivacyRepository {
       return undefined;
     }
   }
+
+  async addMutedUser(
+    userId: Types.ObjectId,
+    opponent: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        { userId },
+        {
+          $addToSet: { mutedUsers: opponent },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addMutedUser", error, { userId, opponent });
+      return undefined;
+    }
+  }
+
+  async removeMutedUser(
+    userId: Types.ObjectId,
+    opponent: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        { userId },
+        {
+          $pull: { mutedUsers: opponent },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeMutedUser", error, { userId, opponent });
+      return undefined;
+    }
+  }
 }
 
 export default new PrivacyRepository();

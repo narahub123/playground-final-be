@@ -34,7 +34,7 @@ interface IPrivacy extends Document {
   topics: string[];
   interests: string[];
   blockedUsers: string[];
-  mutedUsers: string[];
+  mutedUsers: Types.ObjectId[];
   mutedWords: string[];
   muteSettings: IMuteSettings;
   messageAllowSettings: MessageAllowSettingsType;
@@ -54,6 +54,7 @@ interface IPrivacy extends Document {
 
 interface IPrivacyDto {
   replyOption: ReplyOptionType;
+  mutedUser: Types.ObjectId;
 }
 
 export type {

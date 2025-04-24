@@ -1,5 +1,5 @@
 import { IPrivacy } from "@types";
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 const privacySchema = new mongoose.Schema<IPrivacy>(
   {
@@ -41,7 +41,7 @@ const privacySchema = new mongoose.Schema<IPrivacy>(
     },
     // 뮤트한 계정
     mutedUsers: {
-      type: [{ type: String, ref: "User" }],
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
       default: [],
     },
 
