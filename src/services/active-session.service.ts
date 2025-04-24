@@ -13,7 +13,7 @@ class ActiveSessionService {
    * @returns 활성 세션이 존재하면 `true`, 존재하지 않으면 `false`를 반환합니다.
    */
   async checkExistingActiveSession(sessionInfo: {
-    userId: string; // 사용자의 고유 ID
+    userId: Types.ObjectId; // 사용자의 고유 ID
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
@@ -28,7 +28,7 @@ class ActiveSessionService {
   }
 
   async findActiveSessionIdBySessionInfo(sessionInfo: {
-    userId: string;
+    userId: Types.ObjectId;
     device: IDevice;
     ip: string;
     location: ILocation;
@@ -53,7 +53,7 @@ class ActiveSessionService {
    * @throws CustomAPIError - active session 생성 실패 시 오류를 던집니다.
    */
   async createSessionAndIssueTokens(info: {
-    userId: string; // 사용자의 고유 ID
+    userId: Types.ObjectId; // 사용자의 고유 ID
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
@@ -109,7 +109,9 @@ class ActiveSessionService {
     return { refreshToken, accessToken, activeSessionId: activeSession._id };
   }
 
-  async getActiveSessionsByUserId(userId: string): Promise<IActiveSession[]> {
+  async getActiveSessionsByUserId(
+    userId: Types.ObjectId
+  ): Promise<IActiveSession[]> {
     const activeSessions =
       await activeSessionRepository.getActiveSessionsByUserId(userId);
 

@@ -128,7 +128,7 @@ const authTokenMiddleware = async (
       );
 
       // 사용자 조회
-      const user = await userService.getUserByUserId(activeSession.userId);
+      const user = await userService.getUserById(activeSession.userId);
 
       // 사용자가 없으면 로그아웃 처리
       if (!user) {

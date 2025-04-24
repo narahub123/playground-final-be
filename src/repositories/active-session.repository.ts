@@ -11,7 +11,7 @@ class ActiveSessionRepository {
    * @returns 활성 세션이 존재하는 경우 해당 세션을 반환하고, 존재하지 않거나 오류가 발생한 경우 `null` 또는 `undefined`를 반환합니다.
    */
   async getActiveSessionByInfo(sessionInfo: {
-    userId: string; // 사용자의 고유 ID
+    userId: Types.ObjectId; // 사용자의 고유 ID
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
     ip: string; // 사용자의 IP 주소
     location: ILocation; // 사용자의 위치 정보 (국가, 주, 도시, 카운티)
@@ -46,7 +46,7 @@ class ActiveSessionRepository {
    * @throws Error - 데이터베이스에서 세션 생성 중 오류가 발생하면 예외가 발생합니다.
    */
   async createActiveSession(sessionInfo: {
-    userId: string; // 사용자의 고유 ID
+    userId: Types.ObjectId; // 사용자의 고유 ID
     userRole: UserRoleType;
     refreshToken: string; // 사용자의 리프레시 토큰
     device: IDevice; // 디바이스 정보 (타입, 운영체제, 브라우저)
@@ -67,7 +67,9 @@ class ActiveSessionRepository {
     }
   }
 
-  async getActiveSessionsByUserId(userId: string): Promise<IActiveSession[]> {
+  async getActiveSessionsByUserId(
+    userId: Types.ObjectId
+  ): Promise<IActiveSession[]> {
     try {
       const activeSessions = await ActiveSession.find({ userId });
 

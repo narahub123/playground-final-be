@@ -300,7 +300,7 @@ const loginUser = asyncWrapper(
     );
 
     const newActiveSession = {
-      userId: user.userId,
+      userId: user._id,
       device,
       ip,
       location,
@@ -315,7 +315,7 @@ const loginUser = asyncWrapper(
     // 새로운 세션 생성 및 토큰 발급
     const { refreshToken, accessToken, activeSessionId } =
       await activeSessionService.createSessionAndIssueTokens({
-        userId: user.userId,
+        userId: user._id,
         device,
         ip,
         location,

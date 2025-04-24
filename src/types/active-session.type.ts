@@ -66,7 +66,7 @@ interface IActiveSession extends Document {
   /**
    * 세션 소유자의 사용자 ID
    */
-  userId: string;
+  userId: Types.ObjectId;
 
   /**
    * 사용자 역할 (예: "admin", "user", "moderator" 등)

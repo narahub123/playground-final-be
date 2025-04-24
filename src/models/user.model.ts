@@ -164,7 +164,12 @@ const UserSchema = new mongoose.Schema<IUser>(
     },
 
     accountGroup: {
-      type: [String],
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
       default: [],
     },
 

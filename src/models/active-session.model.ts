@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { ipRegExp } from "@data";
 import { REFRESHTOKEN_EXPIRES } from "@constants";
 import { IActiveSession } from "@types";
@@ -6,7 +6,7 @@ import { IActiveSession } from "@types";
 const ActiveSessionSchema = new mongoose.Schema<IActiveSession>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },

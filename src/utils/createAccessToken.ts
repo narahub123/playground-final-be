@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { Types } from "mongoose";
 
 /**
  * Access Token을 생성하는 함수
@@ -13,7 +14,7 @@ import mongoose from "mongoose";
  * @throws {Error} - JWT_SECRET_KEY가 정의되어 있지 않으면 에러를 던짐
  */
 const createAccessToken = (
-  userId: string,
+  userId: Types.ObjectId,
   role: string,
   expiresIn: number
 ): string => {

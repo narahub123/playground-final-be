@@ -204,7 +204,7 @@ const getCurrentUser = asyncWrapper(
     let newAccountGroup = [];
 
     for (const userId of user.accountGroup) {
-      const account = await userService.getUserByUserId(userId);
+      const account = await userService.getUserById(userId);
 
       if (!account) {
         throw new NotFoundError(
@@ -248,7 +248,7 @@ const getCurrentUser = asyncWrapper(
     );
 
     const activeSessions = await activeSessionService.getActiveSessionsByUserId(
-      user.userId
+      user._id
     );
 
     const loginRecords = await loginRecordService.getLoginRecordsByUserId(

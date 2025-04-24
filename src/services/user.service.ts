@@ -12,8 +12,7 @@ import {
   phoneRepository,
   userRepository,
 } from "@repositories";
-import { Email } from "@models";
-import { Types, UpdateResult } from "mongoose";
+import { Types } from "mongoose";
 
 class UserService {
   /**
@@ -80,6 +79,12 @@ class UserService {
 
   async getUserByUserId(userId: string): Promise<IUser | null> {
     const user = await userRepository.getUserByUserId(userId);
+
+    return user;
+  }
+
+  async getUserById(userId: Types.ObjectId): Promise<IUser | null> {
+    const user = await userRepository.getUserById(userId);
 
     return user;
   }

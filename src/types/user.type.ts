@@ -142,7 +142,7 @@ interface IUser extends Document {
   profileImage: string;
   profileCoverImage: string;
   intro: string;
-  accountGroup: string[];
+  accountGroup: Types.ObjectId[];
   followings: IFollower[];
   followers: IFollowing[];
   isAuthorized: boolean;

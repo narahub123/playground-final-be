@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { Types } from "mongoose";
 
 /**
  * Refresh Token을 생성하는 함수
@@ -11,7 +12,10 @@ import jwt from "jsonwebtoken";
  * @throws {Error} - 유효 기간이 제공되지 않으면 에러 발생
  * @throws {Error} - JWT_SECRET_KEY가 정의되지 않으면 에러 발생
  */
-const createRefreshToken = (userId: string, expiresIn: number): string => {
+const createRefreshToken = (
+  userId: Types.ObjectId,
+  expiresIn: number
+): string => {
   // 사용자 아이디가 제공되지 않으면 에러 발생
   if (!userId) {
     throw new Error("유효하지 사용자 아이디 제공");
