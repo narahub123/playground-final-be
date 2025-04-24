@@ -52,6 +52,10 @@ interface IPrivacy extends Document {
   replyOption: ReplyOptionType;
 }
 
+interface IPrivacyDto {
+  replyOption: ReplyOptionType;
+}
+
 export type {
   IMuteSettings,
   IPrivacy,
@@ -61,4 +65,5 @@ export type {
   MuteTargetType,
   TagTargetType,
   ReplyOptionType,
+  IPrivacyDto,
 };

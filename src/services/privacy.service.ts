@@ -1,7 +1,7 @@
-import { NotFoundError } from "@errors";
+import { InternalServerError, NotFoundError } from "@errors";
 import { privacyRepository } from "@repositories";
-import { IPrivacy } from "@types";
-import { Types } from "mongoose";
+import { IPrivacy, IPrivacyDto } from "@types";
+import { Types, UpdateResult } from "mongoose";
 
 class PrivacyService {
   async getPrivacyByUserId(userId: Types.ObjectId): Promise<IPrivacy> {
@@ -18,6 +18,30 @@ class PrivacyService {
     }
 
     return privacy;
+  }
+
+  async updateMyPrivacy(userId: Types.ObjectId, body: IPrivacyDto) {
+    const { replyOption } = body;
+
+    let result: UpdateResult | undefined;
+    
+    if (replyOption) {
+      result = await privacyRepository.updateReplyOption(userId, replyOption);
+    }
+
+    if (!result || result.modifiedCount === 0) {
+      throw new InternalServerError(
+        "개인 정보 수정 중 에러 발생",
+        "PRIVACY_UPDATE_FAILED",
+        {
+          body,
+        }
+      );
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
   }
 }
 

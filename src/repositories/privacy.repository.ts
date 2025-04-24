@@ -1,7 +1,7 @@
 import { Privacy } from "@models";
-import { IPrivacy } from "@types";
+import { IPrivacy, ReplyOptionType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import mongoose, { Types } from "mongoose";
+import mongoose, { Types, UpdateResult } from "mongoose";
 
 class PrivacyRepository {
   async createPrivacy(
@@ -25,6 +25,23 @@ class PrivacyRepository {
     } catch (error) {
       mongoDBErrorHandler("createPrivacy", error, { userId });
       return null;
+    }
+  }
+
+  async updateReplyOption(
+    userId: Types.ObjectId,
+    replyOption: ReplyOptionType
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        { userId },
+        { $set: { replyOption } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateReplyOption", error, { userId });
+      return undefined;
     }
   }
 }

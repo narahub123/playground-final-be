@@ -40,6 +40,7 @@ import {
   MuteTargetType,
   TagTargetType,
   ReplyOptionType,
+  IPrivacyDto,
 } from "./privacy.type";
 
 import {
@@ -140,6 +141,7 @@ export {
   MuteTargetType,
   TagTargetType,
   ReplyOptionType,
+  IPrivacyDto,
 
   // notification
   RepliesType,

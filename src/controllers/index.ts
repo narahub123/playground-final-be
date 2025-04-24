@@ -39,6 +39,8 @@ import {
   updatePin,
 } from "./post.controller";
 
+import privacyController from "./privacy.controller";
+
 export {
   // user
   checkEmailDuplication,
@@ -77,4 +79,7 @@ export {
   updateLikes,
   deletePost,
   updatePin,
+
+  // privacy
+  privacyController,
 };
