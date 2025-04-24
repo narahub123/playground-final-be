@@ -263,6 +263,22 @@ class PostRepository {
     }
   }
 
+  async addView(postId: Types.ObjectId): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { $inc: { "actions.views": 1 } }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addView", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
   async addLike(
     postId: Types.ObjectId,
     userId: Types.ObjectId

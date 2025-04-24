@@ -122,10 +122,24 @@ class PostService {
     return posts;
   }
 
+  async addView(postId: Types.ObjectId) {
+    const result = await postRepository.addView(postId);
+
+    if (!result || result.modifiedCount === 0) {
+      throw new InternalServerError("조회수 처리 중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("포스트 조회 실패");
+    }
+  }
+
   async getPostsByAuthor(
     author: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {
     const posts = await postRepository.getPostsByAuthor(author);
+
+    await Promise.all(posts.map((post) => this.addView(post._id)));
 
     return posts;
   }
