@@ -33,7 +33,7 @@ interface IPrivacy extends Document {
   isSensitiveMediaDisplayed: boolean;
   topics: string[];
   interests: string[];
-  blockedUsers: string[];
+  blockedUsers: Types.ObjectId[];
   mutedUsers: Types.ObjectId[];
   mutedWords: string[];
   muteSettings: IMuteSettings;
@@ -55,6 +55,7 @@ interface IPrivacy extends Document {
 interface IPrivacyDto {
   replyOption: ReplyOptionType;
   mutedUser: Types.ObjectId;
+  blockedUser: Types.ObjectId;
 }
 
 export type {

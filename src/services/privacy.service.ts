@@ -1,4 +1,5 @@
 import { InternalServerError, NotFoundError } from "@errors";
+import { Privacy } from "@models";
 import { privacyRepository } from "@repositories";
 import { IPrivacy, IPrivacyDto, ReplyOptionType } from "@types";
 import mongoose, { Types, UpdateResult } from "mongoose";
@@ -79,8 +80,39 @@ class PrivacyService {
     }
   }
 
+  async isBlocking(userId: Types.ObjectId, opponent: Types.ObjectId) {
+    const privacy = await this.getPrivacyByUserId(userId);
+
+    const blockedUsers = privacy.blockedUsers;
+
+    return blockedUsers.some((b) => b.equals(opponent));
+  }
+
+  async updateBlockedUser(userId: Types.ObjectId, opponent: Types.ObjectId) {
+    const isBlocking = await this.isBlocking(userId, opponent);
+
+    const result = isBlocking
+      ? await privacyRepository.removeBlockedUser(userId, opponent)
+      : await privacyRepository.addBlockedUser(userId, opponent);
+
+    if (!result || result.modifiedCount === 0) {
+      throw new InternalServerError(
+        "차단 수정 중 에러 발생",
+        "BLOCK_UPDATE_FAILED",
+        {
+          userId,
+          opponent,
+        }
+      );
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+  }
+
   async updateMyPrivacy(userId: Types.ObjectId, body: IPrivacyDto) {
-    const { replyOption, mutedUser } = body;
+    const { replyOption, mutedUser, blockedUser } = body;
 
     if (replyOption) {
       await this.updateReplyOption(userId, replyOption);
@@ -90,6 +122,12 @@ class PrivacyService {
       const opponent = new mongoose.Types.ObjectId(mutedUser);
 
       await this.updateMutedUser(userId, opponent);
+    }
+
+    if (blockedUser) {
+      const opponent = new mongoose.Types.ObjectId(blockedUser);
+
+      await this.updateBlockedUser(userId, opponent)
     }
   }
 }

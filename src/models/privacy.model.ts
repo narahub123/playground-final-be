@@ -36,7 +36,7 @@ const privacySchema = new mongoose.Schema<IPrivacy>(
     // 뮤트 및 차단
     // 차단한 계정
     blockedUsers: {
-      type: [{ type: String, ref: "User" }],
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
       default: [],
     },
     // 뮤트한 계정

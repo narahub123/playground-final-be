@@ -82,6 +82,44 @@ class PrivacyRepository {
       return undefined;
     }
   }
+
+  async addBlockedUser(
+    userId: Types.ObjectId,
+    opponent: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        { userId },
+        {
+          $addToSet: { blockedUsers: opponent },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addBlockedUser", error, { userId, opponent });
+      return undefined;
+    }
+  }
+
+  async removeBlockedUser(
+    userId: Types.ObjectId,
+    opponent: Types.ObjectId
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        { userId },
+        {
+          $pull: { blockedUsers: opponent },
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeBlockedUser", error, { userId, opponent });
+      return undefined;
+    }
+  }
 }
 
 export default new PrivacyRepository();
