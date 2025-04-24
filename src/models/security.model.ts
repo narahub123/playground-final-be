@@ -1,10 +1,10 @@
 import { ISecurity } from "@types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const SecuritySchema = new mongoose.Schema<ISecurity>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true,

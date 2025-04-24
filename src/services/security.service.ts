@@ -1,9 +1,10 @@
 import { NotFoundError } from "@errors";
 import { securityRepository } from "@repositories";
 import { ISecurity } from "@types";
+import { Types } from "mongoose";
 
 class SecurityService {
-  async getSecurityByUserId(userId: string): Promise<ISecurity> {
+  async getSecurityByUserId(userId: Types.ObjectId): Promise<ISecurity> {
     const security = await securityRepository.getSecurityByUserId(userId);
 
     if (security === null) {

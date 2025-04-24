@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 interface IDelegate {
   groups: string[];
   members: string[];
@@ -6,7 +8,7 @@ interface IDelegate {
 type twoFactorAuthenticationMethodType = "sms" | "app" | "key" | "";
 
 interface ISecurity extends Document {
-  userId: string;
+  userId: Types.ObjectId;
   twoFactorAuthenticationMethod: twoFactorAuthenticationMethodType;
   isLabelHidden: boolean;
   isPasswordRenewalProtected: boolean;

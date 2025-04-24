@@ -1,11 +1,11 @@
 import { Security } from "@models";
 import { ISecurity } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 class SecurityRepository {
   async createSecurity(
-    userId: string,
+    userId: Types.ObjectId,
     options?: { session: mongoose.ClientSession }
   ): Promise<ISecurity | undefined> {
     try {
@@ -17,7 +17,7 @@ class SecurityRepository {
     }
   }
 
-  async getSecurityByUserId(userId: string): Promise<ISecurity | null> {
+  async getSecurityByUserId(userId: Types.ObjectId): Promise<ISecurity | null> {
     try {
       const security = await Security.findOne({ userId });
 

@@ -110,7 +110,7 @@ class AuthService {
 
     if (newEmail) await emailRepository.createEmail(newEmail, { session });
     if (newPhone) await phoneRepository.createPhone(newPhone, { session });
-    await securityRepository.createSecurity(userId, { session });
+    await securityRepository.createSecurity(user._id, { session });
     await notificationRepository.createNotification(newNotification, {
       session,
     });
