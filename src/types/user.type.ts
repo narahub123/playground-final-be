@@ -175,6 +175,15 @@ interface UserDTO {
   recentEmoji: IEmoji;
   bookmarks: string;
   pinnedPost: string;
+  following: string;
+}
+
+interface IFollowingResponse {
+  _id: Types.ObjectId;
+  userId: string;
+  username: string;
+  profileImage: string;
+  followedAt: Date;
 }
 
 export type {
@@ -190,4 +199,5 @@ export type {
   IEmoji,
   SkintoneType,
   UserDTO,
+  IFollowingResponse,
 };

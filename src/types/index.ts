@@ -10,6 +10,7 @@ import {
   IEmoji,
   SkintoneType,
   UserDTO,
+  IFollowingResponse,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { IActiveSession, IDevice } from "./active-session.type";
@@ -103,6 +104,7 @@ export {
   IEmoji,
   SkintoneType,
   UserDTO,
+  IFollowingResponse,
 
   // oauth
   OauthType,

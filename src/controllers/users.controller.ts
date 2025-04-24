@@ -21,6 +21,7 @@ import {
   IApiSuccessResponse,
   IDevice,
   IEmoji,
+  IFollowingResponse,
   ILocation,
   IUser,
   UserDTO,
@@ -32,6 +33,7 @@ import {
 } from "@utils";
 import { RECENT_EMOJIS_MAX } from "@constants";
 import mongoose from "mongoose";
+import { Types } from "mongoose";
 
 const checkEmailDuplication = asyncWrapper(
   "checkEmailDuplication",
@@ -629,12 +631,34 @@ const updateMe = asyncWrapper(
       await userService.updatePinnedPost(user._id, pinnedPostId);
     }
 
-    const response: IApiSuccessResponse = {
+    type ResponseData =
+      | { following: IFollowingResponse }
+      | { unfollowing: Types.ObjectId }
+      | null;
+
+    const response: IApiSuccessResponse<ResponseData> = {
       success: true,
       message: "User has been updated successfully. (유저 정보 업데이트 성공)",
       code: "USER_UPDATE_SUCCEEDED",
       timestamp: new Date().toISOString(),
     };
+
+    if (body.following) {
+      const following = new mongoose.Types.ObjectId(body.following);
+
+      const followingResult = await userService.updateFollowingAndFollower(
+        user._id,
+        following
+      );
+
+      if (typeof followingResult === "object" && "userId" in followingResult) {
+        // IFollowingResponse
+        response.data = { following: followingResult };
+      } else {
+        // ObjectId (언팔로우)
+        response.data = { unfollowing: followingResult };
+      }
+    }
 
     res.status(200).json(response);
   }

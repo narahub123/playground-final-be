@@ -340,6 +340,144 @@ class UserRepository {
       return null;
     }
   }
+
+  async addFollowing(
+    userId: Types.ObjectId,
+    following: Types.ObjectId,
+    followedAt: Date,
+    session?: ClientSession
+  ): Promise<IUser | null> {
+    try {
+      const user = session
+        ? await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $addToSet: {
+                followings: { user: following, followedAt },
+              },
+            },
+            { new: true }
+          ).session(session)
+        : await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $addToSet: {
+                followings: { user: following, followedAt },
+              },
+            },
+            { new: true }
+          );
+
+      return user;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("addFollowing", error, { userId, following });
+      return null;
+    }
+  }
+
+  async removeFollowing(
+    userId: Types.ObjectId,
+    following: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IUser | null> {
+    try {
+      const user = session
+        ? await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $pull: {
+                followings: { user: following },
+              },
+            },
+            { new: true }
+          ).session(session)
+        : await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $pull: {
+                followings: { user: following },
+              },
+            },
+            { new: true }
+          );
+
+      return user;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("removeFollowing", error, { userId, following });
+      return null;
+    }
+  }
+
+  async addFollower(
+    userId: Types.ObjectId,
+    follower: Types.ObjectId,
+    followedAt: Date,
+    session?: ClientSession
+  ): Promise<IUser | null> {
+    try {
+      const user = session
+        ? await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $addToSet: {
+                followers: { user: follower, followedAt },
+              },
+            },
+            { new: true }
+          ).session(session)
+        : await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $addToSet: {
+                followers: { user: follower, followedAt },
+              },
+            },
+            { new: true }
+          );
+
+      return user;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("addFollower", error, { userId, follower });
+      return null;
+    }
+  }
+
+  async removeFollower(
+    userId: Types.ObjectId,
+    follower: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IUser | null> {
+    try {
+      const user = session
+        ? await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $pull: {
+                followers: { user: follower },
+              },
+            },
+            { new: true }
+          ).session(session)
+        : await User.findOneAndUpdate(
+            { _id: userId },
+            {
+              $pull: {
+                followers: { user: follower },
+              },
+            },
+            { new: true }
+          );
+
+      return user;
+    } catch (error) {
+      // 에러 발생 시, 에러 처리 핸들러 호출
+      mongoDBErrorHandler("removeFollower", error, { userId, follower });
+      return null;
+    }
+  }
 }
 
 export default new UserRepository();

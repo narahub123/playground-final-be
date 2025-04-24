@@ -2,6 +2,7 @@ import { InternalServerError, LockedError, NotFoundError } from "@errors";
 import {
   IEmail,
   IEmoji,
+  IFollowingResponse,
   IPhone,
   IUser,
   LockReasonType,
@@ -12,7 +13,8 @@ import {
   phoneRepository,
   userRepository,
 } from "@repositories";
-import { Types } from "mongoose";
+import { Types, UpdateResult } from "mongoose";
+import mongoose from "mongoose";
 
 class UserService {
   /**
@@ -405,6 +407,101 @@ class UserService {
 
     if (result.modifiedCount === 0) {
       throw new InternalServerError("핀포스트 삭제 처리 중 에러 발생");
+    }
+  }
+
+  async isFollowing(userId: Types.ObjectId, following: Types.ObjectId) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    return user.followings.some((f) => f.user.equals(following));
+  }
+
+  async updateFollowingAndFollower(
+    userId: Types.ObjectId,
+    following: Types.ObjectId
+  ): Promise<Types.ObjectId | IFollowingResponse> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const isFollowing = await this.isFollowing(userId, following);
+
+      let response: IFollowingResponse | Types.ObjectId;
+
+      if (isFollowing) {
+        // 현재 유저의 following에 상대 유저 삭제
+        const unfollowingUser = await userRepository.removeFollowing(
+          userId,
+          following,
+          session
+        );
+
+        if (!unfollowingUser) {
+          throw new InternalServerError("팔로잉 처리 도중 에러 발생");
+        }
+
+        // 상대 유저의 follower에 현재 유저 삭제
+        const unfollowedUser = await userRepository.removeFollower(
+          following,
+          userId,
+          session
+        );
+
+        if (!unfollowedUser) {
+          throw new InternalServerError("팔로우 처리 도중 에러 발생");
+        }
+
+        response = following;
+      } else {
+        const followedAt = new Date();
+
+        // 현재 유저의 following에 상대 유저 추가
+        const followingUser = await userRepository.addFollowing(
+          userId,
+          following,
+          followedAt,
+          session
+        );
+
+        if (!followingUser) {
+          throw new InternalServerError("팔로잉 처리 도중 에러 발생");
+        }
+
+        // 상대 유저의 follower에 현재 유저 추가
+        const followedUser = await userRepository.addFollower(
+          following,
+          userId,
+          followedAt,
+          session
+        );
+
+        if (!followedUser) {
+          throw new InternalServerError("팔로우 처리 도중 에러 발생");
+        }
+
+        const { _id, userId: handle, username, profileImage } = followedUser;
+
+        response = {
+          _id,
+          userId: handle,
+          username,
+          profileImage,
+          followedAt,
+        };
+      }
+      
+      await session.commitTransaction();
+
+      return response;
+    } catch (error: any) {
+      await session.abortTransaction();
+      throw new InternalServerError("팔로잉 처리 중 에러 발생", error);
+    } finally {
+      session.endSession();
     }
   }
 }
