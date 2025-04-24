@@ -6,6 +6,7 @@ import {
   ILogoutInfo,
   INotificationInput,
   IPhoneInput,
+  IPushNotificationInputSettings,
   IUserInput,
   LogoutReasonType,
 } from "@types";
@@ -88,7 +89,7 @@ class AuthService {
     newUser: IUserInput;
     newEmail?: IEmailInput;
     newPhone?: IPhoneInput;
-    newNotification: INotificationInput;
+    pushNotificationSettings: IPushNotificationInputSettings;
     newDisplay: {
       language: string;
     };
@@ -97,7 +98,7 @@ class AuthService {
   }) {
     const {
       newUser,
-      newNotification,
+      pushNotificationSettings,
       newDisplay,
       newEmail,
       newPhone,
@@ -112,6 +113,12 @@ class AuthService {
     if (newEmail) await emailRepository.createEmail(newEmail, { session });
     if (newPhone) await phoneRepository.createPhone(newPhone, { session });
     await securityRepository.createSecurity(user._id, { session });
+
+    const newNotification: INotificationInput = {
+      userId: user._id,
+      pushNotificationSettings: pushNotificationSettings,
+    };
+
     await notificationRepository.createNotification(newNotification, {
       session,
     });

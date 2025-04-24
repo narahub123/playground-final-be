@@ -56,7 +56,7 @@ interface IEmailSpecialNotifications {
 
 interface INotification {
   _id: Types.ObjectId;
-  userId: string;
+  userId: Types.ObjectId;
   isQualityFilterEnabled: boolean;
   isNotificationMuted: boolean;
   notificationMuteRules: INotificationMuteRules;
@@ -69,14 +69,16 @@ interface INotification {
   updatedAt: Date;
 }
 
+interface IPushNotificationInputSettings {
+  posts: boolean;
+  messagesEnabled: boolean;
+  replies: RepliesType;
+  newFollowersEnabled: boolean;
+}
+
 interface INotificationInput {
-  userId: string;
-  pushNotificationSettings: {
-    posts: boolean;
-    messagesEnabled: boolean;
-    replies: RepliesType;
-    newFollowersEnabled: boolean;
-  };
+  userId: Types.ObjectId;
+  pushNotificationSettings: IPushNotificationInputSettings;
 }
 
 export type {
@@ -91,4 +93,5 @@ export type {
   IEmailSpecialNotifications,
   INotification,
   INotificationInput,
+  IPushNotificationInputSettings,
 };

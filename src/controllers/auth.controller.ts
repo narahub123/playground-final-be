@@ -25,6 +25,7 @@ import {
   IEmailInput,
   INotificationInput,
   IPhoneInput,
+  IPushNotificationInputSettings,
   IUserInput,
 } from "@types";
 import verificationService from "services/verification.service";
@@ -176,14 +177,11 @@ const signupUser = asyncWrapper(
         accountGroup: [userId],
       };
 
-      const newNotification: INotificationInput = {
-        userId,
-        pushNotificationSettings: {
-          posts: notifications.posts,
-          messagesEnabled: notifications.messages,
-          replies: notifications.replies ? "all" : "off",
-          newFollowersEnabled: notifications.newFollower,
-        },
+      const pushNotificationSettings: IPushNotificationInputSettings = {
+        posts: notifications.posts,
+        messagesEnabled: notifications.messages,
+        replies: notifications.replies ? "all" : "off",
+        newFollowersEnabled: notifications.newFollower,
       };
 
       const newDisplay = {
@@ -210,7 +208,7 @@ const signupUser = asyncWrapper(
         newUser,
         newEmail,
         newPhone,
-        newNotification,
+        pushNotificationSettings,
         newDisplay,
         userId,
         session,

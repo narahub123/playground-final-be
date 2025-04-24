@@ -54,6 +54,7 @@ import {
   IEmailSpecialNotifications,
   INotification,
   INotificationInput,
+  IPushNotificationInputSettings,
 } from "./notification.type";
 
 import {
@@ -138,8 +139,9 @@ export {
   MuteDurationType,
   MuteTargetType,
   TagTargetType,
+  ReplyOptionType,
 
-  // privacy
+  // notification
   RepliesType,
   RepostsType,
   LikesType,
@@ -151,7 +153,7 @@ export {
   IEmailSpecialNotifications,
   INotification,
   INotificationInput,
-  ReplyOptionType,
+  IPushNotificationInputSettings,
 
   // display
   BgThemeType,

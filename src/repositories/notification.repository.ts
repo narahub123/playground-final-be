@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { INotification, INotificationInput } from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import { Notification } from "@models";
@@ -20,7 +20,9 @@ class NotificationRepository {
     }
   }
 
-  async getNotificationByUserId(userId: string): Promise<INotification | null> {
+  async getNotificationByUserId(
+    userId: Types.ObjectId
+  ): Promise<INotification | null> {
     try {
       const notification = await Notification.findOne({ userId });
 

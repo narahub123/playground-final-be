@@ -9,7 +9,7 @@ import { connectDB } from "@utils"; // 데이터베이스 연결을 위한 유�
 import { errorHandler } from "@middlewares"; // 에러 처리 미들웨어
 import routes from "@routes"; // 라우팅 처리 모듈
 import { v2 as cloudinary } from "cloudinary";
-import { displayRepository } from "@repositories";
+import { displayRepository, notificationRepository } from "@repositories";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -51,7 +51,7 @@ app.use(cookieParser()); // 클라이언트에서 보낸 쿠키를 req.cookies �
 //   try {
 //     await connectDB(); // DB 먼저 연결
 
-//     await displayRepository.updateUserIds(); // userId 마이그레이션
+//     await notificationRepository.updateUserIds(); // userId 마이그레이션
 
 //     app.use("/", routes()); // 라우터 설정
 //     app.use(errorHandler); // 에러 핸들러 설정

@@ -244,7 +244,7 @@ const getCurrentUser = asyncWrapper(
     const privacy = await privacyService.getPrivacyByUserId(user._id);
 
     const notification = await notificationService.getNotificationByUserId(
-      user.userId
+      user._id
     );
 
     const activeSessions = await activeSessionService.getActiveSessionsByUserId(

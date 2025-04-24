@@ -1,9 +1,12 @@
 import { NotFoundError } from "@errors";
 import { notificationRepository } from "@repositories";
 import { INotification } from "@types";
+import { Types } from "mongoose";
 
 class NotificationService {
-  async getNotificationByUserId(userId: string): Promise<INotification> {
+  async getNotificationByUserId(
+    userId: Types.ObjectId
+  ): Promise<INotification> {
     const notification = await notificationRepository.getNotificationByUserId(
       userId
     );

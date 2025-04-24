@@ -1,10 +1,10 @@
 import { INotification } from "@types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const NotificationSchema = new mongoose.Schema<INotification>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true,
