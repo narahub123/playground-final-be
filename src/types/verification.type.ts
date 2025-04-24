@@ -2,13 +2,13 @@ import { Types } from "mongoose";
 
 interface IVerification extends Document {
   _id: Types.ObjectId;
-  userId: string;
+  userId: Types.ObjectId;
   verificationCode: string;
   createdAt: Date;
 }
 
 interface IVerificationInput {
-  userId: string;
+  userId: Types.ObjectId;
   verificationCode: string;
 }
 

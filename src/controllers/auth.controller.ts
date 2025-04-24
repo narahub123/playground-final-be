@@ -204,7 +204,7 @@ const signupUser = asyncWrapper(
           }
         : undefined;
 
-      await authService.initializeUser({
+      const user = await authService.initializeUser({
         newUser,
         newEmail,
         newPhone,
@@ -217,7 +217,7 @@ const signupUser = asyncWrapper(
       await session.commitTransaction();
 
       // 인증 이메일 전송하고 인증 코드 저장
-      await verificationService.sendVerificationCode(email, userId);
+      await verificationService.sendVerificationCode(email, user._id);
 
       const response: IApiSuccessResponse = {
         success: true,

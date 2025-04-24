@@ -11,7 +11,9 @@ class VerificationRepository {
    * @returns {Promise<IVerification | null>} - 사용자의 인증 코드 또는 없으면 null 반환
    * @throws {Error} - MongoDB 쿼리 오류 발생 시 처리
    */
-  async getVerificationByUserId(userId: string): Promise<IVerification | null> {
+  async getVerificationByUserId(
+    userId: Types.ObjectId
+  ): Promise<IVerification | null> {
     try {
       const verification = await Verification.findOne({ userId });
       return verification;

@@ -130,6 +130,8 @@ class AuthService {
 
     await displayRepository.createDisplay(display, { session });
     await privacyRepository.createPrivacy(user._id, { session });
+
+    return user;
   }
 
   // 로그아웃

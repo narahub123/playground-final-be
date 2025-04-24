@@ -2,19 +2,20 @@ import { verificationRepository } from "@repositories";
 import { generateAuthCode } from "@utils";
 import { sendEmail } from "./email.service";
 import { GoneError, InternalServerError } from "@errors";
+import { Types } from "mongoose";
 
 class VerificationService {
   /**
    * 주어진 userId에 대해 연결된 인증 코드가 있다면 삭제합니다.
    * 인증 코드가 없거나 삭제가 실패할 경우 에러를 던집니다.
    *
-   * @param {string} userId - 인증 코드를 삭제할 사용자의 userId입니다.
+   * @param {Types.ObjectId} userId - 인증 코드를 삭제할 사용자의 userId입니다.
    * @returns {Promise<void>} - 삭제가 성공하면 아무 값도 반환하지 않습니다.
    * 실패하거나 인증 코드가 없을 경우 InternalServerError가 발생합니다.
    *
    * @throws {InternalServerError} - 인증 코드 삭제에 실패한 경우 에러가 발생합니다.
    */
-  async deleteExistingVerificationCode(userId: string): Promise<void> {
+  async deleteExistingVerificationCode(userId: Types.ObjectId): Promise<void> {
     // 주어진 userId로 인증 코드가 존재하는지 확인합니다.
     const verification = await verificationRepository.getVerificationByUserId(
       userId
@@ -47,7 +48,7 @@ class VerificationService {
    * @param {string} userId - 인증 코드를 받을 사용자의 고유 ID.
    * @throws {InternalServerError} 인증 코드 저장 실패 시, 서버 내부 오류를 던집니다.
    */
-  async sendVerificationCode(email: string, userId: string) {
+  async sendVerificationCode(email: string, userId: Types.ObjectId) {
     // 새로운 인증 코드 생성
     const verificationCode = generateAuthCode();
     console.log("인증 코드: ", verificationCode);
@@ -89,7 +90,7 @@ class VerificationService {
    * @throws {GoneError} 인증 코드가 만료된 경우 예외를 던집니다.
    */
   async verifyVerificationCode(
-    userId: string,
+    userId: Types.ObjectId,
     verificationCode: string
   ): Promise<boolean> {
     // 인증코드 가져오기

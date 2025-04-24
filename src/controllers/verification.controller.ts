@@ -39,10 +39,10 @@ const requestLoginVerificationCode = asyncWrapper(
       const user = await userService.findUserByIdentifier(email);
 
       // 해당 사용자에 대한 인증 코드 존재 유무를 확인하고 있다면 삭제
-      await verificationService.deleteExistingVerificationCode(user.userId);
+      await verificationService.deleteExistingVerificationCode(user._id);
 
       // 새로운 인증 코드 생성하고 이메일로 전송하기
-      await verificationService.sendVerificationCode(email, user.userId);
+      await verificationService.sendVerificationCode(email, user._id);
     } else {
       // 휴대폰 인증 코드 전송 부분 (아직 구현되지 않음)
       // SMS 전송 로직은 추후 구현 필요
@@ -89,10 +89,10 @@ const requestVerificationCode = asyncWrapper(
 
     // 이메일로 인증 코드 전송
     // 해당 사용자에 대한 인증 코드 존재 유무를 확인하고 있다면 삭제
-    await verificationService.deleteExistingVerificationCode(user.userId);
+    await verificationService.deleteExistingVerificationCode(user._id);
 
     // 새로운 인증 코드 생성하고 이메일로 전송하기
-    await verificationService.sendVerificationCode(email, user.userId);
+    await verificationService.sendVerificationCode(email, user._id);
 
     const response: IApiSuccessResponse<{}> = {
       success: true,
@@ -143,7 +143,7 @@ const checkLoginVerificationCode = asyncWrapper(
 
     // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
     const isVerified = await verificationService.verifyVerificationCode(
-      user.userId,
+      user._id,
       verificationCode
     );
 
@@ -190,7 +190,7 @@ const checkVerificationCode = asyncWrapper(
 
     // 사용자가 입력한 인증 코드와 저장된 인증 코드가 일치하는지 확인
     const isVerified = await verificationService.verifyVerificationCode(
-      user.userId,
+      user._id,
       verificationCode
     );
 
