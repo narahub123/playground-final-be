@@ -39,6 +39,7 @@ import {
   MuteDurationType,
   MuteTargetType,
   TagTargetType,
+  ReplyOptionType,
 } from "./privacy.type";
 
 import {
@@ -150,6 +151,7 @@ export {
   IEmailSpecialNotifications,
   INotification,
   INotificationInput,
+  ReplyOptionType,
 
   // display
   BgThemeType,

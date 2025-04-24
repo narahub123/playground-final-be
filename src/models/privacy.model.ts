@@ -94,6 +94,13 @@ const privacySchema = new mongoose.Schema<IPrivacy>(
     isLocationBasedAdsEnabled: { type: Boolean, default: false },
     // 방문 장소
     visitedLocations: { type: [String], default: [] },
+    // 댓글 허용 범위
+    replyOption: {
+      type: String,
+      enum: ["all", "followings", "authenticated", "mentioned"],
+      default: "all",
+      required: true,
+    },
   },
   { timestamps: true, versionKey: false }
 );

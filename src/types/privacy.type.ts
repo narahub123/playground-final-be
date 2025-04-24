@@ -20,6 +20,8 @@ interface IMuteSettings {
   muteDuration: MuteDurationType;
 }
 
+type ReplyOptionType = "all" | "followings" | "authenticated" | "mentioned";
+
 interface IPrivacy extends Document {
   _id: Types.ObjectId;
   userId: string;
@@ -47,6 +49,7 @@ interface IPrivacy extends Document {
   visitedLocations: string[];
   createdAt: Date;
   updatedAt: Date;
+  replyOption: ReplyOptionType;
 }
 
 export type {
@@ -57,4 +60,5 @@ export type {
   MuteDurationType,
   MuteTargetType,
   TagTargetType,
+  ReplyOptionType,
 };
