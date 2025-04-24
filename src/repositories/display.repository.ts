@@ -1,7 +1,7 @@
 import { Display } from "@models";
 import { IDisplay, IDisplayInput } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 class DisplayRepository {
   async createDisplay(
@@ -17,7 +17,7 @@ class DisplayRepository {
     }
   }
 
-  async getDisplayByUserId(userId: string): Promise<IDisplay | null> {
+  async getDisplayByUserId(userId: Types.ObjectId): Promise<IDisplay | null> {
     try {
       const display = await Display.findOne({ userId });
 

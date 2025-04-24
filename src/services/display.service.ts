@@ -1,9 +1,10 @@
 import { NotFoundError } from "@errors";
 import { displayRepository } from "@repositories";
 import { IDisplay } from "@types";
+import { Types } from "mongoose";
 
 class DisplayService {
-  async getDisplayByUserId(userId: string): Promise<IDisplay> {
+  async getDisplayByUserId(userId: Types.ObjectId): Promise<IDisplay> {
     const display = await displayRepository.getDisplayByUserId(userId);
 
     if (display === null) {

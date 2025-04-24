@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 // Enum Types
 type FontSizeType = "xs" | "s" | "b" | "x" | "xl";
 
@@ -13,7 +15,7 @@ type BgThemeType = "light" | "dark" | "darkers";
 
 // Display Schema Type
 interface IDisplay extends Document {
-  userId: string;
+  userId: Types.ObjectId;
   isColorContrastEnabled: boolean;
   isMotionReduced: boolean;
   isImageDescriptionAdded: boolean;
@@ -28,7 +30,7 @@ interface IDisplay extends Document {
 }
 
 interface IDisplayInput {
-  userId: string;
+  userId: Types.ObjectId;
   language: string;
 }
 

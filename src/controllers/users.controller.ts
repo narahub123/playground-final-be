@@ -237,7 +237,7 @@ const getCurrentUser = asyncWrapper(
       phones: phones.map((item) => item.phone),
     };
 
-    const display = await displayService.getDisplayByUserId(user.userId);
+    const display = await displayService.getDisplayByUserId(user._id);
 
     const security = await securityService.getSecurityByUserId(user._id);
 

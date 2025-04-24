@@ -1,11 +1,11 @@
 import { LANGUAGE_DEFAULT } from "@constants";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { IDisplay } from "types/display.type";
 
 const displaySchema = new mongoose.Schema<IDisplay>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true,

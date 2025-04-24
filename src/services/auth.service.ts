@@ -89,7 +89,9 @@ class AuthService {
     newEmail?: IEmailInput;
     newPhone?: IPhoneInput;
     newNotification: INotificationInput;
-    newDisplay: IDisplayInput;
+    newDisplay: {
+      language: string;
+    };
     userId: string;
     session: mongoose.ClientSession;
   }) {
@@ -97,7 +99,6 @@ class AuthService {
       newUser,
       newNotification,
       newDisplay,
-      userId,
       newEmail,
       newPhone,
       session,
@@ -114,7 +115,13 @@ class AuthService {
     await notificationRepository.createNotification(newNotification, {
       session,
     });
-    await displayRepository.createDisplay(newDisplay, { session });
+
+    const display: IDisplayInput = {
+      userId: user._id,
+      language: newDisplay.language,
+    };
+
+    await displayRepository.createDisplay(display, { session });
     await privacyRepository.createPrivacy(user._id, { session });
   }
 

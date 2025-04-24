@@ -187,7 +187,6 @@ const signupUser = asyncWrapper(
       };
 
       const newDisplay = {
-        userId,
         language,
       };
 
