@@ -171,15 +171,19 @@ class PostService {
     return true;
   }
 
-  async updateLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
+  async isLiking(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<boolean> {
     const post = await this.getPostById(postId);
-    if (!post) {
-      throw new NotFoundError("포스트를 찾을 수 없습니다.");
-    }
 
-    const alreadyLike = post.actions.likes.includes(userId);
+    return post.actions.likes.some((like) => like.equals(userId));
+  }
 
-    const result = alreadyLike
+  async updateLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
+    const isLiking = await this.isLiking(postId, userId);
+
+    const result = isLiking
       ? await postRepository.deleteLike(postId, userId)
       : await postRepository.addLike(postId, userId);
 
@@ -205,7 +209,21 @@ class PostService {
       throw new InternalServerError("포스트의 좋아요 업데이트가 되지 않음");
     }
 
-    return alreadyLike ? false : true;
+    return isLiking ? false : true;
+  }
+
+  async updatePostAndUserLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
+    const postLike = await this.isLiking(postId, userId);
+    const userLike = await userService.isLiking(userId, postId);
+
+    if (postLike !== userLike) {
+      await userRepository.deleteLike(userId, postId);
+      await postRepository.deleteLike(postId, userId);
+      return;
+    }
+
+    await this.updateLikes(postId, userId);
+    await userService.updateLikes(userId, postId);
   }
 
   async deletePost(postId: Types.ObjectId, userId: Types.ObjectId) {

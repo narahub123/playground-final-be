@@ -238,34 +238,14 @@ const updateLikes = asyncWrapper(
 
     const postid = new mongoose.Types.ObjectId(postId);
 
-    // 포스트에서 좋아요 추가 혹은 삭제
-    const postLike = await postService.updateLikes(postid, user);
-
-    // 유저에서 좋아요 추가 혹은 삭제
-    const userLike = await userService.updateLikes(user, postid);
-
-    if (postLike !== userLike) {
-      throw new InternalServerError(
-        "포스트와 유저의 좋아요 상태가 일치하지 않습니다.",
-        "LIKES_STATE_MISMATCH",
-        {
-          postLike,
-          userLike,
-          postId,
-          userId: user,
-        }
-      );
-    }
+    await postService.updatePostAndUserLikes(postid, user._id);
 
     // 포스트 좋아요 추가 혹은 삭제와 유저의 좋아요 추가 혹은 삭제가 일치하는 경우
-    const response: IApiSuccessResponse<{
-      likes: boolean;
-    }> = {
+    const response: IApiSuccessResponse = {
       success: true,
       message:
         "ㅣikes of Post and user updated successfully.(좋아요 업데이트 성공)",
       code: "UPDATE_LIKES_SUCCEEDED",
-      data: { likes: postLike },
       timestamp: new Date().toISOString(),
     };
 

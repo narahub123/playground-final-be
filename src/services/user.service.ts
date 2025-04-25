@@ -312,16 +312,20 @@ class UserService {
     }
   }
 
-  async updateLikes(userId: Types.ObjectId, postId: Types.ObjectId) {
+  async isLiking(userId: Types.ObjectId, postId: Types.ObjectId) {
     const user = await userRepository.getUserById(userId);
 
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.", "USER_NOT_FOUND");
     }
 
-    const alreadyLike = user.likes.includes(postId);
+    return user.likes.some((like) => like.equals(postId));
+  }
 
-    const result = alreadyLike
+  async updateLikes(userId: Types.ObjectId, postId: Types.ObjectId) {
+    const isLiking = await this.isLiking(userId, postId);
+
+    const result = isLiking
       ? await userRepository.deleteLike(userId, postId)
       : await userRepository.addLike(userId, postId);
 
@@ -340,7 +344,7 @@ class UserService {
       throw new InternalServerError("유저의 좋아요 업데이트 실패");
     }
 
-    return alreadyLike ? false : true;
+    return isLiking ? false : true;
   }
 
   async isBookmarking(userId: Types.ObjectId, postId: Types.ObjectId) {
