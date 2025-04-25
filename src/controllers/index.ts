@@ -37,6 +37,7 @@ import {
   updateLikes,
   deletePost,
   updatePin,
+  getPostById,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -79,6 +80,7 @@ export {
   updateLikes,
   deletePost,
   updatePin,
+  getPostById,
 
   // privacy
   privacyController,

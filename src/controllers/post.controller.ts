@@ -328,10 +328,6 @@ const updatePin = asyncWrapper(
 
     const post = await postService.getPostById(postId);
 
-    if (!post) {
-      throw new NotFoundError("포스트를 찾을 수 없음");
-    }
-
     const user_id = post.author._id;
 
     // 사용자 _id와 작성자 _id가 일치하지 않는 경우
@@ -352,6 +348,35 @@ const updatePin = asyncWrapper(
   }
 );
 
+const getPostById = asyncWrapper(
+  "getPostById",
+  "Failed to retrieve post.(포스트 조회 실패)",
+  "GET_POST_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+
+    if (!postid) {
+      throw new BadRequestError("포스트 아이디 필수");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const post = await postService.getPostById(postId);
+
+    const response: IApiSuccessResponse<{ post: IPostResponseDto }> = {
+      success: true,
+      message: "Post retrieved successfully.(포스트 조회 성공)",
+      code: "GET_POST_SUCCEEDED",
+      data: {
+        post,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -360,4 +385,5 @@ export {
   updateLikes,
   deletePost,
   updatePin,
+  getPostById,
 };

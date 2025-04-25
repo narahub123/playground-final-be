@@ -33,20 +33,18 @@ class PostService {
     session.startTransaction();
 
     try {
-      const originalPost = await postRepository.getPostById(
-        repost.originalPostId
-      );
+      const origin = await postRepository.getPostById(repost.originalPostId);
 
-      if (!originalPost) {
+      if (!origin) {
         throw new NotFoundError("original 포스트 조회 실패");
       }
 
-      const { originalPostId, _id } = originalPost;
+      const { _id, originalPost } = origin;
 
       const modified: IRepostRequestDto = {
         type: "repost",
         author: repost.author,
-        originalPostId: originalPostId ? originalPostId : repost.originalPostId,
+        originalPostId: originalPost ? originalPost._id : repost.originalPostId,
       };
 
       const newPost = await postRepository.createRepost(modified, session);
@@ -61,7 +59,7 @@ class PostService {
         );
       }
 
-      for (const postId of [repost.originalPostId, originalPostId]) {
+      for (const postId of [repost.originalPostId, originalPost?._id]) {
         if (!postId) continue;
 
         const result = await postRepository.addRepost(
@@ -144,8 +142,12 @@ class PostService {
     return posts;
   }
 
-  async getPostById(postId: Types.ObjectId): Promise<IPost | null> {
-    const post = postRepository.getPostById(postId);
+  async getPostById(postId: Types.ObjectId): Promise<IPostResponseDto> {
+    const post = await postRepository.getPostById(postId);
+
+    if (!post) {
+      throw new NotFoundError("포스트 조회 실패");
+    }
 
     return post;
   }
