@@ -28,6 +28,7 @@ interface IPostActions {
   comments: string[];
   reposts: Types.ObjectId[];
   likes: Types.ObjectId[];
+  bookmarks: Types.ObjectId[];
   views: number;
 }
 

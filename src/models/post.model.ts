@@ -27,6 +27,11 @@ const PostActionsSchema = new mongoose.Schema<IPostActions>(
       type: Number,
       default: 0,
     },
+    bookmarks: {
+      type: [Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
+    },
   },
   { _id: false, versionKey: false }
 );
