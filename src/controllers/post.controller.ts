@@ -377,6 +377,33 @@ const getPostById = asyncWrapper(
   }
 );
 
+const updateBookmarks = asyncWrapper(
+  "updateBookmarks",
+  "Updating bookmarks failed. (북마트 업데이트 실패)",
+  "UPDATE_BOOKMARKS_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const user = req.user;
+
+    if (!postid) {
+      throw new BadRequestError("포스트 아이디 필수");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    await postService.updateBookmarks(postId, user._id);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Bookmarks updated successfully.(북마크 업데이트 성공)",
+      code: "UPDATE_BOOKMARKS_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -386,4 +413,5 @@ export {
   deletePost,
   updatePin,
   getPostById,
+  updateBookmarks,
 };

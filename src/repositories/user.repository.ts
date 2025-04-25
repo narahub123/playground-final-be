@@ -262,10 +262,11 @@ class UserRepository {
 
   async addBookmark(
     userId: Types.ObjectId,
-    postId: Types.ObjectId
+    postId: Types.ObjectId,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      return await User.updateOne(
+      const updateQuery = User.updateOne(
         { _id: userId },
         {
           $addToSet: {
@@ -273,6 +274,7 @@ class UserRepository {
           },
         }
       );
+      return session ? await updateQuery.session(session) : await updateQuery;
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
       mongoDBErrorHandler("addBookmark", error, { userId, postId });
@@ -282,10 +284,11 @@ class UserRepository {
 
   async removeBookmark(
     userId: Types.ObjectId,
-    postId: Types.ObjectId
+    postId: Types.ObjectId,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      return await User.updateOne(
+      const updateQuery = User.updateOne(
         { _id: userId },
         {
           $pull: {
@@ -293,6 +296,7 @@ class UserRepository {
           },
         }
       );
+      return session ? await updateQuery.session(session) : await updateQuery;
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
       mongoDBErrorHandler("removeBookmark", error, { userId, postId });

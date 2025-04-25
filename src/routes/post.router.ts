@@ -6,6 +6,7 @@ import {
   deletePost,
   getPostById,
   getPostPreview,
+  updateBookmarks,
   updateLikes,
   updatePin,
   updatePostVote,
@@ -17,6 +18,11 @@ export default (router: Router) => {
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, addRepost);
   router.patch("/posts/:postId/likes", authTokenMiddleware, updateLikes);
+  router.patch(
+    "/posts/:postid/bookmarks",
+    authTokenMiddleware,
+    updateBookmarks
+  );
   router.patch("/posts/:postid/pin", authTokenMiddleware, updatePin);
   router.post(
     `/posts/:postId/:optionIndex`,

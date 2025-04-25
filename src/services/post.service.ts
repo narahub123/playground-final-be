@@ -6,7 +6,8 @@ import {
   IPostResponseDto,
   IRepostRequestDto,
 } from "@types";
-import mongoose, { Types } from "mongoose";
+import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
+import userService from "./user.service";
 
 class PostService {
   async createPost(
@@ -300,6 +301,73 @@ class PostService {
 
     if (result.modifiedCount === 0) {
       throw new InternalServerError("핀 처리 도중 에러 발생");
+    }
+  }
+
+  async isBookmarking(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<boolean> {
+    const post = await this.getPostById(postId);
+
+    const bookmarks = post.actions.bookmarks;
+
+    return bookmarks.some((bookmark) => bookmark.equals(userId));
+  }
+
+  async updateBookmarks(postId: Types.ObjectId, userId: Types.ObjectId) {
+    const isBookmarkingonPost = await this.isBookmarking(postId, userId);
+
+    const isBookmarkingOnUser = await userService.isBookmarking(userId, postId);
+
+    // 기록이 불일치하는 경우
+    if (isBookmarkingonPost !== isBookmarkingOnUser) {
+      // 기록 동기화
+      await postRepository.removeBookmark(postId, userId);
+      await userRepository.removeBookmark(userId, postId);
+
+      return;
+    }
+
+    const isBookmarking = isBookmarkingonPost && isBookmarkingOnUser;
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    let postResult: UpdateResult | undefined;
+    let userResult: UpdateResult | undefined;
+
+    try {
+      postResult = isBookmarking
+        ? await postRepository.removeBookmark(postId, userId, session)
+        : await postRepository.addBookmark(postId, userId, session);
+
+      userResult = isBookmarking
+        ? await userRepository.removeBookmark(userId, postId, session)
+        : await userRepository.addBookmark(userId, postId, session);
+
+      if (!userResult || userResult.modifiedCount === 0) {
+        throw new InternalServerError("유저 북마크 업데이트 중 에러 발생");
+      }
+
+      if (!postResult || postResult.modifiedCount === 0) {
+        throw new InternalServerError("포스트 북마크 업데이트 중 에러 발생");
+      }
+
+      if (userResult.matchedCount === 0) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      if (postResult.matchedCount === 0) {
+        throw new NotFoundError("포스트 조회 실패");
+      }
+
+      await session.commitTransaction();
+    } catch (error: any) {
+      await session.abortTransaction();
+      throw new InternalServerError("북마크 처리 중 에러 발생", error);
+    } finally {
+      session.endSession();
     }
   }
 }

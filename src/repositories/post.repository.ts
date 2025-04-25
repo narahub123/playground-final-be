@@ -497,6 +497,54 @@ class PostRepository {
       return [];
     }
   }
+
+  async addBookmark(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { $addToSet: { "actions.bookmarks": userId } }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addBookmark", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
+
+  async removeBookmark(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { $pull: { "actions.bookmarks": userId } }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeBookmark", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
 }
 
 export default new PostRepository();

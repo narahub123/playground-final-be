@@ -38,6 +38,7 @@ import {
   deletePost,
   updatePin,
   getPostById,
+  updateBookmarks,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -81,6 +82,7 @@ export {
   deletePost,
   updatePin,
   getPostById,
+  updateBookmarks,
 
   // privacy
   privacyController,

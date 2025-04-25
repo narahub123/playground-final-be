@@ -343,7 +343,28 @@ class UserService {
     return alreadyLike ? false : true;
   }
 
-  async updateBookmarks(userId: Types.ObjectId, postId: Types.ObjectId) {
+  async isBookmarking(userId: Types.ObjectId, postId: Types.ObjectId) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundError(
+        "User not found. (사용자를 찾을 수 없습니다.)",
+        "USER_NOT_FOUND",
+        {
+          userId,
+        }
+      );
+    }
+
+    const bookmarks = user.bookmarks;
+
+    return bookmarks.some((bookmark) => bookmark.equals(postId));
+  }
+
+  async updateBookmarks(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<void> {
     const user = await userRepository.getUserById(userId);
 
     if (!user) {
@@ -362,7 +383,7 @@ class UserService {
       ? await userRepository.addBookmark(userId, postId)
       : await userRepository.removeBookmark(userId, postId);
 
-    if (!result) {
+    if (!result || result.matchedCount === 0) {
       throw new InternalServerError("북마크 업데이트 도중 에러 발생");
     }
 
@@ -375,12 +396,6 @@ class UserService {
         }
       );
     }
-
-    if (result.modifiedCount === 0) {
-      throw new InternalServerError("북마크 업데이트 도중 에러 발생");
-    }
-
-    return hasBookmark ? false : true;
   }
 
   async updatePinnedPost(
@@ -493,7 +508,7 @@ class UserService {
           followedAt,
         };
       }
-      
+
       await session.commitTransaction();
 
       return response;
