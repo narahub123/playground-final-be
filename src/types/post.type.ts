@@ -24,6 +24,14 @@ interface IRepostRequestDto {
   originalPostId: Types.ObjectId;
 }
 
+interface ICommentRequestDto {
+  type: "comment";
+  author: mongoose.Types.ObjectId;
+  text?: string;
+  media?: string[];
+  originalPostId: Types.ObjectId;
+}
+
 interface IPostActions {
   comments: string[];
   reposts: Types.ObjectId[];
@@ -85,6 +93,7 @@ interface IPostResponseDto {
   vote?: IVote;
   actions: IPostActions;
   originalPost?: IPostResponseDto;
+  originalPostId?: Types.ObjectId;
   repostedAt?: Date;
   quotedAt?: Date;
   commentedAt?: Date;
@@ -102,5 +111,6 @@ export type {
   IAuthor,
   IPostResponseDto,
   IRepostRequestDto,
+  ICommentRequestDto,
   PostType,
 };

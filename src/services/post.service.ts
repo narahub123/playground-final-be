@@ -1,6 +1,7 @@
 import { InternalServerError, NotFoundError } from "@errors";
 import { postRepository, userRepository } from "@repositories";
 import {
+  ICommentRequestDto,
   IPost,
   IPostRequestDto,
   IPostResponseDto,
@@ -384,6 +385,63 @@ class PostService {
     } catch (error: any) {
       await session.abortTransaction();
       throw new InternalServerError("북마크 처리 중 에러 발생", error);
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async createComment(
+    comment: ICommentRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto> {
+    const newComment = await postRepository.createComment(comment, session);
+
+    if (!newComment) {
+      throw new InternalServerError("댓글 생성 중 에러 발생");
+    }
+
+    if (!newComment.originalPostId) {
+      throw new InternalServerError("댓글 생성 중 에러 발생");
+    }
+
+    return newComment;
+  }
+
+  async addComment(
+    postId: Types.ObjectId,
+    commentId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const result = await postRepository.addComment(postId, commentId, session);
+
+    if (result?.matchedCount === 0) {
+      throw new NotFoundError("포스트 조회 실패");
+    }
+
+    if (!result || result.modifiedCount === 0) {
+      throw new InternalServerError("댓글 추가 중 에러 발생");
+    }
+  }
+
+  async createAndAddComment(comment: ICommentRequestDto) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const { originalPostId } = comment;
+
+      const post = await this.getPostById(originalPostId);
+
+      const newComment = await this.createComment(comment, session);
+
+      const { _id: commentId } = newComment;
+
+      await this.addComment(post._id, commentId, session);
+      await session.commitTransaction();
+
+      return newComment;
+    } catch (error: any) {
+      await session.abortTransaction();
+      throw new InternalServerError("댓글 생성 및 추가 중 에러 발생", error);
     } finally {
       session.endSession();
     }

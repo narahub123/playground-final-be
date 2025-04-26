@@ -87,6 +87,7 @@ import {
   IPostResponseDto,
   IRepostRequestDto,
   PostType,
+  ICommentRequestDto,
 } from "./post.type";
 
 import { IRepost } from "./repost.type";
@@ -190,6 +191,7 @@ export {
   IPostResponseDto,
   IRepostRequestDto,
   PostType,
+  ICommentRequestDto,
 
   // repost
   IRepost,

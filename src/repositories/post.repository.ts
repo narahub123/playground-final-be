@@ -1,5 +1,6 @@
 import { Post } from "@models";
 import {
+  ICommentRequestDto,
   IPost,
   IPostRequestDto,
   IPostResponseDto,
@@ -125,6 +126,61 @@ class PostRepository {
       return posts[0] || null;
     } catch (error) {
       mongoDBErrorHandler("createRepost", error, { post });
+      return null;
+    }
+  }
+
+  async createComment(
+    comment: ICommentRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto | null> {
+    try {
+      const newPost = await Post.create([comment], { session });
+
+      const posts = await Post.aggregate<IPostResponseDto>(
+        [
+          { $match: { _id: newPost[0]?._id } },
+
+          // 1. 작성자 정보
+          {
+            $lookup: {
+              from: "users",
+              localField: "author",
+              foreignField: "_id",
+              as: "postAuthor",
+            },
+          },
+          { $unwind: "$postAuthor" },
+
+          // 3. 최종 결과 구성
+          {
+            $project: {
+              _id: 1,
+              type: 1,
+              text: 1,
+              media: 1,
+              schedule: 1,
+              vote: 1,
+              actions: 1,
+              pin: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              author: {
+                _id: "$postAuthor._id",
+                userId: "$postAuthor.userId",
+                username: "$postAuthor.username",
+                profileImage: "$postAuthor.profileImage",
+              },
+              originalPostId: 1, // 없으면 null
+            },
+          },
+        ],
+        { session }
+      );
+
+      return posts[0] || null;
+    } catch (error) {
+      mongoDBErrorHandler("createComment", error, { comment });
       return null;
     }
   }
@@ -541,6 +597,34 @@ class PostRepository {
       mongoDBErrorHandler("removeBookmark", error, {
         postId,
         userId,
+      });
+      return undefined;
+    }
+  }
+
+  async addComment(
+    postId: Types.ObjectId,
+    commentId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        {
+          $addToSet: {
+            "actions.comments": commentId,
+          },
+        }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addComment", error, {
+        postId,
+        commentId,
       });
       return undefined;
     }

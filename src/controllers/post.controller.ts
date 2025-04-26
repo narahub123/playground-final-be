@@ -9,6 +9,7 @@ import {
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
+  ICommentRequestDto,
 } from "@types";
 import { postService, userService } from "@services";
 import { JSDOM } from "jsdom";
@@ -384,6 +385,45 @@ const updateBookmarks = asyncWrapper(
   }
 );
 
+const createComment = asyncWrapper(
+  "createComment",
+  "Failed to create comment.(댓글 생성 실패)",
+  "COMMENT_CREATION_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const { text, media } = req.body;
+    const user = req.user;
+
+    if (!postid) {
+      throw new BadRequestError("postId 필수");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const commentDto: ICommentRequestDto = {
+      type: "comment",
+      author: user._id,
+      text,
+      media,
+      originalPostId: postId,
+    };
+
+    const comment = await postService.createAndAddComment(commentDto);
+
+    const response: IApiSuccessResponse<{ comment: IPostResponseDto }> = {
+      success: true,
+      message: "Comment created successfully.(댓글 생성 성공)",
+      code: "COMMENT_CREATION_SUCCEEDED",
+      data: {
+        comment,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(201).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -394,4 +434,5 @@ export {
   updatePin,
   getPostById,
   updateBookmarks,
+  createComment,
 };

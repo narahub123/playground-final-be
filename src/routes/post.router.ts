@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authTokenMiddleware } from "@middlewares";
 import {
   addRepost,
+  createComment,
   creatNewPost,
   deletePost,
   getPostById,
@@ -17,6 +18,7 @@ export default (router: Router) => {
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, addRepost);
+  router.post("/posts/:postid/comment", authTokenMiddleware, createComment);
   router.patch("/posts/:postId/likes", authTokenMiddleware, updateLikes);
   router.patch(
     "/posts/:postid/bookmarks",
