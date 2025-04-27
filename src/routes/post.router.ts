@@ -5,6 +5,7 @@ import {
   createComment,
   creatNewPost,
   deletePost,
+  getComments,
   getPostById,
   getPostPreview,
   updateBookmarks,
@@ -16,6 +17,7 @@ import {
 export default (router: Router) => {
   router.post("/posts", authTokenMiddleware, creatNewPost);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
+  router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, addRepost);
   router.post("/posts/:postid/comment", authTokenMiddleware, createComment);

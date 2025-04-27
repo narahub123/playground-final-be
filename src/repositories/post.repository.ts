@@ -9,7 +9,6 @@ import {
 import { mongoDBErrorHandler } from "@utils";
 import mongoose, {
   ClientSession,
-  DeleteResult,
   Types,
   UpdateResult,
   UpdateWriteOpResult,
@@ -627,6 +626,63 @@ class PostRepository {
         commentId,
       });
       return undefined;
+    }
+  }
+
+  async getCommentsByOrignalPostId(
+    originalPostId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const comments = await Post.aggregate<IPostResponseDto>(
+        [
+          { $match: { originalPostId, type: "comment" } },
+
+          // 1. 작성자 정보
+          {
+            $lookup: {
+              from: "users",
+              localField: "author",
+              foreignField: "_id",
+              as: "postAuthor",
+            },
+          },
+          { $unwind: "$postAuthor" },
+
+          { $limit: 10 },
+
+          // 3. 최종 결과 구성
+          {
+            $project: {
+              _id: 1,
+              type: 1,
+              text: 1,
+              media: 1,
+              schedule: 1,
+              vote: 1,
+              actions: 1,
+              pin: 1,
+              createdAt: 1,
+              updatedAt: 1,
+              author: {
+                _id: "$postAuthor._id",
+                userId: "$postAuthor.userId",
+                username: "$postAuthor.username",
+                profileImage: "$postAuthor.profileImage",
+              },
+              originalPostId: 1, // 없으면 null
+            },
+          },
+        ],
+        { session }
+      );
+
+      return comments;
+    } catch (error) {
+      mongoDBErrorHandler("getCommentsByOrignalPostId", error, {
+        originalPostId,
+      });
+      throw error;
     }
   }
 }

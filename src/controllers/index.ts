@@ -40,6 +40,7 @@ import {
   getPostById,
   updateBookmarks,
   createComment,
+  getComments,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -85,6 +86,7 @@ export {
   getPostById,
   updateBookmarks,
   createComment,
+  getComments,
 
   // privacy
   privacyController,

@@ -424,6 +424,33 @@ const createComment = asyncWrapper(
   }
 );
 
+const getComments = asyncWrapper(
+  "getComments",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+
+    if (!postid) {
+      throw new BadRequestError("포스트 아이디 필수");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const comments = await postService.getCommentByOriginalPostId(postId);
+
+    const response: IApiSuccessResponse<{ comments: IPostResponseDto[] }> = {
+      success: true,
+      message: "Bookmarks updated successfully.(북마크 업데이트 성공)",
+      code: "UPDATE_BOOKMARKS_SUCCEEDED",
+      data: { comments },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -435,4 +462,5 @@ export {
   getPostById,
   updateBookmarks,
   createComment,
+  getComments,
 };

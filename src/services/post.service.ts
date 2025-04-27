@@ -446,6 +446,14 @@ class PostService {
       session.endSession();
     }
   }
+
+  async getCommentByOriginalPostId(originalPostId: Types.ObjectId) {
+    const comments = await postRepository.getCommentsByOrignalPostId(
+      originalPostId
+    );
+
+    return comments;
+  }
 }
 
 export default new PostService();
