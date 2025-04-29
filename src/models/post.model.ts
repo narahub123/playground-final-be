@@ -12,15 +12,18 @@ const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
 const PostActionsSchema = new mongoose.Schema<IPostActions>(
   {
     comments: {
-      type: [String],
+      type: [Schema.Types.ObjectId],
+      ref: "Post",
       default: [],
     },
     reposts: {
       type: [Schema.Types.ObjectId],
+      ref: "Post",
       default: [],
     },
     likes: {
       type: [Schema.Types.ObjectId],
+      ref: "User",
       default: [],
     },
     views: {

@@ -25,7 +25,7 @@ interface IRepostRequestDto {
 }
 
 interface IPostActions {
-  comments: string[];
+  comments: Types.ObjectId[];
   reposts: Types.ObjectId[];
   likes: Types.ObjectId[];
   bookmarks: Types.ObjectId[];
