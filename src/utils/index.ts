@@ -22,6 +22,24 @@ import deleteImage from "./deleteImage";
 import deleteVideo from "./deleteVideo";
 import deleteMedia from "./deleteMedia";
 import mapPostToIPostResponseDto from "./mapPostToIPostResponseDto";
+import {
+  matchPostById,
+  graphLookupOriginalPosts,
+  addSortedOriginalPosts,
+  unwindOriginalPosts,
+  lookupOriginalPostAuthor,
+  mapAuthorInfoToOriginalPosts,
+  groupOriginalPosts,
+  addPostData,
+  calculateCommentsCount,
+  fetchCommentsFromActions,
+  addFetchedCommentsIfEmpty,
+  lookupCommentAuthors,
+  mergeCommentAuthors,
+  projectFinalFields,
+} from "./aggregatePipelines";
+
+import aggregatePostById from "./aggregatePostById";
 
 export {
   connectDB,
@@ -49,4 +67,21 @@ export {
   deleteVideo,
   deleteMedia,
   mapPostToIPostResponseDto,
+  aggregatePostById,
+
+  // aggregatePipelines
+  matchPostById,
+  graphLookupOriginalPosts,
+  addSortedOriginalPosts,
+  unwindOriginalPosts,
+  lookupOriginalPostAuthor,
+  mapAuthorInfoToOriginalPosts,
+  groupOriginalPosts,
+  addPostData,
+  calculateCommentsCount,
+  fetchCommentsFromActions,
+  addFetchedCommentsIfEmpty,
+  lookupCommentAuthors,
+  mergeCommentAuthors,
+  projectFinalFields,
 };
