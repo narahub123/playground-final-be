@@ -6,7 +6,11 @@ import {
   IPostResponseDto,
   IRepostRequestDto,
 } from "@types";
-import { aggregatePostById, mongoDBErrorHandler } from "@utils";
+import {
+  aggregatePostById,
+  aggregatePostsByUserId,
+  mongoDBErrorHandler,
+} from "@utils";
 import mongoose, {
   ClientSession,
   Types,
@@ -188,95 +192,7 @@ class PostRepository {
     authorId: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {
     try {
-      const posts = await Post.aggregate<IPostResponseDto>([
-        { $match: { author: authorId } },
-
-        // 1. 작성자 정보
-        {
-          $lookup: {
-            from: "users",
-            localField: "author",
-            foreignField: "_id",
-            as: "postAuthor",
-          },
-        },
-        { $unwind: "$postAuthor" },
-
-        // 2. originalPost가 있는 경우에만 연결
-        {
-          $lookup: {
-            from: "posts",
-            let: { originalId: "$originalPostId" },
-            pipeline: [
-              { $match: { $expr: { $eq: ["$_id", "$$originalId"] } } },
-              {
-                $lookup: {
-                  from: "users",
-                  localField: "author",
-                  foreignField: "_id",
-                  as: "originalPostAuthor",
-                },
-              },
-              { $unwind: "$originalPostAuthor" },
-              {
-                $project: {
-                  _id: 1,
-                  type: 1,
-                  text: 1,
-                  media: 1,
-                  schedule: 1,
-                  vote: 1,
-                  actions: 1,
-                  pin: 1,
-                  createdAt: 1,
-                  updatedAt: 1,
-                  author: {
-                    _id: "$originalPostAuthor._id",
-                    userId: "$originalPostAuthor.userId",
-                    username: "$originalPostAuthor.username",
-                    profileImage: "$originalPostAuthor.profileImage",
-                  },
-                },
-              },
-            ],
-            as: "originalPost",
-          },
-        },
-        {
-          $addFields: {
-            originalPost: { $arrayElemAt: ["$originalPost", 0] }, // optional 처리
-          },
-        },
-
-        // 3. 최종 결과 구성
-        {
-          $project: {
-            _id: 1,
-            type: 1,
-            text: 1,
-            media: 1,
-            schedule: 1,
-            vote: 1,
-            actions: 1,
-            pin: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            author: {
-              _id: "$postAuthor._id",
-              userId: "$postAuthor.userId",
-              username: "$postAuthor.username",
-              profileImage: "$postAuthor.profileImage",
-            },
-            originalPost: 1, // 없으면 null
-          },
-        },
-
-        {
-          $sort: {
-            createdAt: -1,
-          },
-        },
-      ]);
+      const posts = await aggregatePostsByUserId(authorId);
 
       return posts;
     } catch (error) {

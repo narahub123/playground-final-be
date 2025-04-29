@@ -5,6 +5,11 @@ const matchPostById = (_id: Types.ObjectId) => {
   return { $match: { _id } };
 };
 
+// 1. 주어진 userId에 해당하는 포스트를 필터링
+const matchPostsByUserId = (userId: Types.ObjectId) => {
+  return { $match: { author: userId } };
+};
+
 // 2. 원본 포스트를 재귀적으로 조회하여 원본 포스트들 배열을 생성
 const graphLookupOriginalPosts = () => {
   return {
@@ -359,8 +364,14 @@ const projectFinalFields = () => {
   };
 };
 
+// 15. createdAt을 기준으로 역순으로 정렬
+const sortPostsByCreatedAtDesc = () => {
+  return { $sort: { createdAt: -1 as -1, "comments.commentedAt": -1 as -1 } };
+};
+
 export {
   matchPostById,
+  matchPostsByUserId,
   graphLookupOriginalPosts,
   addSortedOriginalPosts,
   unwindOriginalPosts,
@@ -374,4 +385,5 @@ export {
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,
+  sortPostsByCreatedAtDesc,
 };

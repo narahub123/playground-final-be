@@ -24,6 +24,7 @@ import deleteMedia from "./deleteMedia";
 import mapPostToIPostResponseDto from "./mapPostToIPostResponseDto";
 import {
   matchPostById,
+  matchPostsByUserId,
   graphLookupOriginalPosts,
   addSortedOriginalPosts,
   unwindOriginalPosts,
@@ -37,9 +38,11 @@ import {
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,
+  sortPostsByCreatedAtDesc,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
+import aggregatePostsByUserId from "./aggregatePostsByUserId";
 
 export {
   connectDB,
@@ -68,9 +71,11 @@ export {
   deleteMedia,
   mapPostToIPostResponseDto,
   aggregatePostById,
+  aggregatePostsByUserId,
 
   // aggregatePipelines
   matchPostById,
+  matchPostsByUserId,
   graphLookupOriginalPosts,
   addSortedOriginalPosts,
   unwindOriginalPosts,
@@ -84,4 +89,5 @@ export {
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,
+  sortPostsByCreatedAtDesc,
 };
