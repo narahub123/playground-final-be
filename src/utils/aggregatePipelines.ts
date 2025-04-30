@@ -1,4 +1,6 @@
+import { COMMENT_LENGTH } from "@constants";
 import { Types } from "mongoose";
+import { pipeline } from "stream";
 
 // 1. 주어진 _id에 해당하는 포스트를 필터링
 const matchPostById = (_id: Types.ObjectId) => {
@@ -197,8 +199,19 @@ const fetchCommentsFromActions = () => {
   return {
     $lookup: {
       from: "posts",
-      localField: "rootPost.actions.comments",
-      foreignField: "_id",
+      let: { commentIds: "$rootPost.actions.comments" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $in: ["$_id", "$$commentIds"],
+            },
+          },
+        },
+        {
+          $limit: COMMENT_LENGTH,
+        },
+      ],
       as: "comments",
     },
   };
