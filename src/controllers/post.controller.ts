@@ -426,10 +426,11 @@ const createComment = asyncWrapper(
 
 const getComments = asyncWrapper(
   "getComments",
-  "",
-  "",
+  "Failed to retrieve comments.(댓글 조회 실패)",
+  "GET_COMMENTS_FAILED",
   async (req: Request, res: Response) => {
     const { postid } = req.params;
+    let { skip } = req.query;
 
     if (!postid) {
       throw new BadRequestError("포스트 아이디 필수");
@@ -437,12 +438,18 @@ const getComments = asyncWrapper(
 
     const postId = new mongoose.Types.ObjectId(postid);
 
-    const comments = await postService.getCommentByOriginalPostId(postId);
+    if (!mongoose.Types.ObjectId.isValid(postid)) {
+      throw new BadRequestError("유효하지 않은 포스트 아이디입니다.");
+    }
+
+    const num = Number(skip ?? 0);
+
+    const comments = await postService.getCommentByPostId(postId, num);
 
     const response: IApiSuccessResponse<{ comments: IPostResponseDto[] }> = {
       success: true,
-      message: "Bookmarks updated successfully.(북마크 업데이트 성공)",
-      code: "UPDATE_BOOKMARKS_SUCCEEDED",
+      message: "Comments retrieved successfully.(댓글 조회 성공)",
+      code: "GET_COMMENTS_SUCCEEDED",
       data: { comments },
       timestamp: new Date().toISOString(),
     };

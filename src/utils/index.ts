@@ -38,10 +38,15 @@ import {
   projectFinalFields,
   sortPostsByCreatedAtDesc,
   addThreadLastCommentedAt,
+  fetchCommentsFromActionsWithSkip,
+  unwindComments,
+  replaceRootWithComments,
+  addSession,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
 import aggregatePostsByUserId from "./aggregatePostsByUserId";
+import aggregateCommentsByPostId from "./aggregateCommentsByPostId";
 
 export {
   connectDB,
@@ -71,6 +76,7 @@ export {
   mapPostToIPostResponseDto,
   aggregatePostById,
   aggregatePostsByUserId,
+  aggregateCommentsByPostId,
 
   // aggregatePipelines
   matchPostById,
@@ -88,4 +94,8 @@ export {
   projectFinalFields,
   sortPostsByCreatedAtDesc,
   addThreadLastCommentedAt,
+  fetchCommentsFromActionsWithSkip,
+  unwindComments,
+  replaceRootWithComments,
+  addSession,
 };

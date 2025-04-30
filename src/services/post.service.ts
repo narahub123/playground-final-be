@@ -447,9 +447,13 @@ class PostService {
     }
   }
 
-  async getCommentByOriginalPostId(originalPostId: Types.ObjectId) {
-    const comments = await postRepository.getCommentsByOrignalPostId(
-      originalPostId
+  async getCommentByPostId(originalPostId: Types.ObjectId, skip: number) {
+    // originalPostId의 유효성 확인
+    await this.getPostById(originalPostId);
+
+    const comments = await postRepository.getCommentsByPostId(
+      originalPostId,
+      skip
     );
 
     return comments;

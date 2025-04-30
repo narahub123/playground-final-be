@@ -1,5 +1,5 @@
 import { COMMENT_LENGTH } from "@constants";
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { pipeline } from "stream";
 
 // 1. 주어진 _id에 해당하는 포스트를 필터링
@@ -217,6 +217,41 @@ const fetchCommentsFromActions = () => {
   };
 };
 
+const fetchCommentsFromActionsWithSkip = (skip: number) => {
+  return {
+    $lookup: {
+      from: "posts",
+      let: { commentIds: "$actions.comments" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $in: ["$_id", "$$commentIds"],
+            },
+          },
+        },
+        {
+          $skip: COMMENT_LENGTH * skip,
+        },
+        {
+          $limit: COMMENT_LENGTH,
+        },
+      ],
+      as: "comments",
+    },
+  };
+};
+
+const unwindComments = () => {
+  return {
+    $unwind: "$comments",
+  };
+};
+
+const replaceRootWithComments = () => {
+  return { $replaceRoot: { newRoot: "$comments" } };
+};
+
 // 12. 댓글의 작성자 정보를 users 컬렉션에서 조회
 const lookupCommentAuthors = () => {
   return {
@@ -404,6 +439,10 @@ const sortPostsByCreatedAtDesc = () => {
   return { $sort: { createdAt: -1 as -1, threadLastCommentedAt: -1 as -1 } };
 };
 
+const addSession = (session?: ClientSession) => {
+  return { session };
+};
+
 export {
   matchPostById,
   matchPostsByUserId,
@@ -415,9 +454,13 @@ export {
   groupOriginalPosts,
   addPostData,
   fetchCommentsFromActions,
+  fetchCommentsFromActionsWithSkip,
+  unwindComments,
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,
   sortPostsByCreatedAtDesc,
   addThreadLastCommentedAt,
+  replaceRootWithComments,
+  addSession,
 };
