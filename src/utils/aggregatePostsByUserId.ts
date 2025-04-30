@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import {
   addPostData,
   addSortedOriginalPosts,
+  addThreadLastCommentedAt,
   graphLookupOriginalPosts,
   groupOriginalPosts,
   lookupOriginalPostAuthor,
@@ -45,9 +46,13 @@ const aggregatePostsByUserId = async (
     // 14. 최종 결과 필드 설정
     projectFinalFields(),
 
+    addThreadLastCommentedAt(),
+
     // 15. createdAt을 기준으로 역순으로 정렬
     sortPostsByCreatedAtDesc(),
   ]);
+
+  console.log(posts);
 
   return posts;
 };

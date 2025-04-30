@@ -372,9 +372,23 @@ const projectFinalFields = () => {
   };
 };
 
+const addThreadLastCommentedAt = () => ({
+  $addFields: {
+    threadLastCommentedAt: {
+      $max: {
+        $map: {
+          input: "$thread",
+          as: "entry",
+          in: "$$entry.createdAt",
+        },
+      },
+    },
+  },
+});
+
 // 15. createdAt을 기준으로 역순으로 정렬
 const sortPostsByCreatedAtDesc = () => {
-  return { $sort: { createdAt: -1 as -1, "thread.commentedAt": -1 as -1 } };
+  return { $sort: { createdAt: -1 as -1, threadLastCommentedAt: -1 as -1 } };
 };
 
 export {
@@ -392,4 +406,5 @@ export {
   mergeCommentAuthors,
   projectFinalFields,
   sortPostsByCreatedAtDesc,
+  addThreadLastCommentedAt,
 };

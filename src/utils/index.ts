@@ -37,6 +37,7 @@ import {
   mergeCommentAuthors,
   projectFinalFields,
   sortPostsByCreatedAtDesc,
+  addThreadLastCommentedAt,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
@@ -86,4 +87,5 @@ export {
   mergeCommentAuthors,
   projectFinalFields,
   sortPostsByCreatedAtDesc,
+  addThreadLastCommentedAt,
 };
