@@ -429,13 +429,13 @@ class PostService {
     try {
       const { originalPostId } = comment;
 
-      const post = await this.getPostById(originalPostId);
+      await this.getPostById(originalPostId);
 
       const newComment = await this.createComment(comment, session);
 
       const { _id: commentId } = newComment;
 
-      await this.addComment(post._id, commentId, session);
+      await this.addComment(originalPostId, commentId, session);
       await session.commitTransaction();
 
       return newComment;
