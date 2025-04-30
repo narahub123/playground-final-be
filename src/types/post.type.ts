@@ -100,6 +100,8 @@ interface IPostResponseDto {
   createdAt?: Date;
   updatedAt?: Date;
   pin: boolean;
+  thread?: IPostResponseDto[];
+  comments?: IPostResponseDto[];
 }
 
 export type {

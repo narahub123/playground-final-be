@@ -181,7 +181,7 @@ const addPostData = () => {
           else: null, // repost, quote 타입만 있는 경우
         },
       },
-      comments: {
+      thread: {
         $filter: {
           input: "$originalPosts",
           as: "op",
@@ -192,38 +192,14 @@ const addPostData = () => {
   };
 };
 
-// 9. 댓글의 개수를 계산하여 commentsCount에 추가
-const calculateCommentsCount = () => {
-  return {
-    $addFields: {
-      commentsCount: { $size: "$comments" },
-    },
-  };
-};
-
 // 10. actions.comments에서 해당 포스트의 댓글 가져오기
 const fetchCommentsFromActions = () => {
   return {
     $lookup: {
       from: "posts",
-      localField: "postData.actions.comments",
+      localField: "rootPost.actions.comments",
       foreignField: "_id",
-      as: "fetchedPosts",
-    },
-  };
-};
-
-// 11. 댓글이 없으면 fetchedPosts에서 댓글을 가져와 comments 배열에 추가
-const addFetchedCommentsIfEmpty = () => {
-  return {
-    $addFields: {
-      comments: {
-        $cond: {
-          if: { $eq: ["$commentsCount", 0] },
-          then: { $concatArrays: ["$comments", "$fetchedPosts"] },
-          else: "$comments",
-        },
-      },
+      as: "comments",
     },
   };
 };
@@ -312,7 +288,7 @@ const projectFinalFields = () => {
           profileImage: "$originalPost.author.profileImage",
           intro: "$originalPost.author.intro",
           followings: "$originalPost.author.followings",
-          followers: "$originalPost.author.followings",
+          followers: "$originalPost.author.followers",
         },
         text: "$originalPost.text",
         media: "$originalPost.media",
@@ -328,6 +304,38 @@ const projectFinalFields = () => {
         updatedAt: "$originalPost.updatedAt",
         pin: "$originalPost.pin",
       },
+      thread: {
+        $map: {
+          input: "$thread",
+          as: "entry",
+          in: {
+            _id: "$$entry._id",
+            type: "$$entry.type",
+            author: {
+              _id: "$$entry.author._id",
+              userId: "$$entry.author.userId",
+              username: "$$entry.author.username",
+              profileImage: "$$entry.author.profileImage",
+              intro: "$$entry.author.intro",
+              followings: "$$entry.author.followings",
+              followers: "$$entry.author.followers",
+            },
+            text: "$$entry.text",
+            media: "$$entry.media",
+            schedule: "$$entry.schedule",
+            vote: "$$entry.vote",
+            actions: "$$entry.actions",
+            originalPost: "$$entry.originalPost",
+            originalPostId: "$$entry.originalPostId",
+            repostedAt: "$$entry.repostedAt",
+            quotedAt: "$$entry.quotedAt",
+            entryedAt: "$$entry.commentedAt",
+            createdAt: "$$entry.createdAt",
+            updatedAt: "$$entry.updatedAt",
+            pin: "$$entry.pin",
+          },
+        },
+      },
       comments: {
         $map: {
           input: "$comments",
@@ -342,7 +350,7 @@ const projectFinalFields = () => {
               profileImage: "$$comment.author.profileImage",
               intro: "$$comment.author.intro",
               followings: "$$comment.author.followings",
-              followers: "$$comment.author.followings",
+              followers: "$$comment.author.followers",
             },
             text: "$$comment.text",
             media: "$$comment.media",
@@ -366,7 +374,7 @@ const projectFinalFields = () => {
 
 // 15. createdAt을 기준으로 역순으로 정렬
 const sortPostsByCreatedAtDesc = () => {
-  return { $sort: { createdAt: -1 as -1, "comments.commentedAt": -1 as -1 } };
+  return { $sort: { createdAt: -1 as -1, "thread.commentedAt": -1 as -1 } };
 };
 
 export {
@@ -379,9 +387,7 @@ export {
   mapAuthorInfoToOriginalPosts,
   groupOriginalPosts,
   addPostData,
-  calculateCommentsCount,
   fetchCommentsFromActions,
-  addFetchedCommentsIfEmpty,
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,

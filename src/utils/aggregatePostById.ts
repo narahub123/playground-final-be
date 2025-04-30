@@ -1,10 +1,8 @@
 import { Types } from "mongoose";
 import { Post } from "@models";
 import {
-  addFetchedCommentsIfEmpty,
   addPostData,
   addSortedOriginalPosts,
-  calculateCommentsCount,
   fetchCommentsFromActions,
   graphLookupOriginalPosts,
   groupOriginalPosts,
@@ -46,14 +44,8 @@ const aggregatePostById = async (
     // 8. postData, originalPost, comments를 나누어 각 필드에 할당
     addPostData(),
 
-    // 9. 댓글의 개수를 계산하여 commentsCount에 추가
-    calculateCommentsCount(),
-
     // 10. actions.comments에서 해당 포스트의 댓글 가져오기
     fetchCommentsFromActions(),
-
-    // 11. 댓글이 없으면 fetchedPosts에서 댓글을 가져와 comments 배열에 추가
-    addFetchedCommentsIfEmpty(),
 
     // 12. 댓글의 작성자 정보를 users 컬렉션에서 조회
     lookupCommentAuthors(),
@@ -64,6 +56,8 @@ const aggregatePostById = async (
     // 14. 최종 결과 필드 설정
     projectFinalFields(),
   ]);
+
+  console.log(posts[0]);
 
   return posts[0];
 };
