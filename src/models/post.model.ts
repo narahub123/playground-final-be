@@ -11,30 +11,78 @@ const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
 
 const PostActionsSchema = new mongoose.Schema<IPostActions>(
   {
-    comments: {
-      type: [Schema.Types.ObjectId],
-      ref: "Post",
-      default: [],
-    },
-    reposts: {
-      type: [Schema.Types.ObjectId],
-      ref: "Post",
-      default: [],
-    },
-    likes: {
-      type: [Schema.Types.ObjectId],
-      ref: "User",
-      default: [],
-    },
+    comments: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+        },
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
+      },
+    ],
+    reposts: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+        },
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
+      },
+    ],
+    likes: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
+      },
+    ],
     views: {
       type: Number,
       default: 0,
     },
-    bookmarks: {
-      type: [Schema.Types.ObjectId],
-      ref: "User",
-      default: [],
-    },
+    bookmarks: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
+      },
+    ],
   },
   { _id: false, versionKey: false }
 );
@@ -89,6 +137,7 @@ const PostSchema = new mongoose.Schema<IPost>(
         comments: [],
         reposts: [],
         likes: [],
+        bookmarks: [],
         views: 0,
       }),
     },
@@ -109,7 +158,7 @@ const PostSchema = new mongoose.Schema<IPost>(
       default: function (this: IPost) {
         return this.type === "repost" && !!this.originalPostId
           ? new Date()
-          : undefined;
+          : null;
       },
     },
 
@@ -121,7 +170,7 @@ const PostSchema = new mongoose.Schema<IPost>(
       default: function (this: IPost) {
         return this.type === "quote" && !!this.originalPostId
           ? new Date()
-          : undefined;
+          : null;
       },
     },
 
@@ -133,7 +182,7 @@ const PostSchema = new mongoose.Schema<IPost>(
       default: function (this: IPost) {
         return this.type === "comment" && !!this.originalPostId
           ? new Date()
-          : undefined;
+          : null;
       },
     },
 
@@ -151,7 +200,7 @@ const PostSchema = new mongoose.Schema<IPost>(
 
     deletedAt: {
       type: Date,
-      default: undefined,
+      default: null,
     },
   },
   {
@@ -181,6 +230,15 @@ PostSchema.pre("validate", function (next) {
     }
   }
 
+  next();
+});
+
+// 논리 삭제 처리
+PostSchema.pre("save", function (next) {
+  const post = this as IPost;
+  if (post.isDeleted && !post.deletedAt) {
+    post.deletedAt = new Date(); // 삭제된 경우 삭제 날짜를 자동으로 기록
+  }
   next();
 });
 
