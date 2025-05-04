@@ -236,24 +236,44 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: [],
     },
 
-    bookmarks: {
-      type: [Schema.Types.ObjectId],
-      ref: "Post",
-      default: [],
-    },
-
-    likes: {
-      type: [Schema.Types.ObjectId],
-      ref: "Post",
-      default: [],
-      validate: {
-        validator: function (v: Types.ObjectId[]) {
-          // likes 배열에 중복이 없도록 처리 (예: 애플리케이션 레벨에서)
-          return v.every((val, index, self) => self.indexOf(val) === index);
+    bookmarks: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+          required: true,
         },
-        message: "중복된 좋아요는 허용되지 않습니다.",
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
       },
-    },
+    ],
+
+    likes: [
+      {
+        _id: {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+          required: true,
+        },
+        isDeleted: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+        deletedAt: {
+          type: Date,
+          default: null,
+        },
+      },
+    ],
+
     pinnedPost: {
       type: Schema.Types.ObjectId,
       ref: "Post",
