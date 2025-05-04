@@ -258,7 +258,7 @@ class UserRepository {
   async updateLike(
     userId: Types.ObjectId,
     postId: Types.ObjectId,
-    isCurrentDeleted: boolean,
+    isCurrentlyDeleted: boolean,
     session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
@@ -266,12 +266,12 @@ class UserRepository {
         {
           _id: userId,
           "likes._id": postId,
-          "likes.isDeleted": isCurrentDeleted,
+          "likes.isDeleted": isCurrentlyDeleted,
         },
         {
           $set: {
-            "likes.$.isDeleted": !isCurrentDeleted,
-            "likes.$.deletedAt": !isCurrentDeleted ? new Date() : null,
+            "likes.$.isDeleted": !isCurrentlyDeleted,
+            "likes.$.deletedAt": !isCurrentlyDeleted ? new Date() : null,
           },
         }
       );
@@ -327,12 +327,21 @@ class UserRepository {
       const updateQuery = User.updateOne(
         { _id: userId },
         {
-          $addToSet: {
-            [`bookmarks`]: postId,
+          $push: {
+            [`bookmarks`]: {
+              _id: postId,
+              isDeleted: false,
+              deletedAt: null,
+            },
           },
         }
       );
-      return session ? await updateQuery.session(session) : await updateQuery;
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
       mongoDBErrorHandler("addBookmark", error, { userId, postId });
@@ -340,24 +349,65 @@ class UserRepository {
     }
   }
 
-  async removeBookmark(
+  async updateBookmark(
     userId: Types.ObjectId,
     postId: Types.ObjectId,
+    isCurrentlyDeleted: boolean,
     session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
       const updateQuery = User.updateOne(
-        { _id: userId },
         {
-          $pull: {
-            [`bookmarks`]: postId,
+          _id: userId,
+          "bookmarks._id": postId,
+          "bookmarks.isDeleted": isCurrentlyDeleted,
+        },
+        {
+          $set: {
+            "bookmarks.$.isDeleted": !isCurrentlyDeleted,
+            "bookmarks.$.deletedAt": !isCurrentlyDeleted ? new Date() : null,
           },
         }
       );
-      return session ? await updateQuery.session(session) : await updateQuery;
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
-      mongoDBErrorHandler("removeBookmark", error, { userId, postId });
+      mongoDBErrorHandler("updateBookmark", error, { userId, postId });
+      return undefined;
+    }
+  }
+
+  async deleteBookmark(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    try {
+      const updateQuery = User.updateOne(
+        {
+          _id: userId,
+        },
+        {
+          $pull: {
+            bookmarks: { _id: postId },
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteBookmark", error, {
+        postId,
+        userId,
+      });
       return undefined;
     }
   }

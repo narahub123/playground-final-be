@@ -360,7 +360,7 @@ class UserService {
     return likedPost ? !likedPost.isDeleted : true;
   }
 
-  async isBookmarking(userId: Types.ObjectId, postId: Types.ObjectId) {
+  async getBookmarkedPost(userId: Types.ObjectId, postId: Types.ObjectId) {
     const user = await userRepository.getUserById(userId);
 
     if (!user) {
@@ -375,34 +375,26 @@ class UserService {
 
     const bookmarks = user.bookmarks;
 
-    return bookmarks.some((bookmark) => bookmark._id.equals(postId));
+    return bookmarks.find((bookmark) => bookmark._id.equals(postId));
   }
 
   async updateBookmarks(
     userId: Types.ObjectId,
-    postId: Types.ObjectId
-  ): Promise<void> {
-    const user = await userRepository.getUserById(userId);
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<boolean> {
+    const bookmarkedPost = await this.getBookmarkedPost(userId, postId);
 
-    if (!user) {
-      throw new NotFoundError(
-        "User not found. (사용자를 찾을 수 없습니다.)",
-        "USER_NOT_FOUND",
-        {
+    const result = bookmarkedPost
+      ? await userRepository.updateBookmark(
           userId,
-        }
-      );
-    }
+          postId,
+          bookmarkedPost.isDeleted,
+          session
+        )
+      : await userRepository.addBookmark(userId, postId, session);
 
-    const hasBookmark = user.bookmarks.some((bookmark) =>
-      bookmark._id.equals(postId)
-    );
-
-    const result = hasBookmark
-      ? await userRepository.addBookmark(userId, postId)
-      : await userRepository.removeBookmark(userId, postId);
-
-    if (!result || result.matchedCount === 0) {
+    if (!result || result.modifiedCount === 0) {
       throw new InternalServerError("북마크 업데이트 도중 에러 발생");
     }
 
@@ -415,6 +407,10 @@ class UserService {
         }
       );
     }
+
+    // true → 북마크가 추가됨
+    // false → 북마크가 제거됨
+    return bookmarkedPost ? !bookmarkedPost.isDeleted : true;
   }
 
   async updatePinnedPost(

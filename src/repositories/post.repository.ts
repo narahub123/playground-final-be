@@ -265,6 +265,8 @@ class PostRepository {
           $push: {
             [`actions.likes`]: {
               _id: userId,
+              isDeleted: false,
+              deletedAt: null,
             },
           },
         }
@@ -449,7 +451,15 @@ class PostRepository {
     try {
       const updateQuery = Post.updateOne(
         { _id: postId },
-        { $addToSet: { "actions.bookmarks": userId } }
+        {
+          $push: {
+            "actions.bookmarks": {
+              _id: userId,
+              isDeleted: false,
+              deletedAt: null,
+            },
+          },
+        }
       );
       const result = session
         ? await updateQuery.session(session)
@@ -465,15 +475,27 @@ class PostRepository {
     }
   }
 
-  async removeBookmark(
+  async updateBookmark(
     postId: Types.ObjectId,
     userId: Types.ObjectId,
+    isCurrentlyDeleted: boolean,
     session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
       const updateQuery = Post.updateOne(
-        { _id: postId },
-        { $pull: { "actions.bookmarks": userId } }
+        {
+          _id: postId,
+          "actions.bookmarks._id": userId,
+          "actions.bookmarks.isDeleted": isCurrentlyDeleted,
+        },
+        {
+          $set: {
+            "actions.bookmarks.$.isDeleted": !isCurrentlyDeleted,
+            "actions.bookmarks.$.deletedAt": !isCurrentlyDeleted
+              ? new Date()
+              : null,
+          },
+        }
       );
       const result = session
         ? await updateQuery.session(session)
@@ -481,7 +503,31 @@ class PostRepository {
 
       return result;
     } catch (error) {
-      mongoDBErrorHandler("removeBookmark", error, {
+      mongoDBErrorHandler("updateBookmark", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
+
+  async deleteBookmark(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { $pull: { "actions.bookmarks": { _id: userId } } }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteBookmark", error, {
         postId,
         userId,
       });
