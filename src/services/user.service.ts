@@ -5,6 +5,7 @@ import {
   IFollowingResponse,
   IPhone,
   IUser,
+  IUserLike,
   LockReasonType,
   SkintoneType,
 } from "@types";
@@ -13,7 +14,7 @@ import {
   phoneRepository,
   userRepository,
 } from "@repositories";
-import { Types, UpdateResult } from "mongoose";
+import { ClientSession, Types, UpdateResult } from "mongoose";
 import mongoose from "mongoose";
 
 class UserService {
@@ -312,22 +313,34 @@ class UserService {
     }
   }
 
-  async isLiking(userId: Types.ObjectId, postId: Types.ObjectId) {
+  async getLikedPost(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<IUserLike | undefined> {
     const user = await userRepository.getUserById(userId);
 
     if (!user) {
       throw new NotFoundError("사용자를 찾을 수 없습니다.", "USER_NOT_FOUND");
     }
 
-    return user.likes.some((like) => like.equals(postId));
+    return user.likes.find((like) => like._id.equals(postId));
   }
 
-  async updateLikes(userId: Types.ObjectId, postId: Types.ObjectId) {
-    const isLiking = await this.isLiking(userId, postId);
+  async updateLikes(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const likedPost = await this.getLikedPost(userId, postId);
 
-    const result = isLiking
-      ? await userRepository.deleteLike(userId, postId)
-      : await userRepository.addLike(userId, postId);
+    const result = likedPost
+      ? await userRepository.updateLike(
+          userId,
+          postId,
+          likedPost.isDeleted,
+          session
+        )
+      : await userRepository.addLike(userId, postId, session);
 
     if (!result) {
       throw new InternalServerError("좋아요 업데이트 중 에러 발생");
@@ -344,7 +357,7 @@ class UserService {
       throw new InternalServerError("유저의 좋아요 업데이트 실패");
     }
 
-    return isLiking ? false : true;
+    return likedPost ? !likedPost.isDeleted : true;
   }
 
   async isBookmarking(userId: Types.ObjectId, postId: Types.ObjectId) {
@@ -362,7 +375,7 @@ class UserService {
 
     const bookmarks = user.bookmarks;
 
-    return bookmarks.some((bookmark) => bookmark.equals(postId));
+    return bookmarks.some((bookmark) => bookmark._id.equals(postId));
   }
 
   async updateBookmarks(
@@ -381,7 +394,9 @@ class UserService {
       );
     }
 
-    const hasBookmark = user.bookmarks.includes(postId);
+    const hasBookmark = user.bookmarks.some((bookmark) =>
+      bookmark._id.equals(postId)
+    );
 
     const result = hasBookmark
       ? await userRepository.addBookmark(userId, postId)

@@ -3,6 +3,7 @@ import { postRepository, userRepository } from "@repositories";
 import {
   ICommentRequestDto,
   IPost,
+  IPostAction,
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
@@ -172,21 +173,30 @@ class PostService {
     return true;
   }
 
-  async isLiking(
+  async getLikingUser(
     postId: Types.ObjectId,
     userId: Types.ObjectId
-  ): Promise<boolean> {
+  ): Promise<IPostAction | undefined> {
     const post = await this.getPostById(postId);
 
-    return post.actions.likes.some((like) => like.equals(userId));
+    return post.actions.likes.find((like) => like._id.equals(userId));
   }
 
-  async updateLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
-    const isLiking = await this.isLiking(postId, userId);
+  async updateLikes(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const likingUser = await this.getLikingUser(postId, userId);
 
-    const result = isLiking
-      ? await postRepository.deleteLike(postId, userId)
-      : await postRepository.addLike(postId, userId);
+    const result = likingUser
+      ? await postRepository.updateLike(
+          postId,
+          userId,
+          likingUser.isDeleted,
+          session
+        )
+      : await postRepository.addLike(postId, userId, session);
 
     if (!result) {
       throw new InternalServerError("서버 내부 에러");
@@ -210,21 +220,30 @@ class PostService {
       throw new InternalServerError("포스트의 좋아요 업데이트가 되지 않음");
     }
 
-    return isLiking ? false : true;
+    // 좋아요 추가 시 true, 삭제시 false 반환
+    return likingUser ? !likingUser.isDeleted : true;
   }
 
   async updatePostAndUserLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
-    const postLike = await this.isLiking(postId, userId);
-    const userLike = await userService.isLiking(userId, postId);
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (postLike !== userLike) {
-      await userRepository.deleteLike(userId, postId);
-      await postRepository.deleteLike(postId, userId);
-      return;
+    try {
+      const postLike = await this.updateLikes(postId, userId, session);
+      const userLike = await userService.updateLikes(userId, postId, session);
+
+      if (postLike !== userLike) {
+        await postRepository.deleteLike(postId, userId, session);
+        await userRepository.deleteLike(userId, postId, session);
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    await this.updateLikes(postId, userId);
-    await userService.updateLikes(userId, postId);
   }
 
   async deletePost(postId: Types.ObjectId, userId: Types.ObjectId) {
@@ -331,7 +350,7 @@ class PostService {
 
     const bookmarks = post.actions.bookmarks;
 
-    return bookmarks.some((bookmark) => bookmark.equals(userId));
+    return bookmarks.some((bookmark) => bookmark._id.equals(userId));
   }
 
   async updateBookmarks(postId: Types.ObjectId, userId: Types.ObjectId) {

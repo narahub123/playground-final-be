@@ -226,13 +226,26 @@ class UserRepository {
 
   async addLike(
     userId: Types.ObjectId,
-    postId: Types.ObjectId
+    postId: Types.ObjectId,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      const result = await User.updateOne(
+      const updateQuery = User.updateOne(
         { _id: userId },
-        { $addToSet: { [`likes`]: postId } }
+        {
+          $push: {
+            [`likes`]: {
+              _id: postId,
+              isDeleted: false,
+              deletedAt: null,
+            },
+          },
+        }
       );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
 
       return result;
     } catch (error) {
@@ -242,20 +255,65 @@ class UserRepository {
     }
   }
 
-  async deleteLike(
+  async updateLike(
     userId: Types.ObjectId,
-    postId: Types.ObjectId
+    postId: Types.ObjectId,
+    isCurrentDeleted: boolean,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      const result = await User.updateOne(
-        { _id: userId },
-        { $pull: { [`likes`]: postId } }
+      const updateQuery = User.updateOne(
+        {
+          _id: userId,
+          "likes._id": postId,
+          "likes.isDeleted": isCurrentDeleted,
+        },
+        {
+          $set: {
+            "likes.$.isDeleted": !isCurrentDeleted,
+            "likes.$.deletedAt": !isCurrentDeleted ? new Date() : null,
+          },
+        }
       );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
 
       return result;
     } catch (error) {
       // 에러 발생 시, 에러 처리 핸들러 호출
-      mongoDBErrorHandler("deleteLike", error, { userId, postId });
+      mongoDBErrorHandler("updateLike", error, { userId, postId });
+      return undefined;
+    }
+  }
+
+  async deleteLike(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    try {
+      const updateQuery = User.updateOne(
+        {
+          _id: userId,
+        },
+        {
+          $pull: {
+            likes: { _id: postId },
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteLike", error, {
+        postId,
+        userId,
+      });
       return undefined;
     }
   }

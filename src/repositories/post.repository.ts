@@ -255,13 +255,23 @@ class PostRepository {
 
   async addLike(
     postId: Types.ObjectId,
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      const result = await Post.updateOne(
+      const updateQuery = Post.updateOne(
         { _id: postId },
-        { $addToSet: { [`actions.likes`]: userId } }
+        {
+          $push: {
+            [`actions.likes`]: {
+              _id: userId,
+            },
+          },
+        }
       );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
 
       return result;
     } catch (error) {
@@ -273,15 +283,60 @@ class PostRepository {
     }
   }
 
-  async deleteLike(
+  async updateLike(
     postId: Types.ObjectId,
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
+    isDeleted: boolean,
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      const result = await Post.updateOne(
-        { _id: postId },
-        { $pull: { [`actions.likes`]: userId } }
+      const updateQuery = Post.updateOne(
+        {
+          _id: postId,
+          "actions.likes._id": userId,
+          "actions.likes.isDeleted": isDeleted,
+        },
+        {
+          $set: {
+            "actions.likes.$.isDeleted": !isDeleted,
+            "actions.likes.$.deletedAt": !isDeleted ? new Date() : null,
+          },
+        }
       );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateLike", error, {
+        postId,
+        userId,
+      });
+      return undefined;
+    }
+  }
+
+  async deleteLike(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    try {
+      const updateQuery = Post.updateOne(
+        {
+          _id: postId,
+        },
+        {
+          $pull: {
+            "actions.likes": { _id: userId },
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
 
       return result;
     } catch (error) {
