@@ -142,6 +142,17 @@ const PostSchema = new mongoose.Schema<IPost>(
       default: false,
       required: true,
     },
+
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    deletedAt: {
+      type: Date,
+      default: undefined,
+    },
   },
   {
     timestamps: true,

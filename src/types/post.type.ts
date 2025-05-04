@@ -69,6 +69,10 @@ interface IPost extends Document {
 
   pin: boolean; // 전체 고정을 하는 경우
 
+  isDeleted: boolean;
+
+  deletedAt?: Date;
+
   createdAt: Date;
   updatedAt: Date;
 }
