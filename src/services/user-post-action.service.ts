@@ -22,6 +22,12 @@ class UserPostActionService {
     return likes;
   }
 
+  async getLikesByUserId(userId: Types.ObjectId): Promise<IUserPostAction[]> {
+    const likes = await userPostActionRepository.getLikesByUserId(userId);
+
+    return likes;
+  }
+
   async addLike(
     userId: Types.ObjectId,
     postId: Types.ObjectId,
@@ -60,6 +66,14 @@ class UserPostActionService {
     if (result.modifiedCount === 0) {
       throw new InternalServerError("좋아요 업데이트 실패");
     }
+  }
+
+  async getBookmarksByUserId(userId: Types.ObjectId) {
+    const bookmarks = await userPostActionRepository.getBookmarksByUserId(
+      userId
+    );
+
+    return bookmarks;
   }
 }
 

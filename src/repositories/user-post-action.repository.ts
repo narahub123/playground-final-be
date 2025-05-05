@@ -25,13 +25,26 @@ class UserPostActionRepository {
     }
   }
 
-  async getLikesByPostId(userId: Types.ObjectId): Promise<IUserPostAction[]> {
+  async getLikesByPostId(postId: Types.ObjectId): Promise<IUserPostAction[]> {
     try {
-      const likes = await UserPostAction.find({ userId });
+      const likes = await UserPostAction.find({ postId, type: "like" });
 
       return likes;
     } catch (error) {
       mongoDBErrorHandler("getLikesByPostId", error, {
+        postId,
+      });
+      return [];
+    }
+  }
+
+  async getLikesByUserId(userId: Types.ObjectId): Promise<IUserPostAction[]> {
+    try {
+      const likes = await UserPostAction.find({ userId, type: "like" });
+
+      return likes;
+    } catch (error) {
+      mongoDBErrorHandler("getLikesByUserId", error, {
         userId,
       });
       return [];
@@ -92,6 +105,21 @@ class UserPostActionRepository {
         _id,
         isCurrentlyDeleted,
       });
+    }
+  }
+
+  async getBookmarksByUserId(
+    userId: Types.ObjectId
+  ): Promise<IUserPostAction[]> {
+    try {
+      const bookmarks = await UserPostAction.find({ userId, type: "bookmark" });
+
+      return bookmarks;
+    } catch (error) {
+      mongoDBErrorHandler("getBookmarksByUserId", error, {
+        userId,
+      });
+      return [];
     }
   }
 }

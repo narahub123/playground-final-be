@@ -15,6 +15,7 @@ import {
   postService,
   privacyService,
   securityService,
+  userPostActionService,
   userService,
 } from "@services";
 import {
@@ -232,11 +233,18 @@ const getCurrentUser = asyncWrapper(
       user.userId
     );
 
+    const likes = await userPostActionService.getLikesByUserId(user._id);
+    const bookmarks = await userPostActionService.getBookmarksByUserId(
+      user._id
+    );
+
     const userInfo = {
       ...userData,
       accountGroup: newAccountGroup,
       emails: emails.map((item) => item.email),
       phones: phones.map((item) => item.phone),
+      likes,
+      bookmarks,
     };
 
     const display = await displayService.getDisplayByUserId(user._id);
@@ -618,11 +626,6 @@ const updateMe = asyncWrapper(
       );
 
       await userService.updateRecentEmojis(user.userId, limitedRecentEmojis);
-    }
-
-    if (body.bookmarks) {
-      const postId = new mongoose.Types.ObjectId(body.bookmarks);
-      await userService.updateBookmarks(user._id, postId);
     }
 
     if (body.pinnedPost) {
