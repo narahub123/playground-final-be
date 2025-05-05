@@ -81,6 +81,7 @@ const PostSchema = new mongoose.Schema<IPost>(
     actions: {
       type: PostActionsSchema,
       required: true,
+      default: {},
     },
 
     originalPostId: {

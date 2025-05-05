@@ -5,7 +5,6 @@ import {
   IFollowingResponse,
   IPhone,
   IUser,
-  IUserLike,
   LockReasonType,
   SkintoneType,
 } from "@types";
@@ -14,7 +13,7 @@ import {
   phoneRepository,
   userRepository,
 } from "@repositories";
-import { ClientSession, Types, UpdateResult } from "mongoose";
+import { Types } from "mongoose";
 import mongoose from "mongoose";
 
 class UserService {
@@ -311,106 +310,6 @@ class UserService {
         }
       );
     }
-  }
-
-  async getLikedPost(
-    userId: Types.ObjectId,
-    postId: Types.ObjectId
-  ): Promise<IUserLike | undefined> {
-    const user = await userRepository.getUserById(userId);
-
-    if (!user) {
-      throw new NotFoundError("사용자를 찾을 수 없습니다.", "USER_NOT_FOUND");
-    }
-
-    return user.likes.find((like) => like._id.equals(postId));
-  }
-
-  async updateLikes(
-    userId: Types.ObjectId,
-    postId: Types.ObjectId,
-    session?: ClientSession
-  ) {
-    const likedPost = await this.getLikedPost(userId, postId);
-
-    const result = likedPost
-      ? await userRepository.updateLike(
-          userId,
-          postId,
-          likedPost.isDeleted,
-          session
-        )
-      : await userRepository.addLike(userId, postId, session);
-
-    if (!result) {
-      throw new InternalServerError("좋아요 업데이트 중 에러 발생");
-    }
-
-    if (result.matchedCount === 0) {
-      throw new NotFoundError(
-        "조건에 맞는 사용자를 찾지 못함",
-        "USER_NOT_MATCHED"
-      );
-    }
-
-    if (result.modifiedCount === 0) {
-      throw new InternalServerError("유저의 좋아요 업데이트 실패");
-    }
-
-    return likedPost ? !likedPost.isDeleted : true;
-  }
-
-  async getBookmarkedPost(userId: Types.ObjectId, postId: Types.ObjectId) {
-    const user = await userRepository.getUserById(userId);
-
-    if (!user) {
-      throw new NotFoundError(
-        "User not found. (사용자를 찾을 수 없습니다.)",
-        "USER_NOT_FOUND",
-        {
-          userId,
-        }
-      );
-    }
-
-    const bookmarks = user.bookmarks;
-
-    return bookmarks.find((bookmark) => bookmark._id.equals(postId));
-  }
-
-  async updateBookmarks(
-    userId: Types.ObjectId,
-    postId: Types.ObjectId,
-    session?: ClientSession
-  ): Promise<boolean> {
-    const bookmarkedPost = await this.getBookmarkedPost(userId, postId);
-
-    const result = bookmarkedPost
-      ? await userRepository.updateBookmark(
-          userId,
-          postId,
-          bookmarkedPost.isDeleted,
-          session
-        )
-      : await userRepository.addBookmark(userId, postId, session);
-
-    if (!result || result.modifiedCount === 0) {
-      throw new InternalServerError("북마크 업데이트 도중 에러 발생");
-    }
-
-    if (result.matchedCount === 0) {
-      throw new NotFoundError(
-        "User not found. (사용자를 찾을 수 없습니다.)",
-        "USER_NOT_FOUND",
-        {
-          userId,
-        }
-      );
-    }
-
-    // true → 북마크가 추가됨
-    // false → 북마크가 제거됨
-    return bookmarkedPost ? !bookmarkedPost.isDeleted : true;
   }
 
   async updatePinnedPost(

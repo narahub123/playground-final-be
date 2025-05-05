@@ -11,6 +11,7 @@ import notificationService from "./notification.service";
 import privacyService from "./privacy.service";
 import securityService from "./security.service";
 import postService from "./post.service";
+import userPostActionService from "./user-post-action.service";
 
 export {
   // email
@@ -51,4 +52,7 @@ export {
 
   // post
   postService,
+
+  // userpostaction
+  userPostActionService,
 };

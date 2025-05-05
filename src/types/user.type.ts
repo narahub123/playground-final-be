@@ -1,4 +1,5 @@
 import mongoose, { Document, Types } from "mongoose";
+import { IUserPostAction } from "./user-post-action.type";
 
 /**
  * 성별을 나타내는 타입입니다.
@@ -150,8 +151,6 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
   skintoneType: SkintoneType;
   recentEmojis: IEmoji[];
-  bookmarks: Types.ObjectId[];
-  likes: Types.ObjectId[];
   pinnedPost: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -173,7 +172,6 @@ interface IUserInput {
 interface UserDTO {
   skintoneType: SkintoneType;
   recentEmoji: IEmoji;
-  bookmarks: string;
   pinnedPost: string;
   following: string;
 }
@@ -184,6 +182,11 @@ interface IFollowingResponse {
   username: string;
   profileImage: string;
   followedAt: Date;
+}
+
+interface IUserResponse extends IUser {
+  bookmarks: IUserPostAction[];
+  likes: IUserPostAction[];
 }
 
 export type {
@@ -200,4 +203,5 @@ export type {
   SkintoneType,
   UserDTO,
   IFollowingResponse,
+  IUserResponse,
 };

@@ -1,15 +1,19 @@
 import { InternalServerError, NotFoundError } from "@errors";
-import { postRepository, userRepository } from "@repositories";
+import {
+  postRepository,
+  userPostActionRepository,
+  userRepository,
+} from "@repositories";
 import {
   ICommentRequestDto,
   IPost,
-  IPostAction,
   IPostRequestDto,
   IPostResponseDto,
   IRepostRequestDto,
 } from "@types";
 import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
 import userService from "./user.service";
+import userPostActionService from "./user-post-action.service";
 
 class PostService {
   async createPost(
@@ -173,55 +177,56 @@ class PostService {
     return true;
   }
 
-  async getLikingUser(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId
-  ): Promise<IPostAction | undefined> {
-    const post = await this.getPostById(postId);
-
-    return post.actions.likes.find((like) => like._id.equals(userId));
-  }
-
-  async updateLikes(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ) {
-    const likingUser = await this.getLikingUser(postId, userId);
-
-    const result = likingUser
-      ? await postRepository.updateLike(
-          postId,
-          userId,
-          likingUser.isDeleted,
-          session
-        )
-      : await postRepository.addLike(postId, userId, session);
+  async addLike(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.addLike(postId, session);
 
     if (!result) {
-      throw new InternalServerError("서버 내부 에러");
+      throw new InternalServerError("좋아요 추가 도중 에러 발생");
     }
 
     if (result.matchedCount === 0) {
-      // 조건에 맞는 document가 없었음 → postId 잘못됐을 가능성
-      throw new NotFoundError(
-        "조건에 맞는 포스트를 찾지 못함",
-        "POST_NOT_MATCHED",
-        {
-          postId,
-          userId,
-        }
-      );
+      throw new NotFoundError("UserPostAction 조회 실패");
     }
 
     if (result.modifiedCount === 0) {
-      // 조건은 맞지만 실제 업데이트된 건 없음
-      // 예: 이미 좋아요가 추가된 상태에서 다시 추가 시도
-      throw new InternalServerError("포스트의 좋아요 업데이트가 되지 않음");
+      throw new InternalServerError("좋아요 추가 실패");
+    }
+  }
+
+  async removeLike(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.removeLike(postId, session);
+
+    if (!result) {
+      throw new InternalServerError("좋아요 삭제 도중 에러 발생");
     }
 
-    // 좋아요 추가 시 true, 삭제시 false 반환
-    return likingUser ? !likingUser.isDeleted : true;
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("좋아요 삭제 실패");
+    }
+  }
+
+  async setLikeCount(
+    postId: Types.ObjectId,
+    count: number,
+    session?: ClientSession
+  ) {
+    const result = await postRepository.setLikeCount(postId, count, session);
+
+    if (!result) {
+      throw new InternalServerError("좋아요 수 정리 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("좋아요 수 정리 실패");
+    }
   }
 
   async updatePostAndUserLikes(postId: Types.ObjectId, userId: Types.ObjectId) {
@@ -229,12 +234,33 @@ class PostService {
     session.startTransaction();
 
     try {
-      const postLike = await this.updateLikes(postId, userId, session);
-      const userLike = await userService.updateLikes(userId, postId, session);
+      const existingLike = await userPostActionService.getLikeByUserIdAndPostId(
+        userId,
+        postId
+      );
 
-      if (postLike !== userLike) {
-        await postRepository.deleteLike(postId, userId, session);
-        await userRepository.deleteLike(userId, postId, session);
+      if (existingLike) {
+        existingLike.isDeleted
+          ? await this.addLike(postId, session)
+          : await this.removeLike(postId, session);
+
+        await userPostActionService.updateLike(
+          existingLike._id,
+          existingLike.isDeleted,
+          session
+        );
+      } else {
+        await this.addLike(postId, session);
+        await userPostActionService.addLike(userId, postId, session);
+      }
+
+      const post = await this.getPostById(postId);
+      const existingLikes = await userPostActionRepository.getLikesByPostId(
+        postId
+      );
+
+      if (post.actions.likes !== existingLikes.length) {
+        await this.setLikeCount(postId, existingLikes.length, session);
       }
 
       await session.commitTransaction();
@@ -342,87 +368,87 @@ class PostService {
     }
   }
 
-  async getBookmarkingUser(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId
-  ): Promise<IPostAction | undefined> {
-    const post = await this.getPostById(postId);
+  // async getBookmarkingUser(
+  //   postId: Types.ObjectId,
+  //   userId: Types.ObjectId
+  // ): Promise<IPostAction | undefined> {
+  //   const post = await this.getPostById(postId);
 
-    const bookmarks = post.actions.bookmarks;
+  //   const bookmarks = post.actions.bookmarks;
 
-    return bookmarks.find((bookmark) => bookmark._id.equals(userId));
-  }
+  //   return bookmarks.find((bookmark) => bookmark._id.equals(userId));
+  // }
 
-  async updateBookmarks(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ) {
-    const bookmarkingUser = await this.getBookmarkingUser(postId, userId);
+  // async updateBookmarks(
+  //   postId: Types.ObjectId,
+  //   userId: Types.ObjectId,
+  //   session?: ClientSession
+  // ) {
+  //   const bookmarkingUser = await this.getBookmarkingUser(postId, userId);
 
-    const result = bookmarkingUser
-      ? await postRepository.updateBookmark(
-          postId,
-          userId,
-          bookmarkingUser.isDeleted,
-          session
-        )
-      : await postRepository.addBookmark(postId, userId, session);
+  //   const result = bookmarkingUser
+  //     ? await postRepository.updateBookmark(
+  //         postId,
+  //         userId,
+  //         bookmarkingUser.isDeleted,
+  //         session
+  //       )
+  //     : await postRepository.addBookmark(postId, userId, session);
 
-    if (!result) {
-      throw new InternalServerError("서버 내부 에러");
-    }
+  //   if (!result) {
+  //     throw new InternalServerError("서버 내부 에러");
+  //   }
 
-    if (result.matchedCount === 0) {
-      // 조건에 맞는 document가 없었음 → postId 잘못됐을 가능성
-      throw new NotFoundError(
-        "조건에 맞는 포스트를 찾지 못함",
-        "POST_NOT_MATCHED",
-        {
-          postId,
-          userId,
-        }
-      );
-    }
+  //   if (result.matchedCount === 0) {
+  //     // 조건에 맞는 document가 없었음 → postId 잘못됐을 가능성
+  //     throw new NotFoundError(
+  //       "조건에 맞는 포스트를 찾지 못함",
+  //       "POST_NOT_MATCHED",
+  //       {
+  //         postId,
+  //         userId,
+  //       }
+  //     );
+  //   }
 
-    if (result.modifiedCount === 0) {
-      // 조건은 맞지만 실제 업데이트된 건 없음
-      // 예: 이미 좋아요가 추가된 상태에서 다시 추가 시도
-      throw new InternalServerError("포스트의 북마크 업데이트가 되지 않음");
-    }
+  //   if (result.modifiedCount === 0) {
+  //     // 조건은 맞지만 실제 업데이트된 건 없음
+  //     // 예: 이미 좋아요가 추가된 상태에서 다시 추가 시도
+  //     throw new InternalServerError("포스트의 북마크 업데이트가 되지 않음");
+  //   }
 
-    // 좋아요 추가 시 true, 삭제시 false 반환
-    return bookmarkingUser ? !bookmarkingUser.isDeleted : true;
-  }
+  //   // 좋아요 추가 시 true, 삭제시 false 반환
+  //   return bookmarkingUser ? !bookmarkingUser.isDeleted : true;
+  // }
 
-  async updatePostAndUserBookmarks(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId
-  ) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+  // async updatePostAndUserBookmarks(
+  //   postId: Types.ObjectId,
+  //   userId: Types.ObjectId
+  // ) {
+  //   const session = await mongoose.startSession();
+  //   session.startTransaction();
 
-    try {
-      const postBookmark = await this.updateBookmarks(postId, userId, session);
-      const userBookmark = await userService.updateBookmarks(
-        userId,
-        postId,
-        session
-      );
+  //   try {
+  //     const postBookmark = await this.updateBookmarks(postId, userId, session);
+  //     const userBookmark = await userService.updateBookmarks(
+  //       userId,
+  //       postId,
+  //       session
+  //     );
 
-      if (postBookmark !== userBookmark) {
-        await postRepository.deleteBookmark(postId, userId, session);
-        await userRepository.deleteBookmark(userId, postId, session);
-      }
+  //     if (postBookmark !== userBookmark) {
+  //       await postRepository.deleteBookmark(postId, userId, session);
+  //       await userRepository.deleteBookmark(userId, postId, session);
+  //     }
 
-      await session.commitTransaction();
-    } catch (error) {
-      await session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
-  }
+  //     await session.commitTransaction();
+  //   } catch (error) {
+  //     await session.abortTransaction();
+  //     throw error;
+  //   } finally {
+  //     session.endSession();
+  //   }
+  // }
 
   async createComment(
     comment: ICommentRequestDto,

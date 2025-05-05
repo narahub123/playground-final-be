@@ -255,20 +255,13 @@ class PostRepository {
 
   async addLike(
     postId: Types.ObjectId,
-    userId: Types.ObjectId,
     session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
       const updateQuery = Post.updateOne(
         { _id: postId },
         {
-          $push: {
-            [`actions.likes`]: {
-              _id: userId,
-              isDeleted: false,
-              deletedAt: null,
-            },
-          },
+          $inc: { "actions.likes": 1 },
         }
       );
       const result = session
@@ -279,59 +272,20 @@ class PostRepository {
     } catch (error) {
       mongoDBErrorHandler("addLike", error, {
         postId,
-        userId,
       });
       return undefined;
     }
   }
 
-  async updateLike(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    isDeleted: boolean,
-    session?: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const updateQuery = Post.updateOne(
-        {
-          _id: postId,
-          "actions.likes._id": userId,
-          "actions.likes.isDeleted": isDeleted,
-        },
-        {
-          $set: {
-            "actions.likes.$.isDeleted": !isDeleted,
-            "actions.likes.$.deletedAt": !isDeleted ? new Date() : null,
-          },
-        }
-      );
-      const result = session
-        ? await updateQuery.session(session)
-        : await updateQuery;
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("updateLike", error, {
-        postId,
-        userId,
-      });
-      return undefined;
-    }
-  }
-
-  async deleteLike(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ) {
+  async removeLike(postId: Types.ObjectId, session?: ClientSession) {
     try {
       const updateQuery = Post.updateOne(
         {
           _id: postId,
         },
         {
-          $pull: {
-            "actions.likes": { _id: userId },
+          $inc: {
+            "actions.likes": -1,
           },
         }
       );
@@ -344,9 +298,29 @@ class PostRepository {
     } catch (error) {
       mongoDBErrorHandler("deleteLike", error, {
         postId,
-        userId,
       });
       return undefined;
+    }
+  }
+
+  async setLikeCount(
+    postId: Types.ObjectId,
+    count: number,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { $set: { "actions.likes": count } }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("setLikeCount", error, { postId, count });
     }
   }
 

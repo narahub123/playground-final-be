@@ -236,10 +236,6 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: [],
     },
 
-    bookmarks: [{ type: Schema.Types.ObjectId, ref: "UserPostAction" }],
-
-    likes: [{ type: Schema.Types.ObjectId, ref: "UserPostAction" }],
-
     pinnedPost: {
       type: Schema.Types.ObjectId,
       ref: "Post",
