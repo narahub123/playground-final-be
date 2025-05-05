@@ -11,78 +11,26 @@ const VoteOptionSchema = new mongoose.Schema<IVoteOption>(
 
 const PostActionsSchema = new mongoose.Schema<IPostActions>(
   {
-    comments: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "Post",
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
-    reposts: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "Post",
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
-    likes: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
+    comments: {
+      type: Number,
+      default: 0,
+    },
+    reposts: {
+      type: Number,
+      default: 0,
+    },
+    likes: {
+      type: Number,
+      default: 0,
+    },
     views: {
       type: Number,
       default: 0,
     },
-    bookmarks: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
+    bookmarks: {
+      type: Number,
+      default: 0,
+    },
   },
   { _id: false, versionKey: false }
 );
@@ -133,13 +81,6 @@ const PostSchema = new mongoose.Schema<IPost>(
     actions: {
       type: PostActionsSchema,
       required: true,
-      default: () => ({
-        comments: [],
-        reposts: [],
-        likes: [],
-        bookmarks: [],
-        views: 0,
-      }),
     },
 
     originalPostId: {

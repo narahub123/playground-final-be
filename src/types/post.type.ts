@@ -32,17 +32,11 @@ interface ICommentRequestDto {
   originalPostId: Types.ObjectId;
 }
 
-interface IPostAction {
-  _id: Types.ObjectId;
-  isDeleted: boolean;
-  deletedAt: Date | null;
-}
-
 interface IPostActions {
-  comments: IPostAction[];
-  reposts: IPostAction[];
-  likes: IPostAction[];
-  bookmarks: IPostAction[];
+  comments: number;
+  reposts: number;
+  likes: number;
+  bookmarks: number;
   views: number;
 }
 
@@ -125,5 +119,4 @@ export type {
   IRepostRequestDto,
   ICommentRequestDto,
   PostType,
-  IPostAction,
 };
