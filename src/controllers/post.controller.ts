@@ -372,7 +372,7 @@ const updateBookmarks = asyncWrapper(
 
     const postId = new mongoose.Types.ObjectId(postid);
 
-    await postService.updateBookmarks(postId, user._id);
+    await postService.updatePostAndUserBookmarks(postId, user._id);
 
     const response: IApiSuccessResponse = {
       success: true,

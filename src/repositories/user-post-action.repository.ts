@@ -108,6 +108,42 @@ class UserPostActionRepository {
     }
   }
 
+  async findBookmarkByUserIdAndPostId(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ): Promise<IUserPostAction | null> {
+    try {
+      const bookmark = await UserPostAction.findOne({
+        userId,
+        postId,
+        type: "bookmark",
+      });
+
+      return bookmark;
+    } catch (error) {
+      mongoDBErrorHandler("findBookmarkByUserIdAndPostId", error, {
+        postId,
+        userId,
+      });
+      return null;
+    }
+  }
+
+  async getBookmarksByPostId(
+    postId: Types.ObjectId
+  ): Promise<IUserPostAction[]> {
+    try {
+      const bookmarks = await UserPostAction.find({ postId, type: "bookmark" });
+
+      return bookmarks;
+    } catch (error) {
+      mongoDBErrorHandler("getBookmarksByPostId", error, {
+        postId,
+      });
+      return [];
+    }
+  }
+
   async getBookmarksByUserId(
     userId: Types.ObjectId
   ): Promise<IUserPostAction[]> {
@@ -120,6 +156,63 @@ class UserPostActionRepository {
         userId,
       });
       return [];
+    }
+  }
+
+  async addBookmark(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IUserPostAction | undefined> {
+    try {
+      const userPostAction = await UserPostAction.create(
+        [
+          {
+            userId,
+            postId,
+            type: "bookmark",
+            isDeleted: false,
+            deletedAt: null,
+          },
+        ],
+        { session }
+      );
+
+      return userPostAction[0];
+    } catch (error) {
+      mongoDBErrorHandler("addBookmark", error, {
+        postId,
+        userId,
+      });
+    }
+  }
+
+  async updateBookmark(
+    _id: Types.ObjectId,
+    isCurrentlyDeleted: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = UserPostAction.updateOne(
+        { _id },
+        {
+          $set: {
+            isDeleted: !isCurrentlyDeleted,
+            deletedAt: isCurrentlyDeleted ? null : new Date(),
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateBookmark", error, {
+        _id,
+        isCurrentlyDeleted,
+      });
     }
   }
 }

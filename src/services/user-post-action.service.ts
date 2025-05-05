@@ -68,12 +68,75 @@ class UserPostActionService {
     }
   }
 
+  async getBookmarkByUserIdAndPostId(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId
+  ) {
+    const bookmark =
+      await userPostActionRepository.findBookmarkByUserIdAndPostId(
+        userId,
+        postId
+      );
+
+    return bookmark;
+  }
+
+  async getBookmarksByPostId(
+    postId: Types.ObjectId
+  ): Promise<IUserPostAction[]> {
+    const bookmarks = await userPostActionRepository.getBookmarksByPostId(
+      postId
+    );
+
+    return bookmarks;
+  }
+
   async getBookmarksByUserId(userId: Types.ObjectId) {
     const bookmarks = await userPostActionRepository.getBookmarksByUserId(
       userId
     );
 
     return bookmarks;
+  }
+
+  async addBookmark(
+    userId: Types.ObjectId,
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const bookmark = await userPostActionRepository.addBookmark(
+      userId,
+      postId,
+      session
+    );
+
+    if (!bookmark) {
+      throw new InternalServerError("북마크 추가 실패");
+    }
+  }
+
+  async updateBookmark(
+    _id: Types.ObjectId,
+    isDeleted: boolean,
+    session?: ClientSession
+  ) {
+    const result = await userPostActionRepository.updateBookmark(
+      _id,
+      isDeleted,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("북마크 업데이트 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("북마크 업데이트 실패");
+    }
   }
 }
 

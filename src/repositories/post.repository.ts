@@ -324,6 +324,77 @@ class PostRepository {
     }
   }
 
+  async addBookmark(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        {
+          $inc: { "actions.bookmarks": 1 },
+        }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addBookmark", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
+  async removeBookmark(postId: Types.ObjectId, session?: ClientSession) {
+    try {
+      const updateQuery = Post.updateOne(
+        {
+          _id: postId,
+        },
+        {
+          $inc: {
+            "actions.bookmarks": -1,
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeBookmark", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
+  async setBookmarkCount(
+    postId: Types.ObjectId,
+    count: number,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { $set: { "actions.bookmarks": count } }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("setBookmarkCount", error, { postId, count });
+    }
+  }
+
   async deletePost(
     postId: Types.ObjectId,
     session: ClientSession
@@ -414,98 +485,6 @@ class PostRepository {
         postId,
       });
       return [];
-    }
-  }
-
-  async addBookmark(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const updateQuery = Post.updateOne(
-        { _id: postId },
-        {
-          $push: {
-            "actions.bookmarks": {
-              _id: userId,
-              isDeleted: false,
-              deletedAt: null,
-            },
-          },
-        }
-      );
-      const result = session
-        ? await updateQuery.session(session)
-        : await updateQuery;
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("addBookmark", error, {
-        postId,
-        userId,
-      });
-      return undefined;
-    }
-  }
-
-  async updateBookmark(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    isCurrentlyDeleted: boolean,
-    session?: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const updateQuery = Post.updateOne(
-        {
-          _id: postId,
-          "actions.bookmarks._id": userId,
-          "actions.bookmarks.isDeleted": isCurrentlyDeleted,
-        },
-        {
-          $set: {
-            "actions.bookmarks.$.isDeleted": !isCurrentlyDeleted,
-            "actions.bookmarks.$.deletedAt": !isCurrentlyDeleted
-              ? new Date()
-              : null,
-          },
-        }
-      );
-      const result = session
-        ? await updateQuery.session(session)
-        : await updateQuery;
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("updateBookmark", error, {
-        postId,
-        userId,
-      });
-      return undefined;
-    }
-  }
-
-  async deleteBookmark(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const updateQuery = Post.updateOne(
-        { _id: postId },
-        { $pull: { "actions.bookmarks": { _id: userId } } }
-      );
-      const result = session
-        ? await updateQuery.session(session)
-        : await updateQuery;
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("deleteBookmark", error, {
-        postId,
-        userId,
-      });
-      return undefined;
     }
   }
 

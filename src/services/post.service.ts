@@ -272,6 +272,108 @@ class PostService {
     }
   }
 
+  async addBookmark(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.addBookmark(postId, session);
+
+    if (!result) {
+      throw new InternalServerError("북마크 추가 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("북마크 추가 실패");
+    }
+  }
+
+  async removeBookmark(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.removeBookmark(postId, session);
+
+    if (!result) {
+      throw new InternalServerError("북마크 삭제 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("북마크 삭제 실패");
+    }
+  }
+
+  async setBookmarkCount(
+    postId: Types.ObjectId,
+    count: number,
+    session?: ClientSession
+  ) {
+    const result = await postRepository.setBookmarkCount(
+      postId,
+      count,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("북마크 수 정리 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("UserPostAction 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("북마크 수 정리 실패");
+    }
+  }
+
+  async updatePostAndUserBookmarks(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const existingBookmark =
+        await userPostActionService.getBookmarkByUserIdAndPostId(
+          userId,
+          postId
+        );
+
+      if (existingBookmark) {
+        existingBookmark.isDeleted
+          ? await this.addBookmark(postId, session)
+          : await this.removeBookmark(postId, session);
+
+        await userPostActionService.updateBookmark(
+          existingBookmark._id,
+          existingBookmark.isDeleted,
+          session
+        );
+      } else {
+        await this.addBookmark(postId, session);
+        await userPostActionService.addBookmark(userId, postId, session);
+      }
+
+      const post = await this.getPostById(postId);
+      const existingBookmarks =
+        await userPostActionRepository.getBookmarksByPostId(postId);
+
+      if (post.actions.bookmarks !== existingBookmarks.length) {
+        await this.setBookmarkCount(postId, existingBookmarks.length, session);
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
   async deletePost(postId: Types.ObjectId, userId: Types.ObjectId) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -367,88 +469,6 @@ class PostService {
       throw new InternalServerError("핀 처리 도중 에러 발생");
     }
   }
-
-  // async getBookmarkingUser(
-  //   postId: Types.ObjectId,
-  //   userId: Types.ObjectId
-  // ): Promise<IPostAction | undefined> {
-  //   const post = await this.getPostById(postId);
-
-  //   const bookmarks = post.actions.bookmarks;
-
-  //   return bookmarks.find((bookmark) => bookmark._id.equals(userId));
-  // }
-
-  // async updateBookmarks(
-  //   postId: Types.ObjectId,
-  //   userId: Types.ObjectId,
-  //   session?: ClientSession
-  // ) {
-  //   const bookmarkingUser = await this.getBookmarkingUser(postId, userId);
-
-  //   const result = bookmarkingUser
-  //     ? await postRepository.updateBookmark(
-  //         postId,
-  //         userId,
-  //         bookmarkingUser.isDeleted,
-  //         session
-  //       )
-  //     : await postRepository.addBookmark(postId, userId, session);
-
-  //   if (!result) {
-  //     throw new InternalServerError("서버 내부 에러");
-  //   }
-
-  //   if (result.matchedCount === 0) {
-  //     // 조건에 맞는 document가 없었음 → postId 잘못됐을 가능성
-  //     throw new NotFoundError(
-  //       "조건에 맞는 포스트를 찾지 못함",
-  //       "POST_NOT_MATCHED",
-  //       {
-  //         postId,
-  //         userId,
-  //       }
-  //     );
-  //   }
-
-  //   if (result.modifiedCount === 0) {
-  //     // 조건은 맞지만 실제 업데이트된 건 없음
-  //     // 예: 이미 좋아요가 추가된 상태에서 다시 추가 시도
-  //     throw new InternalServerError("포스트의 북마크 업데이트가 되지 않음");
-  //   }
-
-  //   // 좋아요 추가 시 true, 삭제시 false 반환
-  //   return bookmarkingUser ? !bookmarkingUser.isDeleted : true;
-  // }
-
-  // async updatePostAndUserBookmarks(
-  //   postId: Types.ObjectId,
-  //   userId: Types.ObjectId
-  // ) {
-  //   const session = await mongoose.startSession();
-  //   session.startTransaction();
-
-  //   try {
-  //     const postBookmark = await this.updateBookmarks(postId, userId, session);
-  //     const userBookmark = await userService.updateBookmarks(
-  //       userId,
-  //       postId,
-  //       session
-  //     );
-
-  //     if (postBookmark !== userBookmark) {
-  //       await postRepository.deleteBookmark(postId, userId, session);
-  //       await userRepository.deleteBookmark(userId, postId, session);
-  //     }
-
-  //     await session.commitTransaction();
-  //   } catch (error) {
-  //     await session.abortTransaction();
-  //     throw error;
-  //   } finally {
-  //     session.endSession();
-  //   }
-  // }
 
   async createComment(
     comment: ICommentRequestDto,
