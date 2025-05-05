@@ -252,6 +252,32 @@ const replaceRootWithComments = () => {
   return { $replaceRoot: { newRoot: "$comments" } };
 };
 
+const lookupCommentsByPostId = () => {
+  return {
+    $lookup: {
+      from: "posts",
+      let: { postId: "$rootPost._id" },
+      pipeline: [
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ["$originalPostId", "$$postId"] },
+                { $eq: ["$type", "comment"] },
+                { $eq: ["$isDeleted", false] }, // 삭제된 댓글 제외
+              ],
+            },
+          },
+        },
+        {
+          $limit: COMMENT_LENGTH,
+        },
+      ],
+      as: "comments",
+    },
+  };
+};
+
 // 12. 댓글의 작성자 정보를 users 컬렉션에서 조회
 const lookupCommentAuthors = () => {
   return {
@@ -456,6 +482,7 @@ export {
   fetchCommentsFromActions,
   fetchCommentsFromActionsWithSkip,
   unwindComments,
+  lookupCommentsByPostId,
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,

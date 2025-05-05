@@ -42,6 +42,7 @@ import {
   unwindComments,
   replaceRootWithComments,
   addSession,
+  lookupCommentsByPostId,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
@@ -98,4 +99,5 @@ export {
   unwindComments,
   replaceRootWithComments,
   addSession,
+  lookupCommentsByPostId,
 };

@@ -13,6 +13,7 @@ import {
   mergeCommentAuthors,
   projectFinalFields,
   unwindOriginalPosts,
+  lookupCommentsByPostId,
 } from "@utils";
 import { IPostResponseDto } from "@types";
 
@@ -44,8 +45,8 @@ const aggregatePostById = async (
     // 8. postData, originalPost, comments를 나누어 각 필드에 할당
     addPostData(),
 
-    // 10. actions.comments에서 해당 포스트의 댓글 가져오기
-    fetchCommentsFromActions(),
+    // 10. orignalPostId가 postId와 일치하는 것을 가져옴
+    lookupCommentsByPostId(),
 
     // 12. 댓글의 작성자 정보를 users 컬렉션에서 조회
     lookupCommentAuthors(),
