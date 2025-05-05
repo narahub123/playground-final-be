@@ -93,6 +93,7 @@ import {
 } from "./post.type";
 
 import { IRepost } from "./repost.type";
+import { IUserPostAction, UserPostActionType } from "./user-post-action.type";
 
 export {
   // user
@@ -199,4 +200,8 @@ export {
 
   // repost
   IRepost,
+
+  // user-post-action
+  IUserPostAction,
+  UserPostActionType,
 };
