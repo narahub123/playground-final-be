@@ -11,8 +11,6 @@ import {
   SkintoneType,
   UserDTO,
   IFollowingResponse,
-  IUserBookmark,
-  IUserLike,
 } from "./user.type";
 import { OauthType, UserData } from "./oauth.type";
 import { IActiveSession, IDevice } from "./active-session.type";
@@ -109,8 +107,6 @@ export {
   SkintoneType,
   UserDTO,
   IFollowingResponse,
-  IUserBookmark,
-  IUserLike,
 
   // oauth
   OauthType,

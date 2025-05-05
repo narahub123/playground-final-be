@@ -127,18 +127,6 @@ interface IFollowing {
   followedAt: Date;
 }
 
-interface IUserLike {
-  _id: Types.ObjectId;
-  isDeleted: boolean;
-  deletedAt: Date | null;
-}
-
-interface IUserBookmark {
-  _id: Types.ObjectId;
-  isDeleted: boolean;
-  deletedAt: Date | null;
-}
-
 // User 모델에 대한 타입 정의
 interface IUser extends Document {
   _id: Types.ObjectId;
@@ -162,8 +150,8 @@ interface IUser extends Document {
   lockStatus: ILockStatus;
   skintoneType: SkintoneType;
   recentEmojis: IEmoji[];
-  bookmarks: IUserBookmark[];
-  likes: IUserLike[];
+  bookmarks: Types.ObjectId[];
+  likes: Types.ObjectId[];
   pinnedPost: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -212,6 +200,4 @@ export type {
   SkintoneType,
   UserDTO,
   IFollowingResponse,
-  IUserBookmark,
-  IUserLike,
 };

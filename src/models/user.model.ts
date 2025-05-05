@@ -236,43 +236,9 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: [],
     },
 
-    bookmarks: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "Post",
-          required: true,
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
+    bookmarks: [{ type: Schema.Types.ObjectId, ref: "UserPostAction" }],
 
-    likes: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          ref: "Post",
-          required: true,
-        },
-        isDeleted: {
-          type: Boolean,
-          required: true,
-          default: false,
-        },
-        deletedAt: {
-          type: Date,
-          default: null,
-        },
-      },
-    ],
+    likes: [{ type: Schema.Types.ObjectId, ref: "UserPostAction" }],
 
     pinnedPost: {
       type: Schema.Types.ObjectId,
