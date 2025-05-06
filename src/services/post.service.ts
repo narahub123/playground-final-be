@@ -144,8 +144,6 @@ class PostService {
   ): Promise<IPostResponseDto[]> {
     const posts = await postRepository.getPostsByAuthor(author);
 
-    await Promise.all(posts.map((post) => this.addView(post._id)));
-
     return posts;
   }
 

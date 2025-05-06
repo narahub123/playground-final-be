@@ -9,7 +9,8 @@ import {
   mapAuthorInfoToOriginalPosts,
   matchPostsByUserId,
   projectFinalFields,
-  sortPostsByCreatedAtDesc,
+  addSortKey,
+  sortBySortKeyDesc,
   unwindOriginalPosts,
 } from "@utils";
 import { Post } from "@models";
@@ -49,7 +50,9 @@ const aggregatePostsByUserId = async (
     addThreadLastCommentedAt(),
 
     // 15. createdAt을 기준으로 역순으로 정렬
-    sortPostsByCreatedAtDesc(),
+    addSortKey(),
+
+    sortBySortKeyDesc(),
   ]);
 
   console.log(posts);

@@ -9,7 +9,12 @@ const matchPostById = (_id: Types.ObjectId) => {
 
 // 1. 주어진 userId에 해당하는 포스트를 필터링
 const matchPostsByUserId = (userId: Types.ObjectId) => {
-  return { $match: { author: userId } };
+  return {
+    $match: {
+      author: userId,
+      isDeleted: false,
+    },
+  };
 };
 
 // 2. 원본 포스트를 재귀적으로 조회하여 원본 포스트들 배열을 생성
@@ -23,6 +28,9 @@ const graphLookupOriginalPosts = () => {
       as: "originalPosts",
       maxDepth: 10,
       depthField: "depth",
+      restrictSearchWithMatch: {
+        isDeleted: false, // 여기서 삭제된 포스트는 탐색을 중단
+      },
     },
   };
 };
@@ -101,78 +109,16 @@ const addPostData = () => {
   return {
     $addFields: {
       postData: {
-        $cond: {
-          if: {
-            $gt: [
-              {
-                $size: {
-                  $filter: {
-                    input: "$originalPosts",
-                    as: "op",
-                    cond: { $in: ["$$op.type", ["repost", "quote"]] },
-                  },
-                },
-              },
-              0,
-            ],
-          },
-          then: {
-            $first: {
+        $let: {
+          vars: {
+            repostQuote: {
               $filter: {
                 input: "$originalPosts",
                 as: "op",
                 cond: { $in: ["$$op.type", ["repost", "quote"]] },
               },
             },
-          },
-          else: {
-            $cond: {
-              if: {
-                $gt: [
-                  {
-                    $size: {
-                      $filter: {
-                        input: "$originalPosts",
-                        as: "op",
-                        cond: { $eq: ["$$op.type", "post"] },
-                      },
-                    },
-                  },
-                  0,
-                ],
-              },
-              then: {
-                $first: {
-                  $filter: {
-                    input: "$originalPosts",
-                    as: "op",
-                    cond: { $eq: ["$$op.type", "post"] },
-                  },
-                },
-              },
-              else: null, // repost, quote, post 모두 없으면 null
-            },
-          },
-        },
-      },
-      originalPost: {
-        $cond: {
-          if: {
-            $gt: [
-              {
-                $size: {
-                  $filter: {
-                    input: "$originalPosts",
-                    as: "op",
-                    cond: { $in: ["$$op.type", ["repost", "quote"]] },
-                  },
-                },
-              },
-              0,
-            ],
-          },
-          then: {
-            $first: {
+            original: {
               $filter: {
                 input: "$originalPosts",
                 as: "op",
@@ -180,7 +126,39 @@ const addPostData = () => {
               },
             },
           },
-          else: null, // repost, quote 타입만 있는 경우
+          in: {
+            $cond: {
+              if: { $gt: [{ $size: "$$repostQuote" }, 0] },
+              then: { $first: "$$repostQuote" },
+              else: {
+                $cond: {
+                  if: { $gt: [{ $size: "$$original" }, 0] },
+                  then: { $first: "$$original" },
+                  else: null,
+                },
+              },
+            },
+          },
+        },
+      },
+      originalPost: {
+        $let: {
+          vars: {
+            original: {
+              $filter: {
+                input: "$originalPosts",
+                as: "op",
+                cond: { $eq: ["$$op.type", "post"] },
+              },
+            },
+          },
+          in: {
+            $cond: {
+              if: { $gt: [{ $size: "$$original" }, 0] },
+              then: { $first: "$$original" },
+              else: null,
+            },
+          },
         },
       },
       thread: {
@@ -349,6 +327,7 @@ const projectFinalFields = () => {
       createdAt: "$postData.createdAt",
       updatedAt: "$postData.updatedAt",
       originalPostId: "$postData.originalPostId",
+      isOriginalPostDeleted: "$postData.isOriginalPostDeleted",
       repostedAt: "$postData.repostedAt",
       quotedAt: "$postData.quotedAt",
       commentedAt: "$postData.commentedAt",
@@ -371,6 +350,7 @@ const projectFinalFields = () => {
         actions: "$originalPost.actions",
         originalPost: "$originalPost.originalPost",
         originalPostId: "$originalPost.originalPostId",
+        isOriginalPostDeleted: "$originalPost.isOriginalPostDeleted",
         repostedAt: "$originalPost.repostedAt",
         quotedAt: "$originalPost.quotedAt",
         commentedAt: "$originalPost.commentedAt",
@@ -401,6 +381,7 @@ const projectFinalFields = () => {
             actions: "$$entry.actions",
             originalPost: "$$entry.originalPost",
             originalPostId: "$$entry.originalPostId",
+            isOriginalPostDeleted: "$$entry.isOriginalPostDeleted",
             repostedAt: "$$entry.repostedAt",
             quotedAt: "$$entry.quotedAt",
             entryedAt: "$$entry.commentedAt",
@@ -460,10 +441,20 @@ const addThreadLastCommentedAt = () => ({
   },
 });
 
-// 15. createdAt을 기준으로 역순으로 정렬
-const sortPostsByCreatedAtDesc = () => {
-  return { $sort: { createdAt: -1 as -1, threadLastCommentedAt: -1 as -1 } };
-};
+
+const addSortKey = () => ({
+  $addFields: {
+    sortKey: {
+      $ifNull: ["$threadLastCommentedAt", "$createdAt"],
+    },
+  },
+});
+
+const sortBySortKeyDesc = () => ({
+  $sort: {
+    sortKey: -1 as -1,
+  },
+});
 
 const addSession = (session?: ClientSession) => {
   return { session };
@@ -486,7 +477,8 @@ export {
   lookupCommentAuthors,
   mergeCommentAuthors,
   projectFinalFields,
-  sortPostsByCreatedAtDesc,
+  addSortKey,
+  sortBySortKeyDesc,
   addThreadLastCommentedAt,
   replaceRootWithComments,
   addSession,
