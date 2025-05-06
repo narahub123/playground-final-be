@@ -348,14 +348,6 @@ class PostService {
         await userPostActionService.addBookmark(userId, postId, session);
       }
 
-      const post = await this.getPostById(postId);
-      const existingBookmarks =
-        await userPostActionRepository.getBookmarksByPostId(postId);
-
-      if (post.actions.bookmarks !== existingBookmarks.length) {
-        await this.setBookmarkCount(postId, existingBookmarks.length, session);
-      }
-
       await session.commitTransaction();
     } catch (error) {
       await session.abortTransaction();
