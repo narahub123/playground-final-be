@@ -254,15 +254,6 @@ class PostService {
         await userPostActionService.addLike(userId, postId, session);
       }
 
-      const post = await this.getPostById(postId);
-      const existingLikes = await userPostActionRepository.getLikesByPostId(
-        postId
-      );
-
-      if (post.actions.likes !== existingLikes.length) {
-        await this.setLikeCount(postId, existingLikes.length, session);
-      }
-
       await session.commitTransaction();
     } catch (error) {
       await session.abortTransaction();
