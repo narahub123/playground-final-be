@@ -157,6 +157,16 @@ class PostService {
     return post;
   }
 
+  async getPurePostById(postId: Types.ObjectId): Promise<IPost> {
+    const post = await postRepository.getPurePostById(postId);
+
+    if (!post) {
+      throw new NotFoundError("포스트 조회 실패");
+    }
+
+    return post;
+  }
+
   async updatePostVoteWithUserId(
     postId: Types.ObjectId,
     userId: Types.ObjectId,
@@ -398,8 +408,6 @@ class PostService {
     );
 
     if (!result) throw new InternalServerError("원본 포스트 삭제 중 에러 발생");
-
-    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
   }
 
   async deletePostAndRemoveRecord(postId: Types.ObjectId) {
@@ -408,7 +416,7 @@ class PostService {
 
     try {
       // 포스트 존재 여부 확인
-      const post = await this.getPostById(postId);
+      const post = await this.getPurePostById(postId);
 
       // 포스트 삭제
       await this.deletePost(postId, session);

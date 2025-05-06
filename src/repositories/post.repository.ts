@@ -215,6 +215,19 @@ class PostRepository {
     }
   }
 
+  async getPurePostById(postId: Types.ObjectId): Promise<IPost | null> {
+    try {
+      const post = await Post.findById(postId);
+
+      return post;
+    } catch (error) {
+      mongoDBErrorHandler("getPurePostById", error, {
+        postId,
+      });
+      return null;
+    }
+  }
+
   async updatePostVoteWithUserId(
     postId: Types.ObjectId,
     userId: Types.ObjectId,
