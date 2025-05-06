@@ -497,8 +497,8 @@ class PostRepository {
       const updateQuery = Post.updateOne(
         { _id: postId },
         {
-          $addToSet: {
-            "actions.comments": commentId,
+          $inc: {
+            "actions.comments": 1,
           },
         }
       );
