@@ -357,72 +357,89 @@ class PostService {
     }
   }
 
-  async deletePost(postId: Types.ObjectId, userId: Types.ObjectId) {
+  async removeRepost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.removeRepost(postId, session);
+
+    if (!result) throw new InternalServerError("리포스트 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError("리포스트 삭제 실패");
+  }
+
+  async removeComment(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.removeComment(postId, session);
+
+    if (!result) throw new InternalServerError("댓글 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError("댓글 삭제 실패");
+  }
+
+  async deletePost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.deletePost(postId);
+
+    if (!result) throw new InternalServerError("포스트 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError("포스트 삭제 실패");
+  }
+
+  async deleteOriginalPostByPostId(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const result = await postRepository.deleteOriginalPostByPostId(
+      postId,
+      session
+    );
+
+    if (!result) throw new InternalServerError("원본 포스트 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
+  }
+
+  async deletePostAndRemoveRecord(postId: Types.ObjectId) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      let removedPostIds: Types.ObjectId[] = [];
+      // 포스트 존재 여부 확인
+      const post = await this.getPostById(postId);
 
-      const post = await postRepository.deletePost(postId, session);
+      // 포스트 삭제
+      await this.deletePost(postId, session);
 
-      if (!post) {
-        throw new InternalServerError("포스트 삭제 도중 에러 발생");
-      }
-
-      removedPostIds.push(postId);
-
-      if (post.type === "repost") {
-        const result = await postRepository.removeRepost(
-          post.originalPostId!,
-          userId,
-          session
-        );
-
-        if (!result) {
-          throw new InternalServerError("포스트 삭제 도중 에러 발생");
+      // 원포스트 기록 삭제
+      const { type, originalPostId } = post;
+      if (originalPostId) {
+        if (type === "quote" || type === "repost") {
+          await this.removeRepost(originalPostId, session);
         }
 
-        if (result.modifiedCount === 0) {
-          throw new InternalServerError("포스트 삭제 도중 에러 발생");
+        if (type === "comment") {
+          await this.removeComment(originalPostId, session);
         }
-      } else {
-        // 해당 게시물을 재게시한 것들을 전부 삭제
-        const reposts = await postRepository.getRepostsByOriginalPostId(postId);
-
-        await Promise.all(
-          reposts.map(async (repost) => {
-            const post = await postRepository.deletePost(repost._id, session);
-
-            if (!post) {
-              throw new InternalServerError("포스트 삭제 도중 에러 발생");
-            }
-          })
-        );
-
-        removedPostIds.push(...reposts.map((repost) => repost._id));
       }
 
-      // 해당 포스트가 pinnedPost 인 경우 pinnedPost 제거하기
-      const user = await userRepository.getUserById(userId);
+      // 액션 기록 삭제
+      // likes 삭제
+      await userPostActionService.deleteAllLikes(postId, session);
+      // bookmarks 삭제
+      await userPostActionService.deleteAllBookmarks(postId, session);
 
-      if (!user) {
-        throw new NotFoundError("사용자 조회 실패");
-      }
+      // 해당 포스트를 원 포스트로 가지고 있는 포스트들의 isOriginalPostDeleted 변경
+      await this.deleteOriginalPostByPostId(postId, session);
 
-      if (Boolean(user.pinnedPost) && user.pinnedPost.equals(postId)) {
-        const result = await userRepository.removePinnedPost(user._id, session);
-
-        if (!result || result.modifiedCount === 0)
-          throw new InternalServerError("핀포스트 삭제 중 에러 발생");
-
-        if (result.matchedCount === 0)
-          throw new NotFoundError("사용자 조회 실패");
-      }
+      // 해당 포스트가 핀 포스트인 경우
+      await userService.removePinnedPostThroUsers(postId, session);
 
       await session.commitTransaction();
-
-      return removedPostIds;
     } catch (error) {
       session.abortTransaction();
       throw error;

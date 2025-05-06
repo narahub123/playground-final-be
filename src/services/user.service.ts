@@ -13,7 +13,7 @@ import {
   phoneRepository,
   userRepository,
 } from "@repositories";
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import mongoose from "mongoose";
 
 class UserService {
@@ -432,6 +432,33 @@ class UserService {
     } finally {
       session.endSession();
     }
+  }
+
+  async findUsersByPinnedPost(pinnedPost: Types.ObjectId) {
+    return await userRepository.findUsersByPinnedPost(pinnedPost);
+  }
+
+  async removePinnedPost(userId: Types.ObjectId, session?: ClientSession) {
+    const result = await userRepository.removePinnedPost(userId, session);
+
+    if (!result) throw new InternalServerError("핀 포스트 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("사용자 조회 실패");
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError("사용자 삭제 실패");
+  }
+
+  async removePinnedPostThroUsers(
+    pinnedPost: Types.ObjectId,
+    session?: ClientSession
+  ) {
+    const users = await this.findUsersByPinnedPost(pinnedPost);
+    if (!users.length) return;
+
+    await Promise.all(
+      users.map((user) => this.removePinnedPost(user._id, session))
+    );
   }
 }
 

@@ -68,6 +68,14 @@ class UserPostActionService {
     }
   }
 
+  async deleteAllLikes(postId: Types.ObjectId, session?: ClientSession) {
+    const likes = await this.getLikesByPostId(postId);
+
+    await Promise.all(
+      likes.map((like) => this.updateLike(like._id, true, session))
+    );
+  }
+
   async getBookmarkByUserIdAndPostId(
     userId: Types.ObjectId,
     postId: Types.ObjectId
@@ -137,6 +145,16 @@ class UserPostActionService {
     if (result.modifiedCount === 0) {
       throw new InternalServerError("북마크 업데이트 실패");
     }
+  }
+
+  async deleteAllBookmarks(postId: Types.ObjectId, session?: ClientSession) {
+    const bookmarks = await this.getBookmarksByPostId(postId);
+
+    await Promise.all(
+      bookmarks.map((bookmark) =>
+        this.updateBookmark(bookmark._id, true, session)
+      )
+    );
   }
 }
 

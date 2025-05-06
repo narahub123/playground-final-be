@@ -395,21 +395,100 @@ class PostRepository {
     }
   }
 
-  async deletePost(
-    postId: Types.ObjectId,
-    session: ClientSession
-  ): Promise<IPost | null> {
+  async removeRepost(postId: Types.ObjectId, session?: ClientSession) {
     try {
-      const post = await Post.findOneAndDelete({ _id: postId }).session(
-        session
+      const updateQuery = Post.updateOne(
+        {
+          _id: postId,
+        },
+        {
+          $inc: {
+            "actions.reposts": -1,
+          },
+        }
       );
 
-      return post;
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeBookmark", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
+  async removeComment(postId: Types.ObjectId, session?: ClientSession) {
+    try {
+      const updateQuery = Post.updateOne(
+        {
+          _id: postId,
+        },
+        {
+          $inc: {
+            "actions.comments": -1,
+          },
+        }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeComment", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
+  async deletePost(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        { isDeleted: true, deletedAt: new Date() }
+      );
+
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
     } catch (error) {
       mongoDBErrorHandler("deleteLike", error, {
         postId,
       });
-      return null;
+    }
+  }
+
+  async deleteOriginalPostByPostId(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateMany(
+        {
+          originalPostId: postId,
+          isOriginalPostDeleted: { $ne: true },
+        },
+        { $set: { isOriginalPostDeleted: true } },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteOriginalPostByPostId", error, {
+        postId,
+      });
+      return undefined;
     }
   }
 
@@ -442,27 +521,6 @@ class PostRepository {
       return result;
     } catch (error) {
       mongoDBErrorHandler("addRepost", error, {
-        postId,
-        userId,
-      });
-      return undefined;
-    }
-  }
-
-  async removeRepost(
-    postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const result = await Post.updateOne(
-        { _id: postId },
-        { $pull: { [`actions.reposts`]: userId } }
-      ).session(session);
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("removeRepost", error, {
         postId,
         userId,
       });

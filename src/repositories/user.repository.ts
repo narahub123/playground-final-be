@@ -412,6 +412,17 @@ class UserRepository {
     }
   }
 
+  async findUsersByPinnedPost(pinnedPost: Types.ObjectId): Promise<IUser[]> {
+    try {
+      const users = await User.find({ pinnedPost });
+
+      return users;
+    } catch (error) {
+      mongoDBErrorHandler("findUsersByPin", error, { pinnedPost });
+      return [];
+    }
+  }
+
   async addPinnedPost(
     userId: Types.ObjectId,
     pinnedPost: Types.ObjectId

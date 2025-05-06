@@ -92,6 +92,12 @@ const PostSchema = new mongoose.Schema<IPost>(
       },
     },
 
+    isOriginalPostDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
     repostedAt: {
       type: Date,
       required: function (this: IPost) {

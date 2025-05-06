@@ -57,6 +57,7 @@ interface IPost extends Document {
   actions: IPostActions;
 
   originalPostId?: Types.ObjectId;
+  isOriginalPostDeleted: boolean;
 
   // repost인 경우
   repostedAt?: Date;

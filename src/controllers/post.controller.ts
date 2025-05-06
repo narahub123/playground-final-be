@@ -277,15 +277,12 @@ const deletePost = asyncWrapper(
       throw new UnauthorizedError("삭제할 권한이 없습니다.");
     }
 
-    const postIds = await postService.deletePost(postid, user_id);
+    await postService.deletePost(postid);
 
     const response: IApiSuccessResponse<{ postIds: Types.ObjectId[] }> = {
       success: true,
       message: "Post is deleted successfully.(포스트 삭제 성공)",
       code: "DELETE_POST_SUCCEEDED",
-      data: {
-        postIds,
-      },
       timestamp: new Date().toISOString(),
     };
 
