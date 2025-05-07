@@ -30,7 +30,7 @@ class PostRepository {
 
       if (!newPost[0]) return undefined;
 
-      const newOne = await aggregatePostById(newPost[0]._id);
+      const newOne = await aggregatePostById(newPost[0]._id, options?.session);
 
       return newOne;
     } catch (error) {
