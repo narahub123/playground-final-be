@@ -212,9 +212,14 @@ class UserRepository {
     }
   }
 
-  async getUserById(userId: Types.ObjectId): Promise<IUser | null> {
+  async getUserById(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IUser | null> {
     try {
-      const user = await User.findById(userId);
+      const user = session
+        ? await User.findById(userId).session(session)
+        : await User.findById(userId);
 
       return user;
     } catch (error) {

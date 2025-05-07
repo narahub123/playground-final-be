@@ -3,6 +3,7 @@ import { authTokenMiddleware } from "@middlewares";
 import {
   addRepost,
   createComment,
+  createQuote,
   creatNewPost,
   deletePost,
   getComments,
@@ -18,6 +19,7 @@ export default (router: Router) => {
   router.post("/posts", authTokenMiddleware, creatNewPost);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
+  router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, addRepost);
   router.post("/posts/:postid/comment", authTokenMiddleware, createComment);
@@ -29,7 +31,7 @@ export default (router: Router) => {
   );
   router.patch("/posts/:postid/pin", authTokenMiddleware, updatePin);
   router.post(
-    `/posts/:postId/:optionIndex`,
+    `/posts/:postId/vote/:optionIndex`,
     authTokenMiddleware,
     updatePostVote
   );

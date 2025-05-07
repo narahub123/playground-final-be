@@ -85,8 +85,11 @@ class UserService {
     return user;
   }
 
-  async getUserById(userId: Types.ObjectId): Promise<IUser | null> {
-    const user = await userRepository.getUserById(userId);
+  async getUserById(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IUser | null> {
+    const user = await userRepository.getUserById(userId, session);
 
     return user;
   }

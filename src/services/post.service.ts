@@ -9,17 +9,19 @@ import {
   IPost,
   IPostRequestDto,
   IPostResponseDto,
+  IQuoteRequestDto,
   IRepostRequestDto,
 } from "@types";
 import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
 import userService from "./user.service";
 import userPostActionService from "./user-post-action.service";
+import { aggregatePostById, deleteMedia, uploadMedia } from "@utils";
 
 class PostService {
   async createPost(
     post: IPostRequestDto,
     session: mongoose.ClientSession
-  ): Promise<IPost> {
+  ): Promise<IPostResponseDto> {
     const newPost = await postRepository.createPost(post, { session });
 
     if (!newPost) {
@@ -167,8 +169,11 @@ class PostService {
     return post;
   }
 
-  async getPurePostById(postId: Types.ObjectId): Promise<IPost> {
-    const post = await postRepository.getPurePostById(postId);
+  async getPurePostById(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPost> {
+    const post = await postRepository.getPurePostById(postId, session);
 
     if (!post) {
       throw new NotFoundError("포스트 조회 실패");
@@ -553,6 +558,58 @@ class PostService {
     );
 
     return comments;
+  }
+
+  async createQuote(
+    newQuote: IQuoteRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto> {
+    const quote = await postRepository.createQuote(newQuote, session);
+
+    if (!quote) {
+      throw new InternalServerError("인용 생성 중 에러 발생");
+    }
+
+    return quote;
+  }
+
+  async createAndAddQuote(newQuote: IQuoteRequestDto) {
+    const { author, originalPostId, media, text } = newQuote;
+
+    // 미디어 처리하기
+    const newMedia = await uploadMedia(media);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // user 확인
+      await userService.getUserById(author, session);
+
+      // originalPost 확인
+      await this.getPurePostById(originalPostId);
+
+      // 인용 생성하기
+      const quote = await this.createQuote(
+        { ...newQuote, media: newMedia.map((medium) => medium.secure_url) },
+        session
+      );
+
+      // 인용추가하기
+      await this.addRepost(originalPostId, session);
+
+      await session.commitTransaction();
+
+      return quote;
+    } catch (error) {
+      if (newMedia.length > 0) {
+        await deleteMedia(newMedia);
+      }
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 

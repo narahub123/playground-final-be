@@ -10,6 +10,7 @@ import {
   IPostResponseDto,
   IRepostRequestDto,
   ICommentRequestDto,
+  IQuoteRequestDto,
 } from "@types";
 import { postService, userService } from "@services";
 import { JSDOM } from "jsdom";
@@ -53,7 +54,7 @@ const creatNewPost = asyncWrapper(
 
       await session.commitTransaction();
 
-      const response: IApiSuccessResponse<{ post: IPost }> = {
+      const response: IApiSuccessResponse<{ post: IPostResponseDto }> = {
         success: true,
         message: "Post is created successfully. (포스트 생성 성공)",
         code: "POST_CREATION_SUCCEEDED",
@@ -64,7 +65,7 @@ const creatNewPost = asyncWrapper(
       res.status(201).json(response);
     } catch (error) {
       if (newMedia.length > 0) {
-        deleteMedia(newMedia);
+        await deleteMedia(newMedia);
       }
       session.abortTransaction();
       throw error;
@@ -455,6 +456,48 @@ const getComments = asyncWrapper(
   }
 );
 
+const createQuote = asyncWrapper(
+  "createQuote",
+  "Fail to creat a quote.(인용 생성 실패)",
+  "QUOTE_CREATION_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const { text, media } = req.body;
+    const user = req.user;
+
+    // 유효성 검사
+    if (!postid) {
+      throw new BadRequestError("postId 필수");
+    }
+
+    if (!text && media.length === 0) {
+      throw new BadRequestError("텍스트 혹은 미디어 필수");
+    }
+
+    const originalPostId = new mongoose.Types.ObjectId(postid);
+
+    const newQuote: IQuoteRequestDto = {
+      type: "quote",
+      author: user._id,
+      originalPostId,
+      text,
+      media,
+    };
+
+    const quote = await postService.createQuote(newQuote);
+
+    const response: IApiSuccessResponse<{ quote: IPostResponseDto }> = {
+      success: true,
+      message: "Quote is created successfully. (인용 생성 성공)",
+      code: "QUOTE_CREATION_SUCCEEDED",
+      data: { quote },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(201).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -467,4 +510,5 @@ export {
   updateBookmarks,
   createComment,
   getComments,
+  createQuote,
 };

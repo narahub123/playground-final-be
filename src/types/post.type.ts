@@ -18,6 +18,14 @@ interface IPostRequestDto {
   vote?: IVote;
 }
 
+interface IQuoteRequestDto {
+  type: "quote";
+  author: Types.ObjectId;
+  originalPostId: Types.ObjectId;
+  text?: string;
+  media: string[];
+}
+
 interface IRepostRequestDto {
   type: "repost";
   author: Types.ObjectId;
@@ -120,4 +128,5 @@ export type {
   IRepostRequestDto,
   ICommentRequestDto,
   PostType,
+  IQuoteRequestDto,
 };

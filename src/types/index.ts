@@ -89,6 +89,7 @@ import {
   IRepostRequestDto,
   PostType,
   ICommentRequestDto,
+  IQuoteRequestDto,
 } from "./post.type";
 
 import { IRepost } from "./repost.type";
@@ -195,6 +196,7 @@ export {
   IRepostRequestDto,
   PostType,
   ICommentRequestDto,
+  IQuoteRequestDto,
 
   // repost
   IRepost,

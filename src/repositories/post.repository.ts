@@ -4,6 +4,7 @@ import {
   IPost,
   IPostRequestDto,
   IPostResponseDto,
+  IQuoteRequestDto,
   IRepostRequestDto,
 } from "@types";
 import {
@@ -23,11 +24,15 @@ class PostRepository {
   async createPost(
     post: IPostRequestDto,
     options?: { session: mongoose.ClientSession }
-  ): Promise<IPost | undefined> {
+  ): Promise<IPostResponseDto | undefined> {
     try {
       const newPost = await Post.create([post], options);
 
-      return newPost[0] || undefined;
+      if (!newPost[0]) return undefined;
+
+      const newOne = await aggregatePostById(newPost[0]._id);
+
+      return newOne;
     } catch (error) {
       mongoDBErrorHandler("createPost", error, { post });
     }
@@ -114,9 +119,14 @@ class PostRepository {
     }
   }
 
-  async getPurePostById(postId: Types.ObjectId): Promise<IPost | null> {
+  async getPurePostById(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPost | null> {
     try {
-      const post = await Post.findById(postId);
+      const post = session
+        ? await Post.findById(postId).session(session)
+        : await Post.findById(postId);
 
       return post;
     } catch (error) {
@@ -547,6 +557,26 @@ class PostRepository {
         originalPostId,
       });
       throw error;
+    }
+  }
+
+  async createQuote(
+    newQuote: IQuoteRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto | undefined> {
+    try {
+      const newPost = await Post.create([newQuote], { session });
+
+      if (!newPost[0]) return undefined;
+
+      const quote = await aggregatePostById(newPost[0]._id, session);
+
+      return quote;
+    } catch (error) {
+      mongoDBErrorHandler("createQuote", error, {
+        newQuote,
+      });
+      return undefined;
     }
   }
 }
