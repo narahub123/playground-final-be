@@ -484,7 +484,7 @@ const createQuote = asyncWrapper(
       media,
     };
 
-    const quote = await postService.createQuote(newQuote);
+    const quote = await postService.createAndAddQuote(newQuote);
 
     const response: IApiSuccessResponse<{ quote: IPostResponseDto }> = {
       success: true,
