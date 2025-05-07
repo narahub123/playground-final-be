@@ -1,4 +1,4 @@
-import { InternalServerError, NotFoundError } from "@errors";
+import { ConflictError, InternalServerError, NotFoundError } from "@errors";
 import {
   postRepository,
   userPostActionRepository,
@@ -35,58 +35,68 @@ class PostService {
     return newPost;
   }
 
-  async createRepost(repost: IRepostRequestDto) {
+  async isReposting(repostInfo: IRepostRequestDto, session?: ClientSession) {
+    const repost = await postRepository.getRepostByRepostInfo(
+      repostInfo,
+      session
+    );
+
+    return Boolean(repost);
+  }
+
+  async createRepost(
+    repost: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto> {
+    const newRepost = await postRepository.createRepost(repost, session);
+
+    if (!newRepost) {
+      throw new InternalServerError(
+        "Failed to create repost. (리포스트 생성 실패)",
+        "REPOST_CREATION_ERROR",
+        {
+          repost: "REPOST_CREATION_FAILED",
+        }
+      );
+    }
+
+    return newRepost;
+  }
+
+  async addRepost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.addRepost(postId, session);
+
+    if (!result) {
+      throw new InternalServerError("리포스트 카운트 증가 도중 에러 발생");
+    }
+
+    if (result?.matchedCount === 0) {
+      throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
+    }
+
+    if (result?.modifiedCount === 0) {
+      throw new InternalServerError("리포스트 카운트 증가 실패");
+    }
+  }
+
+  async createAndAddRepost(repost: IRepostRequestDto) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const origin = await postRepository.getPostById(repost.originalPostId);
+      const isReposting = await this.isReposting(repost, session);
 
-      if (!origin) {
-        throw new NotFoundError("original 포스트 조회 실패");
+      if (isReposting) {
+        throw new ConflictError("이미 리포스트가 존재합니다.");
       }
 
-      const { _id, originalPost } = origin;
+      // 원본 포스트 조회
+      await this.getPurePostById(repost.originalPostId);
 
-      const modified: IRepostRequestDto = {
-        type: "repost",
-        author: repost.author,
-        originalPostId: originalPost ? originalPost._id : repost.originalPostId,
-      };
+      // 리포스트 생성
+      const newPost = await this.createRepost(repost, session);
 
-      const newPost = await postRepository.createRepost(modified, session);
-
-      if (!newPost) {
-        throw new InternalServerError(
-          "Failed to create repost. (리포스트 생성 실패)",
-          "REPOST_CREATION_ERROR",
-          {
-            repost: "REPOST_CREATION_FAILED",
-          }
-        );
-      }
-
-      for (const postId of [repost.originalPostId, originalPost?._id]) {
-        if (!postId) continue;
-
-        const result = await postRepository.addRepost(
-          postId,
-          modified.author,
-          session
-        );
-
-        if (!result) {
-          throw new InternalServerError("리포스트 추가 도중 에러 발생");
-        }
-
-        if (result?.matchedCount === 0) {
-          throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
-        }
-
-        if (result?.modifiedCount === 0) {
-          throw new InternalServerError("리포스트 추가 도중 에러 발생");
-        }
-      }
+      await this.addRepost(repost.originalPostId, session);
 
       await session.commitTransaction();
       return newPost;

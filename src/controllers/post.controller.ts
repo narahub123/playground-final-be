@@ -205,7 +205,7 @@ const addRepost = asyncWrapper(
       originalPostId: postId,
     };
 
-    const newPost = await postService.createRepost(repost);
+    const newPost = await postService.createAndAddRepost(repost);
 
     if (!newPost) {
       throw new InternalServerError("재게시 도중 에러 발생");

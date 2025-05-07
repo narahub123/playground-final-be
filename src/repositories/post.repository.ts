@@ -33,107 +33,6 @@ class PostRepository {
     }
   }
 
-  async createRepost(
-    post: IRepostRequestDto,
-    session: ClientSession
-  ): Promise<IPostResponseDto | null> {
-    try {
-      const newPost = await Post.create([post], { session });
-
-      const posts = await Post.aggregate<IPostResponseDto>(
-        [
-          { $match: { _id: newPost[0]?._id } },
-
-          // 1. 작성자 정보
-          {
-            $lookup: {
-              from: "users",
-              localField: "author",
-              foreignField: "_id",
-              as: "postAuthor",
-            },
-          },
-          { $unwind: "$postAuthor" },
-
-          // 2. originalPost가 있는 경우에만 연결
-          {
-            $lookup: {
-              from: "posts",
-              let: { originalId: "$originalPostId" },
-              pipeline: [
-                { $match: { $expr: { $eq: ["$_id", "$$originalId"] } } },
-                {
-                  $lookup: {
-                    from: "users",
-                    localField: "author",
-                    foreignField: "_id",
-                    as: "originalPostAuthor",
-                  },
-                },
-                { $unwind: "$originalPostAuthor" },
-                {
-                  $project: {
-                    _id: 1,
-                    type: 1,
-                    text: 1,
-                    media: 1,
-                    schedule: 1,
-                    vote: 1,
-                    actions: 1,
-                    pin: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                    author: {
-                      _id: "$originalPostAuthor._id",
-                      userId: "$originalPostAuthor.userId",
-                      username: "$originalPostAuthor.username",
-                      profileImage: "$originalPostAuthor.profileImage",
-                    },
-                  },
-                },
-              ],
-              as: "originalPost",
-            },
-          },
-          {
-            $addFields: {
-              originalPost: { $arrayElemAt: ["$originalPost", 0] }, // optional 처리
-            },
-          },
-
-          // 3. 최종 결과 구성
-          {
-            $project: {
-              _id: 1,
-              type: 1,
-              text: 1,
-              media: 1,
-              schedule: 1,
-              vote: 1,
-              actions: 1,
-              pin: 1,
-              createdAt: 1,
-              updatedAt: 1,
-              author: {
-                _id: "$postAuthor._id",
-                userId: "$postAuthor.userId",
-                username: "$postAuthor.username",
-                profileImage: "$postAuthor.profileImage",
-              },
-              originalPost: 1, // 없으면 null
-            },
-          },
-        ],
-        { session }
-      );
-
-      return posts[0] || null;
-    } catch (error) {
-      mongoDBErrorHandler("createRepost", error, { post });
-      return null;
-    }
-  }
-
   async createComment(
     comment: ICommentRequestDto,
     session?: ClientSession
@@ -516,28 +415,71 @@ class PostRepository {
     }
   }
 
+  async createRepost(
+    post: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto | undefined> {
+    try {
+      const newPost = await Post.create([post], { session });
+
+      if (!newPost[0]) return undefined;
+
+      const repost = await aggregatePostById(newPost[0]._id, session);
+
+      return repost;
+    } catch (error) {
+      mongoDBErrorHandler("createRepost", error, { post });
+      return undefined;
+    }
+  }
+
   async addRepost(
     postId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session: ClientSession
+    session?: ClientSession
   ): Promise<UpdateResult | undefined> {
     try {
-      const result = await Post.updateOne(
+      const updateQuery = Post.updateOne(
         { _id: postId },
         {
-          $addToSet: {
-            ["actions.reposts"]: userId,
+          $inc: {
+            "actions.reposts": 1,
           },
         }
-      ).session(session);
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
 
       return result;
     } catch (error) {
       mongoDBErrorHandler("addRepost", error, {
         postId,
-        userId,
       });
       return undefined;
+    }
+  }
+
+  async getRepostByRepostInfo(
+    repostInfo: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPost | null> {
+    try {
+      const repost = await Post.findOne(
+        {
+          originalPostId: repostInfo.originalPostId,
+          type: "repost",
+          userId: repostInfo.author,
+        },
+        null,
+        { session }
+      );
+
+      return repost;
+    } catch (error) {
+      mongoDBErrorHandler("getRepostByRepostInfo", error, {
+        repostInfo,
+      });
+      return null;
     }
   }
 
