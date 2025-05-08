@@ -271,8 +271,6 @@ const getCurrentUser = asyncWrapper(
       loginRecords,
     };
 
-    const posts = await postService.getPostsByAuthor(user._id);
-
     const response = {
       success: true,
       message:
@@ -285,7 +283,6 @@ const getCurrentUser = asyncWrapper(
         privacy,
         notification,
         display,
-        posts,
       },
     };
 
