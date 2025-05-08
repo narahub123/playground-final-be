@@ -331,6 +331,7 @@ const projectFinalFields = () => {
       repostedAt: "$postData.repostedAt",
       quotedAt: "$postData.quotedAt",
       commentedAt: "$postData.commentedAt",
+      basePostId: "$postData._id",
       originalPost: {
         _id: "$originalPost._id",
         type: "$originalPost.type",
@@ -357,6 +358,7 @@ const projectFinalFields = () => {
         createdAt: "$originalPost.createdAt",
         updatedAt: "$originalPost.updatedAt",
         pin: "$originalPost.pin",
+        basePostId: "$postData._id",
       },
       thread: {
         $map: {
@@ -388,6 +390,7 @@ const projectFinalFields = () => {
             createdAt: "$$entry.createdAt",
             updatedAt: "$$entry.updatedAt",
             pin: "$$entry.pin",
+            basePostId: "$postData._id",
           },
         },
       },
@@ -420,6 +423,7 @@ const projectFinalFields = () => {
             createdAt: "$$comment.createdAt",
             updatedAt: "$$comment.updatedAt",
             pin: "$$comment.pin",
+            basePostId: "$postData._id",
           },
         },
       },
@@ -440,7 +444,6 @@ const addThreadLastCommentedAt = () => ({
     },
   },
 });
-
 
 const addSortKey = () => ({
   $addFields: {
