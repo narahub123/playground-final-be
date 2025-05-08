@@ -31,7 +31,11 @@ class PostRepository {
 
       if (!newPost[0]) return undefined;
 
-      const newOne = await aggregatePostById(newPost[0]._id, options?.session);
+      const newOne = await aggregatePostById(
+        newPost[0]._id,
+        post.author,
+        options?.session
+      );
 
       return newOne;
     } catch (error) {
@@ -131,10 +135,12 @@ class PostRepository {
   }
 
   async getPostById(
-    _id: Types.ObjectId
+    _id: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
   ): Promise<IPostResponseDto | undefined> {
     try {
-      const post = await aggregatePostById(_id);
+      const post = await aggregatePostById(_id, userId, session);
 
       return post;
     } catch (error) {
@@ -458,7 +464,11 @@ class PostRepository {
 
       if (!newPost[0]) return undefined;
 
-      const repost = await aggregatePostById(newPost[0]._id, session);
+      const repost = await aggregatePostById(
+        newPost[0]._id,
+        post.author,
+        session
+      );
 
       return repost;
     } catch (error) {
@@ -593,7 +603,11 @@ class PostRepository {
 
       if (!newPost[0]) return undefined;
 
-      const quote = await aggregatePostById(newPost[0]._id, session);
+      const quote = await aggregatePostById(
+        newPost[0]._id,
+        newQuote.author,
+        session
+      );
 
       return quote;
     } catch (error) {

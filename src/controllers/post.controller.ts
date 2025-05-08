@@ -139,7 +139,7 @@ const updatePostVote = asyncWrapper(
     const user_id = new mongoose.Types.ObjectId(user);
     const index = Number(optionIndex);
 
-    const post = await postService.getPostById(post_id);
+    const post = await postService.getPostById(post_id, user_id);
 
     // 포스트가 존재하지 않는 경우
     if (!post) {
@@ -265,7 +265,7 @@ const deletePost = asyncWrapper(
 
     const postid = new mongoose.Types.ObjectId(postId);
 
-    const post = await postService.getPostById(postid);
+    const post = await postService.getPostById(postid, user_id);
 
     if (!post) {
       throw new BadRequestError("포스트 조회 실패");
@@ -305,7 +305,7 @@ const updatePin = asyncWrapper(
 
     const postId = new mongoose.Types.ObjectId(postid);
 
-    const post = await postService.getPostById(postId);
+    const post = await postService.getPostById(postId, user._id);
 
     const user_id = post.author._id;
 
@@ -333,6 +333,7 @@ const getPostById = asyncWrapper(
   "GET_POST_FAILED",
   async (req: Request, res: Response) => {
     const { postid } = req.params;
+    const { _id: userId } = req.user;
 
     if (!postid) {
       throw new BadRequestError("포스트 아이디 필수");
@@ -340,7 +341,7 @@ const getPostById = asyncWrapper(
 
     const postId = new mongoose.Types.ObjectId(postid);
 
-    const post = await postService.getPostById(postId);
+    const post = await postService.getPostById(postId, userId);
 
     const response: IApiSuccessResponse<{ post: IPostResponseDto }> = {
       success: true,

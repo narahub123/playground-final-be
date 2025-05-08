@@ -15,11 +15,15 @@ import {
   unwindOriginalPosts,
   lookupCommentsByPostId,
   addSession,
+  lookupRepostsByCurrentUser,
+  addRepostedOriginalPostIds,
+  addIsRepostedByCurrentUser,
 } from "@utils";
 import { IPostResponseDto } from "@types";
 
 const aggregatePostById = async (
   postId: Types.ObjectId,
+  userId: Types.ObjectId,
   session?: ClientSession
 ): Promise<IPostResponseDto | undefined> => {
   const posts = await Post.aggregate<IPostResponseDto>(
@@ -47,6 +51,12 @@ const aggregatePostById = async (
 
       // 8. postData, originalPost, comments를 나누어 각 필드에 할당
       addPostData(),
+
+      lookupRepostsByCurrentUser(userId),
+
+      addRepostedOriginalPostIds(),
+
+      addIsRepostedByCurrentUser(),
 
       // 10. orignalPostId가 postId와 일치하는 것을 가져옴
       lookupCommentsByPostId(),

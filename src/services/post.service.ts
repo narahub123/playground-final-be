@@ -184,8 +184,12 @@ class PostService {
     return posts;
   }
 
-  async getPostById(postId: Types.ObjectId): Promise<IPostResponseDto> {
-    const post = await postRepository.getPostById(postId);
+  async getPostById(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPostResponseDto> {
+    const post = await postRepository.getPostById(postId, userId, session);
 
     if (!post) {
       throw new NotFoundError("포스트 조회 실패");
@@ -495,11 +499,7 @@ class PostService {
   }
 
   async updatePin(postId: Types.ObjectId) {
-    const post = await this.getPostById(postId);
-
-    if (!post) {
-      throw new NotFoundError("포스트를 찾을 수 없습니다.");
-    }
+    await this.getPurePostById(postId);
 
     const result = await postRepository.updatePin(postId);
 
@@ -555,7 +555,7 @@ class PostService {
     try {
       const { originalPostId } = comment;
 
-      await this.getPostById(originalPostId);
+      await this.getPurePostById(originalPostId);
 
       const newComment = await this.createComment(comment, session);
 
@@ -575,7 +575,7 @@ class PostService {
 
   async getCommentByPostId(originalPostId: Types.ObjectId, skip: number) {
     // originalPostId의 유효성 확인
-    await this.getPostById(originalPostId);
+    await this.getPurePostById(originalPostId);
 
     const comments = await postRepository.getCommentsByPostId(
       originalPostId,
