@@ -409,17 +409,6 @@ class PostService {
     }
   }
 
-  async removeRepost(postId: Types.ObjectId, session?: ClientSession) {
-    const result = await postRepository.removeRepost(postId, session);
-
-    if (!result) throw new InternalServerError("리포스트 삭제 중 에러 발생");
-
-    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
-
-    if (result.modifiedCount === 0)
-      throw new InternalServerError("리포스트 삭제 실패");
-  }
-
   async removeComment(postId: Types.ObjectId, session?: ClientSession) {
     const result = await postRepository.removeComment(postId, session);
 
@@ -630,6 +619,60 @@ class PostService {
       if (newMedia.length > 0) {
         await deleteMedia(newMedia);
       }
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async removeRepost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.removeRepost(postId, session);
+
+    if (!result) throw new InternalServerError("리포스트 삭제 중 에러 발생");
+
+    if (result.matchedCount === 0) throw new NotFoundError("포스트 조회 실패");
+
+    if (result.modifiedCount === 0)
+      throw new InternalServerError("리포스트 삭제 실패");
+  }
+
+  async deleteRepostByPostIdAndUserId(
+    originalPostId: Types.ObjectId,
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPost> {
+    const repost = await postRepository.deleteRepostByPostIdAndUserId(
+      originalPostId,
+      userId,
+      session
+    );
+
+    if (!repost) throw new NotFoundError("재게시 삭제 실패");
+
+    return repost;
+  }
+
+  async deleteAndRemoveRepost(
+    postId: Types.ObjectId,
+    userId: Types.ObjectId
+  ): Promise<IPost> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const repost = await this.deleteRepostByPostIdAndUserId(
+        postId,
+        userId,
+        session
+      );
+
+      await this.removeRepost(postId, session);
+
+      await session.commitTransaction();
+
+      return repost;
+    } catch (error) {
       session.abortTransaction();
       throw error;
     } finally {

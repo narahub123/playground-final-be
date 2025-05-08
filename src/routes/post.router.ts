@@ -6,6 +6,7 @@ import {
   createQuote,
   creatNewPost,
   deletePost,
+  deleteRepost,
   getComments,
   getPostById,
   getPostPreview,
@@ -37,5 +38,6 @@ export default (router: Router) => {
     authTokenMiddleware,
     updatePostVote
   );
+  router.delete("/posts/:postid/repost", authTokenMiddleware, deleteRepost);
   router.delete("/posts/:postId", authTokenMiddleware, deletePost);
 };

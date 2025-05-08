@@ -528,6 +528,34 @@ const getPostsByUserAndFollowings = asyncWrapper(
   }
 );
 
+const deleteRepost = asyncWrapper(
+  "deleteRepost",
+  "Failed to delete repost.(재게시 삭제 실패)",
+  "REPOST_DELETION_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const { _id: userId } = req.user;
+
+    if (!postid) throw new BadRequestError("postid 필수");
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const repost = await postService.deleteAndRemoveRepost(postId, userId);
+
+    const response: IApiSuccessResponse<{ repost: IPost }> = {
+      success: true,
+      message: "Repost were deleted successfully. (재게시 삭제 성공)",
+      code: "REPOST_DELETION_SUCCEEDED",
+      data: {
+        repost,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -542,4 +570,5 @@ export {
   getComments,
   createQuote,
   getPostsByUserAndFollowings,
+  deleteRepost,
 };
