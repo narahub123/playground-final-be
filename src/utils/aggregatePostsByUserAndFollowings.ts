@@ -17,6 +17,9 @@ import {
   matchReposts,
   replaceRootWithFirstRepost,
   addSession,
+  addIsRepostedByCurrentUser,
+  addRepostedOriginalPostIds,
+  lookupRepostsByCurrentUser,
 } from "./aggregatePipelines";
 
 const aggregatePostsByUserAndFollowings = async (
@@ -47,6 +50,12 @@ const aggregatePostsByUserAndFollowings = async (
 
       // 8. postData, originalPost, comments를 나누어 각 필드에 할당
       addPostData(),
+
+      lookupRepostsByCurrentUser(userIds[0]!),
+
+      addRepostedOriginalPostIds(),
+
+      addIsRepostedByCurrentUser(),
 
       matchReposts(),
 

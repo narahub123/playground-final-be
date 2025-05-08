@@ -47,6 +47,9 @@ import {
   matchPostsByUserAndFollowings,
   matchReposts,
   replaceRootWithFirstRepost,
+  addIsRepostedByCurrentUser,
+  addRepostedOriginalPostIds,
+  lookupRepostsByCurrentUser,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
@@ -110,4 +113,7 @@ export {
   matchPostsByUserAndFollowings,
   matchReposts,
   replaceRootWithFirstRepost,
+  addIsRepostedByCurrentUser,
+  addRepostedOriginalPostIds,
+  lookupRepostsByCurrentUser,
 };

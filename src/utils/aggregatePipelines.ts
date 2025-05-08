@@ -338,9 +338,11 @@ const projectFinalFields = () => {
       originalPostId: "$postData.originalPostId",
       isOriginalPostDeleted: "$postData.isOriginalPostDeleted",
       repostedAt: "$postData.repostedAt",
+      isRepostedByCurrentUser: "$postData.isRepostedByCurrentUser",
       quotedAt: "$postData.quotedAt",
       commentedAt: "$postData.commentedAt",
       basePostId: "$postData._id",
+
       originalPost: {
         _id: "$originalPost._id",
         type: "$originalPost.type",
@@ -472,6 +474,56 @@ const addSession = (session?: ClientSession) => {
   return { session };
 };
 
+const lookupRepostsByCurrentUser = (currentUser: Types.ObjectId) => ({
+  $lookup: {
+    from: "posts",
+    let: { currentUser },
+    pipeline: [
+      {
+        $match: {
+          $expr: {
+            $and: [
+              { $eq: ["$type", "repost"] },
+              { $eq: ["$author", "$$currentUser"] },
+            ],
+          },
+        },
+      },
+      {
+        $project: { originalPostId: 1 },
+      },
+    ],
+    as: "repostsByCurrentUser",
+  },
+});
+
+const addRepostedOriginalPostIds = () => ({
+  $addFields: {
+    repostedOriginalPostIds: {
+      $map: {
+        input: "$repostsByCurrentUser",
+        as: "rp",
+        in: "$$rp.originalPostId",
+      },
+    },
+  },
+});
+
+const addIsRepostedByCurrentUser = () => ({
+  $set: {
+    postData: {
+      $mergeObjects: [
+        "$postData",
+        {
+          isRepostedByCurrentUser: {
+            $in: ["$postData._id", "$repostedOriginalPostIds"], // 나중에 추가되는 배열과 비교
+          },
+        },
+      ],
+    },
+  },
+});
+
 const matchReposts = () => ({
   $match: {
     $or: [
@@ -524,4 +576,7 @@ export {
   matchReposts,
   replaceRootWithFirstRepost,
   matchPostsByUserAndFollowings,
+  addIsRepostedByCurrentUser,
+  addRepostedOriginalPostIds,
+  lookupRepostsByCurrentUser,
 };

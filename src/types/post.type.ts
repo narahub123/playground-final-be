@@ -115,6 +115,7 @@ interface IPostResponseDto {
   pin: boolean;
   thread?: IPostResponseDto[];
   comments?: IPostResponseDto[];
+  isRepostedByCurrentUser: boolean;
 }
 
 export type {
