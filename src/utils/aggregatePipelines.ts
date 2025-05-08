@@ -17,6 +17,15 @@ const matchPostsByUserId = (userId: Types.ObjectId) => {
   };
 };
 
+const matchPostsByUserAndFollowings = (userIds: Types.ObjectId[]) => {
+  return {
+    $match: {
+      author: { $in: userIds },
+      isDeleted: false,
+    },
+  };
+};
+
 // 2. 원본 포스트를 재귀적으로 조회하여 원본 포스트들 배열을 생성
 const graphLookupOriginalPosts = () => {
   return {
@@ -463,6 +472,33 @@ const addSession = (session?: ClientSession) => {
   return { session };
 };
 
+const matchReposts = () => ({
+  $match: {
+    $or: [
+      { "postData.type": { $ne: "repost" } }, // "repost"가 아닌 포스트는 그대로 반환
+      { "postData.type": "repost", "postData.originalPostId": { $ne: null } }, // "repost" 중 originalPostId가 있는 것만 가져오기
+    ],
+  },
+});
+
+const replaceRootWithFirstRepost = () => ({
+  $addFields: {
+    // 첫 번째 리포스트만 선택 (리포스트가 여러 개 있을 수 있기 때문에, 가장 첫 번째 원본 포스트를 찾아서 넣음)
+    firstRepost: {
+      $arrayElemAt: [
+        {
+          $filter: {
+            input: "$postData.originalPosts", // 원본 포스트 배열
+            as: "post",
+            cond: { $eq: ["$$post.type", "repost"] }, // type이 "repost"인 것만 필터링
+          },
+        },
+        0, // 첫 번째 리포스트만 선택
+      ],
+    },
+  },
+});
+
 export {
   matchPostById,
   matchPostsByUserId,
@@ -485,4 +521,7 @@ export {
   addThreadLastCommentedAt,
   replaceRootWithComments,
   addSession,
+  matchReposts,
+  replaceRootWithFirstRepost,
+  matchPostsByUserAndFollowings,
 };

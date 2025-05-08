@@ -498,6 +498,31 @@ const createQuote = asyncWrapper(
   }
 );
 
+const getPostsByUserAndFollowings = asyncWrapper(
+  "getPostsByUserAndFollowings",
+  "Failed to retrieve posts (포스트 목록 조회 실패)",
+  "POST_RETRIEVAL_FAILED",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+
+    const followings = user.followings.map((following) => following.user);
+
+    const authors = [user._id, ...followings];
+
+    const posts = await postService.getPostsByUserAndFollowings(authors);
+
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -511,4 +536,5 @@ export {
   createComment,
   getComments,
   createQuote,
+  getPostsByUserAndFollowings,
 };

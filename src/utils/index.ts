@@ -44,11 +44,15 @@ import {
   replaceRootWithComments,
   addSession,
   lookupCommentsByPostId,
+  matchPostsByUserAndFollowings,
+  matchReposts,
+  replaceRootWithFirstRepost,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
 import aggregatePostsByUserId from "./aggregatePostsByUserId";
 import aggregateCommentsByPostId from "./aggregateCommentsByPostId";
+import aggregatePostsByUserAndFollowings from "./aggregatePostsByUserAndFollowings";
 
 export {
   connectDB,
@@ -79,6 +83,7 @@ export {
   aggregatePostById,
   aggregatePostsByUserId,
   aggregateCommentsByPostId,
+  aggregatePostsByUserAndFollowings,
 
   // aggregatePipelines
   matchPostById,
@@ -102,4 +107,7 @@ export {
   replaceRootWithComments,
   addSession,
   lookupCommentsByPostId,
+  matchPostsByUserAndFollowings,
+  matchReposts,
+  replaceRootWithFirstRepost,
 };

@@ -151,6 +151,29 @@ class PostService {
     }
   }
 
+  async getPostsByUserAndFollowings(
+    userIds: Types.ObjectId[]
+  ): Promise<IPostResponseDto[]> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const posts = await postRepository.getPostsByAuthorAndFollowings(
+        userIds,
+        session
+      );
+
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
   async getPostsByAuthor(
     author: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {

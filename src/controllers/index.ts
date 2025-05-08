@@ -42,6 +42,7 @@ import {
   createComment,
   getComments,
   createQuote,
+  getPostsByUserAndFollowings,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -89,6 +90,7 @@ export {
   createComment,
   getComments,
   createQuote,
+  getPostsByUserAndFollowings,
 
   // privacy
   privacyController,

@@ -9,6 +9,7 @@ import {
   getComments,
   getPostById,
   getPostPreview,
+  getPostsByUserAndFollowings,
   updateBookmarks,
   updateLikes,
   updatePin,
@@ -16,6 +17,7 @@ import {
 } from "@controllers";
 
 export default (router: Router) => {
+  router.get("/posts", authTokenMiddleware, getPostsByUserAndFollowings);
   router.post("/posts", authTokenMiddleware, creatNewPost);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);

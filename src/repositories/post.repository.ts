@@ -10,6 +10,7 @@ import {
 import {
   aggregateCommentsByPostId,
   aggregatePostById,
+  aggregatePostsByUserAndFollowings,
   aggregatePostsByUserId,
   mongoDBErrorHandler,
 } from "@utils";
@@ -93,6 +94,24 @@ class PostRepository {
     }
   }
 
+  // 사용자와 사용자의 팔로잉의 포스트 목록
+  async getPostsByAuthorAndFollowings(
+    authorIds: Types.ObjectId[],
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await aggregatePostsByUserAndFollowings(authorIds, session);
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsByAuthorAndFollowings", error, {
+        user_id: authorIds,
+      });
+      return [];
+    }
+  }
+
+  // 사용자의 포스트 목록
   async getPostsByAuthor(
     authorId: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {
