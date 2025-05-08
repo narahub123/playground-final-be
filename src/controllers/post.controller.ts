@@ -504,12 +504,16 @@ const getPostsByUserAndFollowings = asyncWrapper(
   "POST_RETRIEVAL_FAILED",
   async (req: Request, res: Response) => {
     const user = req.user;
+    const { skip } = req.query;
 
     const followings = user.followings.map((following) => following.user);
 
     const authors = [user._id, ...followings];
 
-    const posts = await postService.getPostsByUserAndFollowings(authors);
+    const posts = await postService.getPostsByUserAndFollowings(
+      authors,
+      Number(skip || 0)
+    );
 
     const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
       success: true,

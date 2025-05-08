@@ -20,10 +20,14 @@ import {
   addIsRepostedByCurrentUser,
   addRepostedOriginalPostIds,
   lookupRepostsByCurrentUser,
+  limitResults,
+  skipPosts,
 } from "./aggregatePipelines";
+import { POSTS_LENGTH } from "@constants";
 
 const aggregatePostsByUserAndFollowings = async (
   userIds: Types.ObjectId[],
+  skip: number,
   session?: ClientSession
 ): Promise<IPostResponseDto[]> => {
   const posts = await Post.aggregate<IPostResponseDto>(
@@ -70,6 +74,10 @@ const aggregatePostsByUserAndFollowings = async (
       addSortKey(),
 
       sortBySortKeyDesc(),
+
+      skipPosts(skip, POSTS_LENGTH),
+
+      limitResults(POSTS_LENGTH),
     ],
     addSession(session)
   );

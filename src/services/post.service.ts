@@ -152,7 +152,8 @@ class PostService {
   }
 
   async getPostsByUserAndFollowings(
-    userIds: Types.ObjectId[]
+    userIds: Types.ObjectId[],
+    skip: number
   ): Promise<IPostResponseDto[]> {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -160,6 +161,7 @@ class PostService {
     try {
       const posts = await postRepository.getPostsByAuthorAndFollowings(
         userIds,
+        skip,
         session
       );
 

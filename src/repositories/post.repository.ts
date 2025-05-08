@@ -97,10 +97,15 @@ class PostRepository {
   // 사용자와 사용자의 팔로잉의 포스트 목록
   async getPostsByAuthorAndFollowings(
     authorIds: Types.ObjectId[],
+    skip: number,
     session?: ClientSession
   ): Promise<IPostResponseDto[]> {
     try {
-      const posts = await aggregatePostsByUserAndFollowings(authorIds, session);
+      const posts = await aggregatePostsByUserAndFollowings(
+        authorIds,
+        skip,
+        session
+      );
 
       return posts;
     } catch (error) {

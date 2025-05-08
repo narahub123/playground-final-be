@@ -50,6 +50,8 @@ import {
   addIsRepostedByCurrentUser,
   addRepostedOriginalPostIds,
   lookupRepostsByCurrentUser,
+  skipPosts,
+  limitResults,
 } from "./aggregatePipelines";
 
 import aggregatePostById from "./aggregatePostById";
@@ -116,4 +118,6 @@ export {
   addIsRepostedByCurrentUser,
   addRepostedOriginalPostIds,
   lookupRepostsByCurrentUser,
+  skipPosts,
+  limitResults,
 };

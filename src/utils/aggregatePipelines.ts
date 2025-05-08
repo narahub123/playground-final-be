@@ -551,6 +551,14 @@ const replaceRootWithFirstRepost = () => ({
   },
 });
 
+const skipPosts = (skip: number, limit: number) => ({
+  $skip: skip * limit, // pageNumber에 맞는 문서 건너뛰기
+});
+
+const limitResults = (limit: number) => ({
+  $limit: limit,
+});
+
 export {
   matchPostById,
   matchPostsByUserId,
@@ -579,4 +587,6 @@ export {
   addIsRepostedByCurrentUser,
   addRepostedOriginalPostIds,
   lookupRepostsByCurrentUser,
+  skipPosts,
+  limitResults,
 };
