@@ -485,6 +485,7 @@ const lookupRepostsByCurrentUser = (currentUser: Types.ObjectId) => ({
             $and: [
               { $eq: ["$type", "repost"] },
               { $eq: ["$author", "$$currentUser"] },
+              { $eq: ["$isDeleted", false] },
             ],
           },
         },
