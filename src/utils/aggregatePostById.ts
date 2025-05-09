@@ -3,7 +3,6 @@ import { Post } from "@models";
 import {
   addPostData,
   addSortedOriginalPosts,
-  fetchCommentsFromActions,
   graphLookupOriginalPosts,
   groupOriginalPosts,
   lookupCommentAuthors,

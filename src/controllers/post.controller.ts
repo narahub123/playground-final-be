@@ -531,10 +531,15 @@ const createRepost = asyncWrapper(
 
     const postId = new mongoose.Types.ObjectId(postid);
 
+    const post = await postService.getPurePostById(postId);
+
+    const { type, originalPostId } = post;
+
     const repost: IRepostRequestDto = {
       type: "repost",
       author: user._id,
-      originalPostId: postId,
+      originalPostId: type === "repost" ? originalPostId! : postId,
+      repostedPostId: postId,
     };
 
     const newPost = await postService.createAndAddRepost(repost);

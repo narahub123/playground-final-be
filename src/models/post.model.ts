@@ -92,6 +92,14 @@ const PostSchema = new mongoose.Schema<IPost>(
       },
     },
 
+    repostedPostId: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: function (this: IPost) {
+        return this.type === "repost";
+      },
+    },
+
     isOriginalPostDeleted: {
       type: Boolean,
       required: true,

@@ -700,6 +700,7 @@ class PostService {
       originalPostId,
       author,
       type: "repost",
+      repostedPostId: originalPostId,
     };
 
     const repost = await this.findRepostByRepostDto(repostDto, session);

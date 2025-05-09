@@ -571,9 +571,14 @@ class PostRepository {
     session?: ClientSession
   ): Promise<IPost | null> {
     try {
-      const { type, originalPostId, author } = repostDto;
+      const { type, originalPostId, author, repostedPostId } = repostDto;
 
-      const searchQuery = Post.findOne({ type, originalPostId, author });
+      const searchQuery = Post.findOne({
+        type,
+        originalPostId,
+        author,
+        repostedPostId,
+      });
 
       const repost = session
         ? await searchQuery.session(session)

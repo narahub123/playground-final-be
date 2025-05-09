@@ -30,6 +30,7 @@ interface IRepostRequestDto {
   type: "repost";
   author: Types.ObjectId;
   originalPostId: Types.ObjectId;
+  repostedPostId: Types.ObjectId;
 }
 
 interface ICommentRequestDto {
@@ -65,6 +66,7 @@ interface IPost extends Document {
   actions: IPostActions;
 
   originalPostId?: Types.ObjectId;
+  repostedPostId?: Types.ObjectId;
   isOriginalPostDeleted: boolean;
 
   // repost인 경우
@@ -106,6 +108,7 @@ interface IPostResponseDto {
   vote?: IVote;
   actions: IPostActions;
   originalPost?: IPostResponseDto;
+  repostedPostId?: Types.ObjectId;
   originalPostId?: Types.ObjectId;
   repostedAt?: Date;
   quotedAt?: Date;

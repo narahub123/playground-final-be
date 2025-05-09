@@ -1,6 +1,5 @@
 import { COMMENT_LENGTH } from "@constants";
 import { ClientSession, Types } from "mongoose";
-import { pipeline } from "stream";
 
 // 1. 주어진 _id에 해당하는 포스트를 필터링
 const matchPostById = (_id: Types.ObjectId) => {
@@ -336,6 +335,7 @@ const projectFinalFields = () => {
       createdAt: "$postData.createdAt",
       updatedAt: "$postData.updatedAt",
       originalPostId: "$postData.originalPostId",
+      repostedPostId: "$postData.repostedPostId",
       isOriginalPostDeleted: "$postData.isOriginalPostDeleted",
       repostedAt: "$postData.repostedAt",
       isRepostedByCurrentUser: "$postData.isRepostedByCurrentUser",
@@ -362,6 +362,7 @@ const projectFinalFields = () => {
         actions: "$originalPost.actions",
         originalPost: "$originalPost.originalPost",
         originalPostId: "$originalPost.originalPostId",
+        repostedPostId: "$originalPost.repostedPostId",
         isOriginalPostDeleted: "$originalPost.isOriginalPostDeleted",
         repostedAt: "$originalPost.repostedAt",
         quotedAt: "$originalPost.quotedAt",
@@ -490,9 +491,6 @@ const lookupRepostsByCurrentUser = (currentUser: Types.ObjectId) => ({
           },
         },
       },
-      {
-        $project: { originalPostId: 1 },
-      },
     ],
     as: "repostsByCurrentUser",
   },
@@ -504,7 +502,7 @@ const addRepostedOriginalPostIds = () => ({
       $map: {
         input: "$repostsByCurrentUser",
         as: "rp",
-        in: "$$rp.originalPostId",
+        in: "$$rp.repostedPostId",
       },
     },
   },
