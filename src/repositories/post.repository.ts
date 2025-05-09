@@ -135,16 +135,16 @@ class PostRepository {
   }
 
   async getPostById(
-    _id: Types.ObjectId,
+    postId: Types.ObjectId,
     userId: Types.ObjectId,
     session?: ClientSession
   ): Promise<IPostResponseDto | undefined> {
     try {
-      const post = await aggregatePostById(_id, userId, session);
+      const post = await aggregatePostById(postId, userId, session);
 
       return post;
     } catch (error) {
-      mongoDBErrorHandler("getPostById", error, { _id });
+      mongoDBErrorHandler("getPostById", error, { postId });
       return undefined;
     }
   }
@@ -429,54 +429,6 @@ class PostRepository {
     }
   }
 
-  async createRepost(
-    post: IRepostRequestDto,
-    session?: ClientSession
-  ): Promise<IPostResponseDto | undefined> {
-    try {
-      const newPost = await Post.create([post], { session });
-
-      if (!newPost[0]) return undefined;
-
-      const repost = await aggregatePostById(
-        newPost[0]._id,
-        post.author,
-        session
-      );
-
-      return repost;
-    } catch (error) {
-      mongoDBErrorHandler("createRepost", error, { post });
-      return undefined;
-    }
-  }
-
-  async addRepost(
-    postId: Types.ObjectId,
-    session?: ClientSession
-  ): Promise<UpdateResult | undefined> {
-    try {
-      const updateQuery = Post.updateOne(
-        { _id: postId },
-        {
-          $inc: {
-            "actions.reposts": 1,
-          },
-        }
-      );
-      const result = session
-        ? await updateQuery.session(session)
-        : await updateQuery;
-
-      return result;
-    } catch (error) {
-      mongoDBErrorHandler("addRepost", error, {
-        postId,
-      });
-      return undefined;
-    }
-  }
-
   async getRepostByRepostInfo(
     repostInfo: IRepostRequestDto,
     session?: ClientSession
@@ -592,7 +544,98 @@ class PostRepository {
     }
   }
 
-  async removeRepost(
+  async createRepost(
+    post: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto | undefined> {
+    try {
+      const newPost = await Post.create([post], { session });
+
+      if (!newPost[0]) return undefined;
+
+      const repost = await aggregatePostById(
+        newPost[0]._id,
+        post.author,
+        session
+      );
+
+      return repost;
+    } catch (error) {
+      mongoDBErrorHandler("createRepost", error, { post });
+      return undefined;
+    }
+  }
+
+  async findRepostByRepostDto(
+    repostDto: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPost | null> {
+    try {
+      const { type, originalPostId, author } = repostDto;
+
+      const searchQuery = Post.findOne({ type, originalPostId, author });
+
+      const repost = session
+        ? await searchQuery.session(session)
+        : await searchQuery;
+
+      console.log("찾은 repost", repost);
+
+      return repost;
+    } catch (error) {
+      mongoDBErrorHandler("findRepostByPostIdAndUserId", error, {
+        repostDto,
+      });
+      return null;
+    }
+  }
+
+  async toggleRepost(
+    postId: Types.ObjectId,
+    isDeleting: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Post.updateOne(
+        { _id: postId },
+        { isDeleted: isDeleting, deletedAt: isDeleting ? new Date() : null },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateRepost", error, { postId });
+      return undefined;
+    }
+  }
+
+  async increaseRepost(
+    postId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const updateQuery = Post.updateOne(
+        { _id: postId },
+        {
+          $inc: {
+            "actions.reposts": 1,
+          },
+        }
+      );
+      const result = session
+        ? await updateQuery.session(session)
+        : await updateQuery;
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("increaseRepost", error, {
+        postId,
+      });
+      return undefined;
+    }
+  }
+
+  async decreaseRepost(
     postId: Types.ObjectId,
     session?: ClientSession
   ): Promise<UpdateResult | undefined> {

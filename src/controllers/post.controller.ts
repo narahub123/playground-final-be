@@ -186,46 +186,6 @@ const updatePostVote = asyncWrapper(
   }
 );
 
-const addRepost = asyncWrapper(
-  "addRepost",
-  "Adding repost failed (재게시 실패)",
-  "ADD_REPOST_FAILED",
-  async (req: Request, res: Response) => {
-    const { postid } = req.params;
-    const user = req.user;
-
-    if (!postid) {
-      throw new BadRequestError("postid 필수");
-    }
-
-    const postId = new mongoose.Types.ObjectId(postid);
-
-    const repost: IRepostRequestDto = {
-      type: "repost",
-      author: user._id,
-      originalPostId: postId,
-    };
-
-    const newPost = await postService.createAndAddRepost(repost);
-
-    if (!newPost) {
-      throw new InternalServerError("재게시 도중 에러 발생");
-    }
-
-    const response: IApiSuccessResponse<{
-      post: IPostResponseDto;
-    }> = {
-      success: true,
-      message: "Adding repost has succeeded.(재게시 성공)",
-      code: "ADD_REPOST_SUCCEEDED",
-      data: { post: newPost },
-      timestamp: new Date().toISOString(),
-    };
-
-    res.status(201).json(response);
-  }
-);
-
 const updateLikes = asyncWrapper(
   "updateLikes",
   "Updating likes failed. (좋아요 업데이트 실패)",
@@ -528,6 +488,46 @@ const getPostsByUserAndFollowings = asyncWrapper(
   }
 );
 
+const createRepost = asyncWrapper(
+  "createRepost",
+  "Adding repost failed (재게시 실패)",
+  "ADD_REPOST_FAILED",
+  async (req: Request, res: Response) => {
+    const { postid } = req.params;
+    const user = req.user;
+
+    if (!postid) {
+      throw new BadRequestError("postid 필수");
+    }
+
+    const postId = new mongoose.Types.ObjectId(postid);
+
+    const repost: IRepostRequestDto = {
+      type: "repost",
+      author: user._id,
+      originalPostId: postId,
+    };
+
+    const newPost = await postService.createAndAddRepost(repost);
+
+    if (!newPost) {
+      throw new InternalServerError("재게시 도중 에러 발생");
+    }
+
+    const response: IApiSuccessResponse<{
+      post: IPostResponseDto;
+    }> = {
+      success: true,
+      message: "Adding repost has succeeded.(재게시 성공)",
+      code: "ADD_REPOST_SUCCEEDED",
+      data: { post: newPost },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(201).json(response);
+  }
+);
+
 const deleteRepost = asyncWrapper(
   "deleteRepost",
   "Failed to delete repost.(재게시 삭제 실패)",
@@ -560,7 +560,7 @@ export {
   creatNewPost,
   getPostPreview,
   updatePostVote,
-  addRepost,
+  createRepost,
   updateLikes,
   deletePost,
   updatePin,

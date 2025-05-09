@@ -37,79 +37,6 @@ class PostService {
     return newPost;
   }
 
-  async isReposting(repostInfo: IRepostRequestDto, session?: ClientSession) {
-    const repost = await postRepository.getRepostByRepostInfo(
-      repostInfo,
-      session
-    );
-
-    return Boolean(repost);
-  }
-
-  async createRepost(
-    repost: IRepostRequestDto,
-    session?: ClientSession
-  ): Promise<IPostResponseDto> {
-    const newRepost = await postRepository.createRepost(repost, session);
-
-    if (!newRepost) {
-      throw new InternalServerError(
-        "Failed to create repost. (리포스트 생성 실패)",
-        "REPOST_CREATION_ERROR",
-        {
-          repost: "REPOST_CREATION_FAILED",
-        }
-      );
-    }
-
-    return newRepost;
-  }
-
-  async addRepost(postId: Types.ObjectId, session?: ClientSession) {
-    const result = await postRepository.addRepost(postId, session);
-
-    if (!result) {
-      throw new InternalServerError("리포스트 카운트 증가 도중 에러 발생");
-    }
-
-    if (result?.matchedCount === 0) {
-      throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
-    }
-
-    if (result?.modifiedCount === 0) {
-      throw new InternalServerError("리포스트 카운트 증가 실패");
-    }
-  }
-
-  async createAndAddRepost(repost: IRepostRequestDto) {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      const isReposting = await this.isReposting(repost, session);
-
-      if (isReposting) {
-        throw new ConflictError("이미 리포스트가 존재합니다.");
-      }
-
-      // 원본 포스트 조회
-      await this.getPurePostById(repost.originalPostId);
-
-      // 리포스트 생성
-      const newPost = await this.createRepost(repost, session);
-
-      await this.addRepost(repost.originalPostId, session);
-
-      await session.commitTransaction();
-      return newPost;
-    } catch (error) {
-      session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-    }
-  }
-
   async getPostsForProfilePage(
     author: mongoose.Types.ObjectId
   ): Promise<IPostResponseDto[]> {
@@ -458,7 +385,7 @@ class PostService {
       const { type, originalPostId } = post;
       if (originalPostId) {
         if (type === "quote" || type === "repost") {
-          await this.removeRepost(originalPostId, session);
+          await this.decreaseRepost(originalPostId, session);
         }
 
         if (type === "comment") {
@@ -610,7 +537,7 @@ class PostService {
       );
 
       // 인용추가하기
-      await this.addRepost(originalPostId, session);
+      await this.increaseRepost(originalPostId, session);
 
       await session.commitTransaction();
 
@@ -626,8 +553,131 @@ class PostService {
     }
   }
 
-  async removeRepost(postId: Types.ObjectId, session?: ClientSession) {
-    const result = await postRepository.removeRepost(postId, session);
+  async findDeletedRepostByRepostDto(
+    repostInfo: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPost | null> {
+    const repost = await postRepository.findRepostByRepostDto(
+      repostInfo,
+      session
+    );
+
+    if (repost && !repost.isDeleted) {
+      throw new ConflictError("재게시 중복");
+    }
+
+    return repost && repost.isDeleted ? repost : null;
+  }
+
+  async findRepostByRepostDto(
+    repostDto: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPost | null> {
+    const repost = await postRepository.findRepostByRepostDto(
+      repostDto,
+      session
+    );
+
+    return repost;
+  }
+
+  async createRepost(
+    repost: IRepostRequestDto,
+    session?: ClientSession
+  ): Promise<IPostResponseDto> {
+    const newRepost = await postRepository.createRepost(repost, session);
+
+    if (!newRepost) {
+      throw new InternalServerError(
+        "Failed to create repost. (리포스트 생성 실패)",
+        "REPOST_CREATION_ERROR",
+        {
+          repost: "REPOST_CREATION_FAILED",
+        }
+      );
+    }
+
+    return newRepost;
+  }
+
+  async toggleRepost(
+    postId: Types.ObjectId,
+    isDeleting: boolean,
+    session: ClientSession
+  ): Promise<void> {
+    const result = await postRepository.toggleRepost(
+      postId,
+      isDeleting,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("ㄹ포스트 토글 도중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("포스트를 찾을 수 없습니다.");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("리포스트 토글 실패");
+    }
+  }
+
+  async increaseRepost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.increaseRepost(postId, session);
+
+    if (!result) {
+      throw new InternalServerError("리포스트 카운트 증가 도중 에러 발생");
+    }
+
+    if (result?.matchedCount === 0) {
+      throw new NotFoundError("오리지널 포스트를 찾을 수 없음");
+    }
+
+    if (result?.modifiedCount === 0) {
+      throw new InternalServerError("리포스트 카운트 증가 실패");
+    }
+  }
+
+  // repost 생성
+  async createAndAddRepost(repostDto: IRepostRequestDto) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 해당 postId와 userId를 통해서 리포스트한 것이 있는지 조회
+      let repost = await this.findDeletedRepostByRepostDto(repostDto, session);
+
+      let newPost: IPostResponseDto;
+      // repost가 존재하고 isDeleted: true : 토글
+      if (repost) {
+        // isDeleted, deletedAt 변경
+        await this.toggleRepost(repost._id, false, session);
+
+        // repost의 IPostResponseDto 반환
+        newPost = await this.getPostById(repost._id, repostDto.author, session);
+      } else {
+        // repost가 없는 경우 : 생성
+        // 리포스트 생성
+        newPost = await this.createRepost(repostDto, session);
+      }
+
+      // 원본 포스트 actions.reposts 업데이트
+      await this.increaseRepost(repostDto.originalPostId, session);
+
+      await session.commitTransaction();
+      return newPost;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async decreaseRepost(postId: Types.ObjectId, session?: ClientSession) {
+    const result = await postRepository.decreaseRepost(postId, session);
 
     if (!result) throw new InternalServerError("리포스트 삭제 중 에러 발생");
 
@@ -667,7 +717,7 @@ class PostService {
         session
       );
 
-      await this.removeRepost(postId, session);
+      await this.decreaseRepost(postId, session);
 
       await session.commitTransaction();
 
