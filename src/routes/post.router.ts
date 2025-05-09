@@ -39,5 +39,5 @@ export default (router: Router) => {
     updatePostVote
   );
   router.delete("/posts/:postid/repost", authTokenMiddleware, deleteRepost);
-  router.delete("/posts/:postId", authTokenMiddleware, deletePost);
+  router.delete("/posts/:postid", authTokenMiddleware, deletePost);
 };

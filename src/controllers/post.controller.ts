@@ -220,30 +220,59 @@ const deletePost = asyncWrapper(
   "Deleting post failed.(포스트 삭제 실패)",
   "DELETE_POST_FAILED",
   async (req: Request, res: Response) => {
-    const { postId } = req.params;
+    const { postid } = req.params;
     const { _id: user_id } = req.user;
 
-    const postid = new mongoose.Types.ObjectId(postId);
+    const postId = new mongoose.Types.ObjectId(postid);
 
-    const post = await postService.getPostById(postid, user_id);
+    const post = await postService.getPurePostById(postId);
 
-    if (!post) {
-      throw new BadRequestError("포스트 조회 실패");
-    }
-
-    const { author } = post;
+    const { author, type, originalPostId } = post;
 
     // 사용자가 작성한 포스트가 아닌 경우
     if (!author._id.equals(user_id)) {
       throw new UnauthorizedError("삭제할 권한이 없습니다.");
     }
 
-    await postService.deletePostAndRemoveRecord(postid);
+    if (type === "post") {
+      await postService.deletePostAndRemoveRecord(postId);
+    } else if (type === "repost") {
+      if (!originalPostId)
+        throw new BadRequestError("originalPost가 존재하지 않습니다.");
+      await postService.deleteRepostById(postId, originalPostId);
+    } else if (type === "comment") {
+    } else {
+    }
+
+    const postType =
+      type === "post"
+        ? "DELETE_POST_SUCCEEDED"
+        : type === "repost"
+        ? "DELETE_REPOST_SUCCEEDED"
+        : type === "comment"
+        ? "DELETE_COMMENT_SUCCEEDED"
+        : "DELETE_QUOTE_SUCCEEDED";
 
     const response: IApiSuccessResponse<{ postIds: Types.ObjectId[] }> = {
       success: true,
-      message: "Post is deleted successfully.(포스트 삭제 성공)",
-      code: "DELETE_POST_SUCCEEDED",
+      message: `${
+        type === "post"
+          ? "Post"
+          : type === "repost"
+          ? "Repost"
+          : type === "comment"
+          ? "Comment"
+          : "Quote"
+      } is deleted successfully.(${
+        type === "post"
+          ? "포스트"
+          : type === "repost"
+          ? "재게시"
+          : type === "comment"
+          ? "댓글"
+          : "인용"
+      } 삭제 성공)`,
+      code: postType,
       timestamp: new Date().toISOString(),
     };
 

@@ -348,7 +348,7 @@ class PostService {
   }
 
   async deletePost(postId: Types.ObjectId, session?: ClientSession) {
-    const result = await postRepository.deletePost(postId);
+    const result = await postRepository.deletePost(postId, session);
 
     if (!result) throw new InternalServerError("포스트 삭제 중 에러 발생");
 
@@ -728,6 +728,29 @@ class PostService {
       await session.commitTransaction();
 
       return repost;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async deleteRepostById(
+    postId: Types.ObjectId,
+    originalPostId: Types.ObjectId
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 해당 포스트 삭제
+      await this.deletePost(postId, session);
+
+      // 원본 포스트의 actions.reposts 감소
+      await this.decreaseRepost(originalPostId, session);
+
+      await session.commitTransaction();
     } catch (error) {
       session.abortTransaction();
       throw error;
