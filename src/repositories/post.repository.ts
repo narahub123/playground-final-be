@@ -660,30 +660,6 @@ class PostRepository {
       return undefined;
     }
   }
-
-  async deleteRepostByPostIdAndUserId(
-    originalPostId: Types.ObjectId,
-    userId: Types.ObjectId,
-    session?: ClientSession
-  ): Promise<IPost | null> {
-    try {
-      const repost = await Post.findOneAndUpdate(
-        { originalPostId, author: userId, isDeleted: false },
-        { isDeleted: true, deletedAt: new Date() },
-        { session }
-      );
-
-      console.log(repost);
-
-      return repost;
-    } catch (error) {
-      mongoDBErrorHandler("deleteRepostByPostIdAndUserId", error, {
-        originalPostId,
-        userId,
-      });
-      return null;
-    }
-  }
 }
 
 export default new PostRepository();

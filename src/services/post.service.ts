@@ -572,11 +572,15 @@ class PostService {
   async findRepostByRepostDto(
     repostDto: IRepostRequestDto,
     session?: ClientSession
-  ): Promise<IPost | null> {
+  ): Promise<IPost> {
     const repost = await postRepository.findRepostByRepostDto(
       repostDto,
       session
     );
+
+    if (!repost) {
+      throw new NotFoundError("재게시 조회 실패");
+    }
 
     return repost;
   }
@@ -603,7 +607,7 @@ class PostService {
   async toggleRepost(
     postId: Types.ObjectId,
     isDeleting: boolean,
-    session: ClientSession
+    session?: ClientSession
   ): Promise<void> {
     const result = await postRepository.toggleRepost(
       postId,
@@ -689,16 +693,18 @@ class PostService {
 
   async deleteRepostByPostIdAndUserId(
     originalPostId: Types.ObjectId,
-    userId: Types.ObjectId,
+    author: Types.ObjectId,
     session?: ClientSession
   ): Promise<IPost> {
-    const repost = await postRepository.deleteRepostByPostIdAndUserId(
+    const repostDto: IRepostRequestDto = {
       originalPostId,
-      userId,
-      session
-    );
+      author,
+      type: "repost",
+    };
 
-    if (!repost) throw new NotFoundError("재게시 삭제 실패");
+    const repost = await this.findRepostByRepostDto(repostDto, session);
+
+    await this.toggleRepost(repost._id, true, session);
 
     return repost;
   }
