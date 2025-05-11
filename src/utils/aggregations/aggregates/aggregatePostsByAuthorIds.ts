@@ -333,6 +333,7 @@ const aggregatePostsByAuthorIds = async (
                           {
                             // 삭제된 포스트를 발견하면 해당 포스트를 추가하고, 이후에는 포함하지 않음
                             $setField: {
+                              input: "$$post",
                               field: "deletedFound",
                               value: true,
                             },
