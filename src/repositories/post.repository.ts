@@ -8,6 +8,7 @@ import {
   IRepostRequestDto,
 } from "@types";
 import {
+  Aggregate,
   aggregateCommentsByPostId,
   aggregatePostById,
   aggregatePostsByUserAndFollowings,
@@ -105,7 +106,12 @@ class PostRepository {
     session?: ClientSession
   ): Promise<IPostResponseDto[]> {
     try {
-      const posts = await aggregatePostsByUserAndFollowings(
+      // const posts = await aggregatePostsByUserAndFollowings(
+      //   authorIds,
+      //   skip,
+      //   session
+      // );
+      const posts = await Aggregate.aggregatePostsByAuthorIds(
         authorIds,
         skip,
         session

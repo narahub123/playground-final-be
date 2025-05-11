@@ -95,7 +95,13 @@ import {
 import { IRepost } from "./repost.type";
 import { IUserPostAction, UserPostActionType } from "./user-post-action.type";
 
+import { SortOrderType, ActionFieldType } from "./aggregates.type";
+
 export {
+  // aggregates
+  SortOrderType,
+  ActionFieldType,
+
   // user
   IUser,
   ILocation,

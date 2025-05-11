@@ -59,6 +59,10 @@ import aggregatePostsByUserId from "./aggregatePostsByUserId";
 import aggregateCommentsByPostId from "./aggregateCommentsByPostId";
 import aggregatePostsByUserAndFollowings from "./aggregatePostsByUserAndFollowings";
 
+import { Aggregate } from "./aggregations";
+
+export { Aggregate };
+
 export {
   connectDB,
   createHashedPassword,

@@ -342,6 +342,7 @@ const projectFinalFields = () => {
       quotedAt: "$postData.quotedAt",
       commentedAt: "$postData.commentedAt",
       basePostId: "$postData._id",
+      isDeleted: "$postData.isDeleted",
 
       originalPost: {
         _id: "$originalPost._id",
@@ -371,6 +372,7 @@ const projectFinalFields = () => {
         updatedAt: "$originalPost.updatedAt",
         pin: "$originalPost.pin",
         basePostId: "$postData._id",
+        isDeleted: "$originalPost.isDeleted",
       },
       thread: {
         $map: {
@@ -403,6 +405,7 @@ const projectFinalFields = () => {
             updatedAt: "$$entry.updatedAt",
             pin: "$$entry.pin",
             basePostId: "$postData._id",
+            isDeleted: "$$entry.isDeleted",
           },
         },
       },
@@ -436,6 +439,7 @@ const projectFinalFields = () => {
             updatedAt: "$$comment.updatedAt",
             pin: "$$comment.pin",
             basePostId: "$postData._id",
+            isDeleted: "$$comment.isDeleted",
           },
         },
       },
