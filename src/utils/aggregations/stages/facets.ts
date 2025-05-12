@@ -13,12 +13,11 @@ class FacetStage {
   static filterRepostsAndComments() {
     return {
       $facet: {
-        comments: [
+        comments: [MatchStage.matchByType("comment"), SortStage.createdAt(-1)],
+        originalPostIds: [
           MatchStage.matchByType("comment"),
           SortStage.createdAt(-1),
-          LookupStage.originalPostWithPipeline("originalPostId"),
-          UnwindStage.simple("originalPosts"),
-          MatchStage.excludeOriginalPost(),
+          ProjectStage.commentOrignalPostIds(),
         ],
         reposts: [
           MatchStage.matchByType("repost"),

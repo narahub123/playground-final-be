@@ -9,6 +9,43 @@ class ProjectStage {
     };
   }
 
+  static commentOrignalPostIds() {
+    return {
+      $project: {
+        originalPostId: 1,
+      },
+    };
+  }
+
+  static filterComments() {
+    return {
+      $project: {
+        comments: {
+          $filter: {
+            input: "$comments",
+            as: "comment",
+            cond: {
+              $not: {
+                $in: [
+                  "$$comment._id",
+                  {
+                    $map: {
+                      input: "$originalPostIds",
+                      as: "op",
+                      in: "$$op.originalPostId",
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+        reposts: 1,
+        others: 1,
+      },
+    };
+  }
+
   static posts() {
     return {
       $project: {

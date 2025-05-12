@@ -29,6 +29,7 @@ const aggregatePostsByAuthorIds = async (
 
       // reposts, comments 필터링
       FacetStage.filterRepostsAndComments(),
+      ProjectStage.filterComments(),
       ProjectStage.combineFields("allPosts", [
         "$comments",
         "$reposts",
