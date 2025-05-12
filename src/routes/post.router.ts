@@ -24,7 +24,7 @@ export default (router: Router) => {
     authTokenMiddleware,
     getPostsByUserAndFollowings
   );
-  router.post("/posts/me/articles", authTokenMiddleware, getPostsByCurrentUser);
+  router.get("/posts/me/ariticles", authTokenMiddleware, getPostsByCurrentUser);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
   router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);
