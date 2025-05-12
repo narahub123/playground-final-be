@@ -18,7 +18,7 @@ import {
 } from "@controllers";
 
 export default (router: Router) => {
-  router.get("/posts", authTokenMiddleware, getPostsByUserAndFollowings);
+  router.get("/posts/me/feed", authTokenMiddleware, getPostsByUserAndFollowings);
   router.post("/posts", authTokenMiddleware, creatNewPost);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
