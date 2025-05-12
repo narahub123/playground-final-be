@@ -44,6 +44,7 @@ import {
   createQuote,
   getPostsByUserAndFollowings,
   deleteRepost,
+  getPostsByCurrentUser,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -93,6 +94,7 @@ export {
   createQuote,
   getPostsByUserAndFollowings,
   deleteRepost,
+  getPostsByCurrentUser,
 
   // privacy
   privacyController,

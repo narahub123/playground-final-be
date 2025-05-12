@@ -120,6 +120,27 @@ class PostRepository {
     }
   }
 
+  async getPostsByCurrentUser(
+    authorIds: Types.ObjectId[],
+    skip: number,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Aggregate.aggregatePostsByCurrentUser(
+        authorIds,
+        skip,
+        session
+      );
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsByCurrentUser", error, {
+        user_id: authorIds,
+      });
+      return [];
+    }
+  }
+
   // 사용자의 포스트 목록
   async getPostsByAuthor(
     authorId: mongoose.Types.ObjectId

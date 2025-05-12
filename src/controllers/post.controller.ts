@@ -590,6 +590,33 @@ const deleteRepost = asyncWrapper(
   }
 );
 
+const getPostsByCurrentUser = asyncWrapper(
+  "getPostsByCurrentUser",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const { skip } = req.query;
+
+    const authors = [user._id];
+
+    const posts = await postService.getPostsByCurrentUser(
+      authors,
+      Number(skip || 0)
+    );
+
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -605,4 +632,5 @@ export {
   createQuote,
   getPostsByUserAndFollowings,
   deleteRepost,
+  getPostsByCurrentUser,
 };
