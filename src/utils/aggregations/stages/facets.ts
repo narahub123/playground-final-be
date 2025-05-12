@@ -48,10 +48,10 @@ class FacetStage {
           LookupStage.originalPost("originalPostId"),
 
           // 3. 'originalPost' 배열을 개별 문서로 풀어서 처리
-          UnwindStage.unwind("originalPost"),
+          UnwindStage.unwind("originalPosts"),
 
           // 4. repost 데이터와 원본 포스트 데이터를 하나의 배열로 병합
-          ProjectStage.combineRootAndOriginalPost(),
+          ProjectStage.combineRootAndOriginalPosts(),
 
           // 5-1. postsArray의 각 요소를 개별 문서로 풀기
           UnwindStage.simple("postsArray"),
@@ -78,10 +78,10 @@ class FacetStage {
           LookupStage.originalPost("originalPostId"),
 
           // 3. 'originalPost' 배열을 개별 문서로 풀어서 처리
-          UnwindStage.unwind("originalPost"),
+          UnwindStage.unwind("originalPosts"),
 
           // 4. repost 데이터와 원본 포스트 데이터를 하나의 배열로 병합
-          ProjectStage.combineRootAndOriginalPost(),
+          ProjectStage.combineRootAndOriginalPosts(),
 
           // 5-1. postsArray의 각 요소를 개별 문서로 풀기
           UnwindStage.simple("postsArray"),
@@ -114,7 +114,7 @@ class FacetStage {
           UnwindStage.unwind("originalPosts"),
 
           // 4. 현재 댓글 데이터와 부모 댓글 데이터를 하나의 배열로 병합
-          ProjectStage.combineRootAndOriginalPost(),
+          ProjectStage.combineRootAndOriginalPosts(),
 
           // 5. 'postsArray'에 사용자 정보 추가를 위해 $lookup을 사용해 사용자 정보를 조회합니다.
           // 5-1. postsArray의 각 요소를 개별 문서로 풀기

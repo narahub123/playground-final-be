@@ -171,12 +171,12 @@ class ProjectStage {
     };
   }
 
-  static combineRootAndOriginalPost() {
+  static combineRootAndOriginalPosts() {
     return {
       $project: {
         postsArray: [
           "$$ROOT", // 현재 'repost' 데이터
-          "$originalPost", // 'originalPost' 데이터
+          "$originalPosts", // 'originalPost' 데이터
         ],
       },
     };
