@@ -8,7 +8,7 @@ class LookupStage {
         from: "posts",
         localField: localField,
         foreignField: "_id",
-        as: "originalPost",
+        as: "originalPosts",
       },
     };
   }
@@ -19,7 +19,7 @@ class LookupStage {
         from: "posts",
         localField: localField,
         foreignField: "_id",
-        as: "originalPost",
+        as: "originalPosts",
         pipeline: [MatchStage.matchByType("comment")],
       },
     };

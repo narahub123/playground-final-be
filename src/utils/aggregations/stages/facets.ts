@@ -17,7 +17,7 @@ class FacetStage {
           MatchStage.matchByType("comment"),
           SortStage.createdAt(-1),
           LookupStage.originalPostWithPipeline("originalPostId"),
-          UnwindStage.simple("originalPost"),
+          UnwindStage.simple("originalPosts"),
           MatchStage.excludeOriginalPost(),
         ],
         reposts: [
