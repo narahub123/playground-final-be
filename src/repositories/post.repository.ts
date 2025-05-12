@@ -11,7 +11,6 @@ import {
   Aggregate,
   aggregateCommentsByPostId,
   aggregatePostById,
-  aggregatePostsByUserAndFollowings,
   aggregatePostsByUserId,
   mongoDBErrorHandler,
 } from "@utils";
@@ -106,11 +105,6 @@ class PostRepository {
     session?: ClientSession
   ): Promise<IPostResponseDto[]> {
     try {
-      // const posts = await aggregatePostsByUserAndFollowings(
-      //   authorIds,
-      //   skip,
-      //   session
-      // );
       const posts = await Aggregate.aggregatePostsByAuthorIds(
         authorIds,
         skip,

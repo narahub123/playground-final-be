@@ -59,9 +59,39 @@ import aggregatePostsByUserId from "./aggregatePostsByUserId";
 import aggregateCommentsByPostId from "./aggregateCommentsByPostId";
 import aggregatePostsByUserAndFollowings from "./aggregatePostsByUserAndFollowings";
 
-import { Aggregate } from "./aggregations";
+import {
+  Aggregate,
+  MatchStage,
+  LookupStage,
+  FacetStage,
+  SortStage,
+  ProjectStage,
+  GroupStage,
+  LimitStage,
+  UnwindStage,
+  AddFieldsStage,
+  ReplaceRootStage,
+  SkipStage,
+  SetStage,
+  Extra,
+} from "./aggregations";
 
-export { Aggregate };
+export {
+  Aggregate,
+  MatchStage,
+  LookupStage,
+  FacetStage,
+  SortStage,
+  ProjectStage,
+  GroupStage,
+  LimitStage,
+  UnwindStage,
+  AddFieldsStage,
+  ReplaceRootStage,
+  SkipStage,
+  SetStage,
+  Extra,
+};
 
 export {
   connectDB,
