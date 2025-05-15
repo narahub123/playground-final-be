@@ -28,7 +28,7 @@ const aggregatePostsByCurrentUser = async (
       $facet: {
         comments: [
           MatchStage.matchByType("comment"),
-          LookupStage.graphLookupOriginalPost(),
+          LookupStage.graphLookupOriginalPost("originalPosts"),
           // originalPost 중 현재 사용자가 아닌 글이 있으면 제거
           {
             $match: {

@@ -64,6 +64,125 @@ class AddFieldsStage {
       },
     };
   }
+
+  static distributePosts() {
+    return {
+      $addFields: {
+        postData: {
+          $let: {
+            vars: {
+              repostQuote: {
+                $filter: {
+                  input: "$postsArrayWithAuthors",
+                  as: "op",
+                  cond: { $in: ["$$op.type", ["repost", "quote"]] },
+                },
+              },
+              original: {
+                $filter: {
+                  input: "$postsArrayWithAuthors",
+                  as: "op",
+                  cond: { $eq: ["$$op.type", "post"] },
+                },
+              },
+            },
+            in: {
+              $cond: {
+                if: { $gt: [{ $size: "$$repostQuote" }, 0] },
+                then: { $first: "$$repostQuote" },
+                else: {
+                  $cond: {
+                    if: { $gt: [{ $size: "$$original" }, 0] },
+                    then: { $first: "$$original" },
+                    else: null,
+                  },
+                },
+              },
+            },
+          },
+        },
+        originalPost: {
+          $let: {
+            vars: {
+              original: {
+                $filter: {
+                  input: "$postsArrayWithAuthors",
+                  as: "op",
+                  cond: { $eq: ["$$op.type", "post"] },
+                },
+              },
+            },
+            in: {
+              $cond: {
+                if: { $gt: [{ $size: "$$original" }, 0] },
+                then: { $first: "$$original" },
+                else: null,
+              },
+            },
+          },
+        },
+        thread: {
+          $sortArray: {
+            input: {
+              $filter: {
+                input: "$postsArrayWithAuthors",
+                as: "op",
+                cond: { $eq: ["$$op.type", "comment"] },
+              },
+            },
+            sortBy: { commentedAt: 1 },
+          },
+        },
+      },
+    };
+  }
+
+  static combineRootAndOriginalPosts() {
+    return {
+      $addFields: {
+        postsArray: {
+          $concatArrays: [
+            ["$$ROOT"], // 현재 문서(객체)를 배열로 감싸기
+            { $ifNull: ["$originalPosts", []] }, // originalPosts 배열 꺼내기 (null 방지)
+          ],
+        },
+      },
+    };
+  }
+
+  static addAuthorToComment() {
+    return {
+      $addFields: {
+        comments: {
+          $map: {
+            input: "$comments",
+            as: "comment",
+            in: {
+              $mergeObjects: [
+                "$$comment",
+                {
+                  author: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$commentAuthors",
+                          as: "author",
+                          cond: {
+                            $eq: ["$$author._id", "$$comment.author"],
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    };
+  }
 }
 
 export default AddFieldsStage;

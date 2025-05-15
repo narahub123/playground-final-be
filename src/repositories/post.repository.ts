@@ -161,7 +161,9 @@ class PostRepository {
     session?: ClientSession
   ): Promise<IPostResponseDto | undefined> {
     try {
-      const post = await aggregatePostById(postId, userId, session);
+      // const post = await aggregatePostById(postId, userId, session);
+
+      const post = await Aggregate.getPostByPostId(postId, session);
 
       return post;
     } catch (error) {

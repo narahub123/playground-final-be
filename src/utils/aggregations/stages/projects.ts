@@ -219,6 +219,19 @@ class ProjectStage {
     };
   }
 
+  static flattenRootAndOriginalPosts() {
+    return {
+      $project: {
+        postsArray: {
+          $concatArrays: [
+            ["$$ROOT"], // 현재 문서(객체)를 배열로 감싸기
+            { $ifNull: ["$originalPosts", []] }, // originalPosts 배열 꺼내기 (null 방지)
+          ],
+        },
+      },
+    };
+  }
+
   static fullPostStructure() {
     return {
       $project: {

@@ -1,8 +1,9 @@
 import { Types } from "mongoose";
 import { GroupStage, MatchStage, ReplaceRootStage } from "@utils";
+import { COMMENT_LENGTH } from "@constants";
 
 class LookupStage {
-  static originalPost(localField: string) {
+  static originalPosts(localField: string) {
     return {
       $lookup: {
         from: "posts",
@@ -51,16 +52,42 @@ class LookupStage {
     };
   }
 
-  static graphLookupOriginalPost() {
+  static graphLookupOriginalPost(aka: string) {
     return {
       $graphLookup: {
         from: "posts",
         startWith: "$originalPostId",
         connectFromField: "originalPostId",
         connectToField: "_id",
-        as: "originalPosts",
+        as: aka,
         maxDepth: 10,
         depthField: "level",
+      },
+    };
+  }
+
+  static commentsByPostId() {
+    return {
+      $lookup: {
+        from: "posts",
+        let: { postId: "$$ROOT._id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ["$originalPostId", "$$postId"] },
+                  { $eq: ["$type", "comment"] },
+                  { $eq: ["$isDeleted", false] }, // 삭제된 댓글 제외
+                ],
+              },
+            },
+          },
+          {
+            $limit: COMMENT_LENGTH,
+          },
+        ],
+        as: "comments",
       },
     };
   }

@@ -44,7 +44,7 @@ class FacetStage {
 
           // 2. 'posts' 컬렉션에서 원본 포스트 조회
           // repost의 'originalPostId'와 'posts' 컬렉션의 '_id'를 매칭하여 원본 포스트를 가져옵니다.
-          LookupStage.originalPost("originalPostId"),
+          LookupStage.originalPosts("originalPostId"),
 
           // 3. 'originalPost' 배열을 개별 문서로 풀어서 처리
           UnwindStage.unwind("originalPosts"),
@@ -74,7 +74,7 @@ class FacetStage {
 
           // 2. 'posts' 컬렉션에서 원본 포스트 조회
           // repost의 'originalPostId'와 'posts' 컬렉션의 '_id'를 매칭하여 원본 포스트를 가져옵니다.
-          LookupStage.originalPost("originalPostId"),
+          LookupStage.originalPosts("originalPostId"),
 
           // 3. 'originalPost' 배열을 개별 문서로 풀어서 처리
           UnwindStage.unwind("originalPosts"),
@@ -103,7 +103,7 @@ class FacetStage {
           MatchStage.matchByType("comment"),
 
           // 2. $graphLookup를 사용하여 원본 포스트 기반으로 재귀적으로 댓글을 찾습니다.
-          LookupStage.graphLookupOriginalPost(),
+          LookupStage.graphLookupOriginalPost("originalPosts"),
 
           // originalPosts 중 isDeleted가 있는 경우 이후 데이터는 제외
           // 삭제된 글에 대한 댓글이 존재하는 경우 원 글의 사용자를 표시하기 위한 조치

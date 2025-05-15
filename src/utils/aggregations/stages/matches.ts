@@ -58,6 +58,14 @@ class MatchStage {
       },
     };
   }
+
+  static postId(postId: Types.ObjectId) {
+    return {
+      $match: {
+        _id: postId,
+      },
+    };
+  }
 }
 
 export default MatchStage;
