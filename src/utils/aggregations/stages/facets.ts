@@ -103,7 +103,7 @@ class FacetStage {
           MatchStage.matchByType("comment"),
 
           // 2. $graphLookup를 사용하여 원본 포스트 기반으로 재귀적으로 댓글을 찾습니다.
-          LookupStage.graphLookupOriginalPost("originalPosts"),
+          LookupStage.graphLookupOriginalPost("originalPosts", 10),
 
           // originalPosts 중 isDeleted가 있는 경우 이후 데이터는 제외
           // 삭제된 글에 대한 댓글이 존재하는 경우 원 글의 사용자를 표시하기 위한 조치

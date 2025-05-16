@@ -30,7 +30,7 @@ const getPostsWithReplies = async (
         $facet: {
           comments: [
             MatchStage.matchByType("comment"),
-            LookupStage.graphLookupOriginalPost("originalPosts"),
+            LookupStage.graphLookupOriginalPost("originalPosts", 10),
           ],
           originalPostIds: [
             MatchStage.matchByType("comment"),

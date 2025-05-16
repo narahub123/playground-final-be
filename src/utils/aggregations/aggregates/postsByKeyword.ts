@@ -1,63 +1,55 @@
 import { Post } from "@models";
 import { IPostResponseDto } from "@types";
 import { ClientSession } from "mongoose";
-import { LookupStage, ProjectStage, UnwindStage } from "../stages";
+import {
+  AddFieldsStage,
+  Extra,
+  LimitStage,
+  LookupStage,
+  MatchStage,
+  ProjectStage,
+  SkipStage,
+  SortStage,
+  UnwindStage,
+} from "@utils";
+import { POSTS_LENGTH } from "@constants";
 
 const getPostsByKeyword = async (
   keyword: string,
   pageNum: number,
   session?: ClientSession
 ): Promise<IPostResponseDto[]> => {
-  const posts = await Post.aggregate<IPostResponseDto>([
-    {
-      $match: {
-        text: { $regex: keyword, $options: "i" },
-        isDeleted: false,
-      },
-    },
+  const posts = await Post.aggregate<IPostResponseDto>(
+    [
+      MatchStage.search(keyword),
 
-    LookupStage.author("author", "authorInfo"),
+      LookupStage.author("author", "authorInfo"),
 
-    {
-      $addFields: {
-        author: { $arrayElemAt: ["$authorInfo", 0] },
-      },
-    },
+      AddFieldsStage.author("author", "authorInfo"),
 
-    {
-      $graphLookup: {
-        from: "posts",
-        startWith: "$originalPostId",
-        connectFromField: "originalPostId",
-        connectToField: "_id",
-        as: "originalPosts",
-        maxDepth: 1,
-        depthField: "level",
-      },
-    },
+      LookupStage.graphLookupOriginalPost("originalPosts", 1),
 
-    UnwindStage.unwind("originalPosts"),
+      UnwindStage.unwind("originalPosts"),
 
-    LookupStage.author("originalPosts.authors", "originalPostAuthor"),
+      LookupStage.author("originalPosts.authors", "originalPostAuthor"),
 
-    {
-      $addFields: {
-        "originalPosts.author": {
-          $arrayElemAt: ["$originalPostAuthor", 0],
-        },
-      },
-    },
+      AddFieldsStage.author("originalPosts.author", "originalPostAuthor"),
 
-    {
-      $project: {
-        postData: "$$ROOT", // 현재 포스트 전체
-        originalPost: "$originalPosts",
-        thread: [],
-      },
-    },
+      ProjectStage.keyword(),
 
-    ProjectStage.fullPostStructure(),
-  ]);
+      ProjectStage.fullPostStructure(),
+
+      // 정렬
+      AddFieldsStage.addThreadLastCommentedAt(),
+      AddFieldsStage.addSortKey(),
+      SortStage.sortKey(-1),
+
+      // 페이지네이션
+      SkipStage.skipPage(pageNum, POSTS_LENGTH),
+      LimitStage.basic(POSTS_LENGTH),
+    ],
+    Extra.addSession(session)
+  );
 
   console.log("검색 결과", posts);
 

@@ -52,7 +52,7 @@ class LookupStage {
     };
   }
 
-  static graphLookupOriginalPost(aka: string) {
+  static graphLookupOriginalPost(aka: string, maxDepth: number) {
     return {
       $graphLookup: {
         from: "posts",
@@ -60,7 +60,7 @@ class LookupStage {
         connectFromField: "originalPostId",
         connectToField: "_id",
         as: aka,
-        maxDepth: 10,
+        maxDepth,
         depthField: "level",
       },
     };

@@ -209,6 +209,14 @@ class AddFieldsStage {
       },
     };
   }
+
+  static author(field: string, array: string) {
+    return {
+      $addFields: {
+        [field]: { $arrayElemAt: [`$${array}`, 0] },
+      },
+    };
+  }
 }
 
 export default AddFieldsStage;

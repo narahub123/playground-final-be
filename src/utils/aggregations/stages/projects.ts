@@ -379,6 +379,16 @@ class ProjectStage {
       },
     };
   }
+
+  static keyword() {
+    return {
+      $project: {
+        postData: "$$ROOT", // 현재 포스트 전체
+        originalPost: "$originalPosts",
+        thread: [],
+      },
+    };
+  }
 }
 
 export default ProjectStage;

@@ -21,7 +21,7 @@ const getPostByPostId = async (
     [
       MatchStage.postId(postId),
 
-      LookupStage.graphLookupOriginalPost("originalPosts"),
+      LookupStage.graphLookupOriginalPost("originalPosts", 10),
 
       ProjectStage.flattenRootAndOriginalPosts(),
 

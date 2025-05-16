@@ -70,6 +70,15 @@ class MatchStage {
   static media(userId: Types.ObjectId) {
     return { $match: { author: userId, isDeleted: false, media: { $ne: [] } } };
   }
+
+  static search(keyword: string) {
+    return {
+      $match: {
+        text: { $regex: keyword, $options: "i" },
+        isDeleted: false,
+      },
+    };
+  }
 }
 
 export default MatchStage;
