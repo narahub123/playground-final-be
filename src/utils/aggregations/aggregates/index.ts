@@ -1,5 +1,5 @@
 import aggregatePostsByAuthorIds from "./postsByAuthorIds";
-import aggregatePostsByCurrentUser from "./aggregatePostsByCurrentUser";
+import aggregatePostsByCurrentUser from "./postsByCurrentUser";
 import getPostByPostId from "./postByPostId";
 import getPostsWithReplies from "./postsWithRepliesByCurrentUser";
 import getPostsByKeyword from "./postsByKeyword";
