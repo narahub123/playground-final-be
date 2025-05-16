@@ -3,6 +3,7 @@ import aggregatePostsByCurrentUser from "./postsByCurrentUser";
 import getPostByPostId from "./postByPostId";
 import getPostsWithReplies from "./postsWithRepliesByCurrentUser";
 import getPostsByKeyword from "./postsByKeyword";
+import getMediaByCurrentUser from "./mediaByCurrentUser";
 
 const Aggregate = {
   aggregatePostsByAuthorIds,
@@ -10,6 +11,7 @@ const Aggregate = {
   getPostByPostId,
   getPostsWithReplies,
   getPostsByKeyword,
+  getMediaByCurrentUser,
 };
 
 export default Aggregate;

@@ -364,6 +364,21 @@ class ProjectStage {
       },
     };
   }
+
+  static media() {
+    return {
+      $project: {
+        postData: {
+          $mergeObjects: [
+            "$$ROOT",
+            { author: { $arrayElemAt: ["$authors", 0] } },
+          ],
+        },
+        originalPost: null,
+        thread: [],
+      },
+    };
+  }
 }
 
 export default ProjectStage;

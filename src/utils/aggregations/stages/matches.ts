@@ -66,6 +66,10 @@ class MatchStage {
       },
     };
   }
+
+  static media(userId: Types.ObjectId) {
+    return { $match: { author: userId, isDeleted: false, media: { $ne: [] } } };
+  }
 }
 
 export default MatchStage;
