@@ -1,4 +1,4 @@
-import aggregatePostsByAuthorIds from "./aggregatePostsByAuthorIds";
+import aggregatePostsByAuthorIds from "./postsByAuthorIds";
 import aggregatePostsByCurrentUser from "./aggregatePostsByCurrentUser";
 import getPostByPostId from "./postByPostId";
 import getPostsWithReplies from "./postsWithRepliesByCurrentUser";

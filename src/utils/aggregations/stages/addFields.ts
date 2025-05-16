@@ -183,6 +183,32 @@ class AddFieldsStage {
       },
     };
   }
+
+  static addThreadLastCommentedAt() {
+    return {
+      $addFields: {
+        threadLastCommentedAt: {
+          $max: {
+            $map: {
+              input: "$thread",
+              as: "entry",
+              in: "$$entry.createdAt",
+            },
+          },
+        },
+      },
+    };
+  }
+
+  static addSortKey() {
+    return {
+      $addFields: {
+        sortKey: {
+          $ifNull: ["$threadLastCommentedAt", "$createdAt"],
+        },
+      },
+    };
+  }
 }
 
 export default AddFieldsStage;

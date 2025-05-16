@@ -63,6 +63,11 @@ const aggregatePostsByAuthorIds = async (
 
       // 반환 형식
       ProjectStage.fullPostStructure(),
+
+      // 정렬
+      AddFieldsStage.addThreadLastCommentedAt(),
+      AddFieldsStage.addSortKey(),
+      SortStage.sortKey(-1),
     ],
     Extra.addSession(session)
   );

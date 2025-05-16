@@ -12,6 +12,14 @@ class SortStage {
       $sort: { repostedAt: order },
     };
   }
+
+  static sortKey(order: SortOrderType) {
+    return {
+      $sort: {
+        sortKey: order,
+      },
+    };
+  }
 }
 
 export default SortStage;
