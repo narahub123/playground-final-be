@@ -16,6 +16,7 @@ import {
   updatePostVote,
   createRepost,
   getPostsByCurrentUser,
+  getMediaByCurrentUser,
 } from "@controllers";
 
 export default (router: Router) => {
@@ -25,6 +26,7 @@ export default (router: Router) => {
     getPostsByUserAndFollowings
   );
   router.get("/posts/me/ariticles", authTokenMiddleware, getPostsByCurrentUser);
+  router.get("/posts/me/media", authTokenMiddleware, getMediaByCurrentUser);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
   router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);

@@ -784,6 +784,25 @@ class PostService {
       session.endSession();
     }
   }
+
+  async getMediaByCurrentUser(
+    userId: Types.ObjectId
+  ): Promise<IPostResponseDto[]> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const posts = await postRepository.getMediaByCurrentUser(userId, session);
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 }
 
 export default new PostService();

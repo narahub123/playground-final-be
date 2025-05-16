@@ -617,6 +617,27 @@ const getPostsByCurrentUser = asyncWrapper(
   }
 );
 
+const getMediaByCurrentUser = asyncWrapper(
+  "getMediaByCurrentUser",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { _id: userId } = req.user;
+
+    const posts = await postService.getMediaByCurrentUser(userId);
+
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -633,4 +654,5 @@ export {
   getPostsByUserAndFollowings,
   deleteRepost,
   getPostsByCurrentUser,
+  getMediaByCurrentUser,
 };

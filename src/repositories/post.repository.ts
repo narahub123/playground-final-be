@@ -12,7 +12,10 @@ import {
   aggregateCommentsByPostId,
   aggregatePostById,
   aggregatePostsByUserId,
+  LookupStage,
   mongoDBErrorHandler,
+  ProjectStage,
+  UnwindStage,
 } from "@utils";
 import mongoose, {
   ClientSession,
@@ -686,6 +689,47 @@ class PostRepository {
         postId,
       });
       return undefined;
+    }
+  }
+
+  async getMediaByCurrentUser(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Post.aggregate<IPostResponseDto>(
+        [
+          { $match: { author: userId, isDeleted: false, media: { $ne: [] } } },
+
+          LookupStage.author("author", "authors"),
+
+          {
+            $project: {
+              postData: {
+                $mergeObjects: [
+                  "$$ROOT",
+                  { author: { $arrayElemAt: ["$authors", 0] } },
+                ],
+              },
+              originalPost: null,
+              thread: [],
+            },
+          },
+
+          ProjectStage.fullPostStructure(),
+        ],
+        { session }
+      );
+
+      console.log(posts);
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("removeBookmark", error, {
+        userId,
+      });
+
+      return [];
     }
   }
 }
