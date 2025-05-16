@@ -38,6 +38,7 @@ export default (router: Router) => {
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
   router.get("/posts/search", authTokenMiddleware, getPostsByKeyword);
 
+  router.post("/posts", authTokenMiddleware, creatNewPost);
   router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, createRepost);
