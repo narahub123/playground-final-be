@@ -17,6 +17,7 @@ import {
   createRepost,
   getPostsByCurrentUser,
   getMediaByCurrentUser,
+  getPostsAndRepliesByCurrentUser,
 } from "@controllers";
 
 export default (router: Router) => {
@@ -26,6 +27,11 @@ export default (router: Router) => {
     getPostsByUserAndFollowings
   );
   router.get("/posts/me/ariticles", authTokenMiddleware, getPostsByCurrentUser);
+  router.get(
+    "/posts/me/with-replies",
+    authTokenMiddleware,
+    getPostsAndRepliesByCurrentUser
+  );
   router.get("/posts/me/media", authTokenMiddleware, getMediaByCurrentUser);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);

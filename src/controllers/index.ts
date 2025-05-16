@@ -45,6 +45,7 @@ import {
   getPostsByUserAndFollowings,
   deleteRepost,
   getPostsByCurrentUser,
+  getPostsAndRepliesByCurrentUser,
   getMediaByCurrentUser,
 } from "./post.controller";
 
@@ -96,6 +97,7 @@ export {
   getPostsByUserAndFollowings,
   deleteRepost,
   getPostsByCurrentUser,
+  getPostsAndRepliesByCurrentUser,
   getMediaByCurrentUser,
 
   // privacy

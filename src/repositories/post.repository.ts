@@ -732,6 +732,27 @@ class PostRepository {
       return [];
     }
   }
+
+  async getPostsAndRepliesByCurrentUser(
+    authorIds: Types.ObjectId[],
+    skip: number,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Aggregate.getPostsWithReplies(
+        authorIds,
+        skip,
+        session
+      );
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsAndRepliesByCurrentUser", error, {
+        user_id: authorIds,
+      });
+      return [];
+    }
+  }
 }
 
 export default new PostRepository();

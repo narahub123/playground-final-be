@@ -785,6 +785,31 @@ class PostService {
     }
   }
 
+  async getPostsAndRepliesByCurrentUser(
+    userIds: Types.ObjectId[],
+    skip: number
+  ): Promise<IPostResponseDto[]> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const posts = await postRepository.getPostsAndRepliesByCurrentUser(
+        userIds,
+        skip,
+        session
+      );
+
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
   async getMediaByCurrentUser(
     userId: Types.ObjectId
   ): Promise<IPostResponseDto[]> {
