@@ -753,6 +753,28 @@ class PostRepository {
       return [];
     }
   }
+
+  async getPostsByKeyword(
+    keyword: string,
+    pageNum: number,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Aggregate.getPostsByKeyword(
+        keyword,
+        pageNum,
+        session
+      );
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsAndRepliesByCurrentUser", error, {
+        keyword,
+        pageNum,
+      });
+      return [];
+    }
+  }
 }
 
 export default new PostRepository();

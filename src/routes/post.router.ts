@@ -18,6 +18,7 @@ import {
   getPostsByCurrentUser,
   getMediaByCurrentUser,
   getPostsAndRepliesByCurrentUser,
+  getPostsByKeyword,
 } from "@controllers";
 
 export default (router: Router) => {
@@ -35,6 +36,8 @@ export default (router: Router) => {
   router.get("/posts/me/media", authTokenMiddleware, getMediaByCurrentUser);
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
+  router.get("/posts/search", authTokenMiddleware, getPostsByKeyword);
+
   router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);
   router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, createRepost);

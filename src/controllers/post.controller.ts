@@ -665,6 +665,27 @@ const getMediaByCurrentUser = asyncWrapper(
   }
 );
 
+const getPostsByKeyword = asyncWrapper(
+  "getPostsByKeyword",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { _id: userId } = req.user;
+    const { q, skip } = req.query;
+
+    if (!q || !skip) {
+      throw new NotFoundError("검색어 필수");
+    }
+
+    const posts = await postService.getPostsByKeyword(
+      q.toString(),
+      Number(skip || 0)
+    );
+
+    console.log(posts);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -683,4 +704,5 @@ export {
   getPostsByCurrentUser,
   getPostsAndRepliesByCurrentUser,
   getMediaByCurrentUser,
+  getPostsByKeyword,
 };

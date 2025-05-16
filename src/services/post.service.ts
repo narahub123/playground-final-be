@@ -828,6 +828,27 @@ class PostService {
       session.endSession();
     }
   }
+
+  async getPostsByKeyword(keyword: string, pageNum: number) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const posts = await postRepository.getPostsByKeyword(
+        keyword,
+        pageNum,
+        session
+      );
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 }
 
 export default new PostService();
