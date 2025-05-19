@@ -29,6 +29,8 @@ import {
 
 import { oauthCallback } from "./oauth.controller";
 
+import searchHistoryController from "./search-history.controller";
+
 import {
   creatNewPost,
   getPostPreview,
@@ -104,4 +106,7 @@ export {
 
   // privacy
   privacyController,
+
+  // search-history
+  searchHistoryController,
 };

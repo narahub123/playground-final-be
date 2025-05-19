@@ -13,6 +13,12 @@ const SearchHistorySchema = new mongoose.Schema<ISearchHistory>(
       type: String,
       required: true,
     },
+
+    isDeleted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   {
     versionKey: false,

@@ -5,6 +5,7 @@ import authRouter from "./auth.router";
 import verificationRouter from "./verification.router";
 import postRouter from "./post.router";
 import privacyRouter from "./privacy.router";
+import searchHistoryRouter from "./search-history.router";
 
 // express.Router() 인스턴스를 생성합니다.
 const router = express.Router();
@@ -18,5 +19,6 @@ export default (): express.Router => {
   verificationRouter(router);
   postRouter(router);
   privacyRouter(router);
+  searchHistoryRouter(router);
   return router; // 라우터 인스턴스를 반환
 };
