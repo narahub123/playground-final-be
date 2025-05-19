@@ -606,6 +606,63 @@ class UserRepository {
       return null;
     }
   }
+
+  async addSavedSearches(
+    userId: Types.ObjectId,
+    keyword: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const normalizedKeyword = keyword.toLowerCase();
+      const result = await User.updateOne(
+        { _id: userId },
+        {
+          $push: {
+            savedSearches: {
+              $each: [normalizedKeyword],
+              $position: 0,
+            },
+          },
+        },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addSavedSearch", error, {
+        userId,
+        keyword,
+      });
+      return undefined;
+    }
+  }
+
+  async removeSavedSearches(
+    userId: Types.ObjectId,
+    keyword: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const normalizedKeyword = keyword.toLowerCase();
+      const result = await User.updateOne(
+        { _id: userId },
+        {
+          $pull: {
+            savedSearches: normalizedKeyword,
+          },
+        },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeSavedSearches", error, {
+        userId,
+        keyword,
+      });
+      return undefined;
+    }
+  }
 }
 
 export default new UserRepository();

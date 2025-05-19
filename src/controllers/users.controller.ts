@@ -12,7 +12,6 @@ import {
   duplicateDetectionService,
   loginRecordService,
   notificationService,
-  postService,
   privacyService,
   securityService,
   userPostActionService,
@@ -629,6 +628,10 @@ const updateMe = asyncWrapper(
       const pinnedPostId = new mongoose.Types.ObjectId(body.pinnedPost);
 
       await userService.updatePinnedPost(user._id, pinnedPostId);
+    }
+
+    if (body.keyword) {
+      await userService.updateSavedSearches(user._id, body.keyword);
     }
 
     type ResponseData =

@@ -1,4 +1,9 @@
-import { InternalServerError, LockedError, NotFoundError } from "@errors";
+import {
+  ConflictError,
+  InternalServerError,
+  LockedError,
+  NotFoundError,
+} from "@errors";
 import {
   IEmail,
   IEmoji,
@@ -462,6 +467,88 @@ class UserService {
     await Promise.all(
       users.map((user) => this.removePinnedPost(user._id, session))
     );
+  }
+
+  async addSavedSearches(
+    userId: Types.ObjectId,
+    keyword: string,
+    session?: ClientSession
+  ) {
+    const result = await userRepository.addSavedSearches(
+      userId,
+      keyword,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("검색어 저장 중 오류 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("검색어 저장 실패");
+    }
+  }
+
+  async removeSavedSearches(
+    userId: Types.ObjectId,
+    keyword: string,
+    session?: ClientSession
+  ) {
+    const result = await userRepository.removeSavedSearches(
+      userId,
+      keyword,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("검색어 삭제 중 오류 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("검색어 삭제 실패");
+    }
+  }
+
+  async updateSavedSearches(userId: Types.ObjectId, keyword: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.getUserById(userId, session);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const savedSearches = user.savedSearches;
+
+      const normalizedKeyword = keyword.toLowerCase();
+
+      if (
+        savedSearches.some(
+          (search) => search.toLowerCase() === normalizedKeyword
+        )
+      ) {
+        await this.removeSavedSearches(userId, normalizedKeyword, session);
+      } else {
+        await this.addSavedSearches(userId, normalizedKeyword, session);
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
 

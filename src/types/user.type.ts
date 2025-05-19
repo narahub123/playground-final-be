@@ -175,6 +175,7 @@ interface UserDTO {
   recentEmoji: IEmoji;
   pinnedPost: string;
   following: string;
+  keyword: string;
 }
 
 interface IFollowingResponse {
