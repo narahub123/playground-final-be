@@ -241,6 +241,12 @@ const UserSchema = new mongoose.Schema<IUser>(
       ref: "Post",
       required: false,
     },
+
+    savedSearches: {
+      type: [String],
+      required: true,
+      default: [],
+    },
   },
   {
     timestamps: true,

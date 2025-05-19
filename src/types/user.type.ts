@@ -154,6 +154,7 @@ interface IUser extends Document {
   pinnedPost: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  savedSearches: string[];
 }
 
 interface IUserInput {
