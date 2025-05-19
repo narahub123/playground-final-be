@@ -97,6 +97,8 @@ import { IUserPostAction, UserPostActionType } from "./user-post-action.type";
 
 import { SortOrderType, ActionFieldType } from "./aggregates.type";
 
+import { ISearchHistory } from "./search-history.type";
+
 export {
   // aggregates
   SortOrderType,
@@ -210,4 +212,7 @@ export {
   // user-post-action
   IUserPostAction,
   UserPostActionType,
+
+  // search-history
+  ISearchHistory,
 };

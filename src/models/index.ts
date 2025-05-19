@@ -12,6 +12,7 @@ import Phone from "./phone.model";
 import Post from "./post.model";
 import Repost from "./repost.model";
 import UserPostAction from "./user-post-action.model";
+import SearchHistory from "./search-history.model";
 
 export {
   User,
@@ -28,4 +29,5 @@ export {
   Post,
   Repost,
   UserPostAction,
+  SearchHistory,
 };
