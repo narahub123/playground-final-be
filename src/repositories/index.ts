@@ -11,6 +11,7 @@ import emailRepository from "./email.repository";
 import phoneRepository from "./phone.repository";
 import postRepository from "./post.repository";
 import userPostActionRepository from "./user-post-action.repository";
+import searchHistoryRepository from "./search-history.repository";
 
 export {
   userRepository,
@@ -26,4 +27,5 @@ export {
   phoneRepository,
   postRepository,
   userPostActionRepository,
+  searchHistoryRepository,
 };

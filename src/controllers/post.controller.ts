@@ -678,6 +678,7 @@ const getPostsByKeyword = asyncWrapper(
     }
 
     const posts = await postService.getPostsByKeyword(
+      userId,
       q.toString(),
       Number(skip || 0)
     );

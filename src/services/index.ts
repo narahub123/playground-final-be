@@ -12,6 +12,7 @@ import privacyService from "./privacy.service";
 import securityService from "./security.service";
 import postService from "./post.service";
 import userPostActionService from "./user-post-action.service";
+import searchHistoryService from "./search-history.service";
 
 export {
   // email
@@ -55,4 +56,5 @@ export {
 
   // userpostaction
   userPostActionService,
+  searchHistoryService,
 };

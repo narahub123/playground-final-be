@@ -16,6 +16,7 @@ import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
 import userService from "./user.service";
 import userPostActionService from "./user-post-action.service";
 import { aggregatePostById, deleteMedia, uploadMedia } from "@utils";
+import searchHistoryService from "./search-history.service";
 
 class PostService {
   async createPost(
@@ -829,11 +830,17 @@ class PostService {
     }
   }
 
-  async getPostsByKeyword(keyword: string, pageNum: number) {
+  async getPostsByKeyword(
+    userId: Types.ObjectId,
+    keyword: string,
+    pageNum: number
+  ) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
+      await searchHistoryService.createSearchHistory(userId, keyword);
+
       const posts = await postRepository.getPostsByKeyword(
         keyword,
         pageNum,
