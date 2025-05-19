@@ -26,12 +26,6 @@ class SearchHistoryService {
 
     return recentSearches;
   }
-
-  async getSearchHistory(userId: Types.ObjectId): Promise<Record<string, any>> {
-    const recentSearches = await this.getRecentSearches(userId);
-
-    return { recentSearches, savedSearches: [] };
-  }
 }
 
 export default new SearchHistoryService();

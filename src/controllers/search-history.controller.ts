@@ -4,9 +4,14 @@ import { Request, Response } from "express";
 
 class SearchHistoryController {
   async getSearchHistory(req: Request, res: Response) {
-    const { _id: userId } = req.user;
+    const { _id: userId, savedSearches } = req.user;
 
-    const searchHistory = await searchHistoryService.getSearchHistory(userId);
+    const recentSearches = await searchHistoryService.getRecentSearches(userId);
+
+    const searchHistory = {
+      recentSearches,
+      savedSearches: savedSearches || [],
+    };
 
     const response: IApiSuccessResponse<Record<string, any>> = {
       success: true,
