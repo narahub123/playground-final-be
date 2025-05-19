@@ -682,7 +682,15 @@ const getPostsByKeyword = asyncWrapper(
       Number(skip || 0)
     );
 
-    console.log(posts);
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
   }
 );
 
