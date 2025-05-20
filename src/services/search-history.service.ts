@@ -39,14 +39,14 @@ class SearchHistoryService {
 
   async getAutoCompleteByKeyword(keyword: string): Promise<{
     keywordSuggestions: string[];
-    userSuggestions: IAuthor[];
+    accountSuggestions: IAuthor[];
   }> {
     const keywordSuggestions = await this.getAutoCompleteKeywords(keyword);
-    const userSuggestions = await userService.getUsersByKeyword(keyword);
+    const accountSuggestions = await userService.getUsersByKeyword(keyword);
 
     return {
       keywordSuggestions,
-      userSuggestions,
+      accountSuggestions,
     };
   }
 
