@@ -81,6 +81,37 @@ class SearchHistoryService {
       session.endSession();
     }
   }
+
+  async deleteAllRecentKeyword(userId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const result = await searchHistoryRepository.deleteAllRecentKeyword(
+        userId,
+        session
+      );
+
+      if (!result) {
+        throw new InternalServerError("모든 최근 검색어 삭제 중 에러 발생");
+      }
+
+      if (result.matchedCount === 0) {
+        throw new NotFoundError("최근 검색어를 찾을 수 없음");
+      }
+
+      if (result.matchedCount !== 0 && result.modifiedCount === 0) {
+        throw new InternalServerError("모든 최근 검색어 삭제 중 에러 발생");
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 }
 
 export default new SearchHistoryService();

@@ -61,8 +61,24 @@ class SearchHistoryController {
 
     const response: IApiSuccessResponse = {
       success: true,
-      message: "Keyword is deleted successfully.(검색어 자동완성 조회 성공)",
+      message: "Keyword is deleted successfully.(최신 검색어 삭제 조회 성공)",
       code: "RECENT_KEYWORD_DELETION_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+
+  async deleteAllRecentKeywords(req: Request, res: Response) {
+    const { _id: userId } = req.user;
+
+    await searchHistoryService.deleteAllRecentKeyword(userId);
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message:
+        "All recent searches were deleted successfully.(모든 최신 검색어 삭제 성공)",
+      code: "ALL_RECENT_KEYWORD_DELETION_SUCCEEDED",
       timestamp: new Date().toISOString(),
     };
 

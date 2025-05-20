@@ -122,6 +122,35 @@ class SearchHistoryRepository {
       return undefined;
     }
   }
+
+  async deleteAllRecentKeyword(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await SearchHistory.updateMany(
+        {
+          userId,
+          isDeleted: false,
+        },
+        {
+          $set: {
+            isDeleted: true,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteAllRecentKeyword", error, {
+        userId,
+      });
+      return undefined;
+    }
+  }
 }
 
 export default new SearchHistoryRepository();
