@@ -20,4 +20,14 @@ export default (router: Router) => {
       )
     )
   );
+  router.delete(
+    "/search-history",
+    authTokenMiddleware,
+    asyncWrapper(
+      "deleteRecentKeyword",
+      "Failed to delete recent keyword(검색어 자동완성 조회 실패)",
+      "RECENT_KEYWORD_DELETION_FAILED",
+      searchHistoryController.deleteRecentKeyword.bind(searchHistoryController)
+    )
+  );
 };

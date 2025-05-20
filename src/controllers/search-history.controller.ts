@@ -48,6 +48,26 @@ class SearchHistoryController {
 
     res.status(200).json(response);
   }
+
+  async deleteRecentKeyword(req: Request, res: Response) {
+    const { _id: userId } = req.user;
+    const { keyword } = req.query;
+
+    if (!keyword) {
+      throw new BadRequestError("keyword 필수");
+    }
+
+    await searchHistoryService.deleteRecentKeyword(userId, keyword.toString());
+
+    const response: IApiSuccessResponse = {
+      success: true,
+      message: "Keyword is deleted successfully.(검색어 자동완성 조회 성공)",
+      code: "RECENT_KEYWORD_DELETION_SUCCEEDED",
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
 }
 
 export default new SearchHistoryController();

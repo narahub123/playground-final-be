@@ -1,7 +1,7 @@
 import { SearchHistory } from "@models";
 import { ISearchHistory } from "@types";
 import { Aggregate, mongoDBErrorHandler } from "@utils";
-import { ClientSession, Types } from "mongoose";
+import { ClientSession, Types, UpdateResult } from "mongoose";
 
 class SearchHistoryRepository {
   async createSearchHistory(
@@ -86,6 +86,40 @@ class SearchHistoryRepository {
       });
 
       return [];
+    }
+  }
+
+  async deleteRecentKeyword(
+    userId: Types.ObjectId,
+    keyword: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await SearchHistory.updateMany(
+        {
+          userId,
+          isDeleted: false,
+          query: {
+            $regex: `^${keyword}$`,
+            $options: "i",
+          },
+        },
+        {
+          $set: {
+            isDeleted: true,
+          },
+        },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("deleteRecentKeyword", error, {
+        userId,
+        keyword,
+      });
+
+      return undefined;
     }
   }
 }
