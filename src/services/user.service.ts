@@ -550,6 +550,12 @@ class UserService {
       session.endSession();
     }
   }
+
+  async getUsersByKeyword(keyword: string) {
+    const users = await userRepository.getUsersByKeyword(keyword);
+
+    return users;
+  }
 }
 
 export default new UserService();

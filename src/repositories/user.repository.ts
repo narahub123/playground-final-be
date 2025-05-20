@@ -5,7 +5,14 @@ import mongoose, {
   UpdateResult,
 } from "mongoose";
 import { User } from "@models";
-import { IEmoji, ILockStatus, IUser, IUserInput, SkintoneType } from "@types";
+import {
+  IAuthor,
+  IEmoji,
+  ILockStatus,
+  IUser,
+  IUserInput,
+  SkintoneType,
+} from "@types";
 import { mongoDBErrorHandler } from "@utils";
 import { UpdateWriteOpResult } from "mongoose";
 
@@ -661,6 +668,49 @@ class UserRepository {
         keyword,
       });
       return undefined;
+    }
+  }
+
+  async getUsersByKeyword(keyword: string): Promise<IAuthor[]> {
+    try {
+      const regex = new RegExp(keyword, "i");
+
+      const users = await User.aggregate<IAuthor>([
+        {
+          $match: {
+            username: { $regex: regex },
+          },
+        },
+        {
+          $addFields: {
+            followersCount: { $size: "$followers" }, // followers 배열 크기 계산
+          },
+        },
+        {
+          $sort: {
+            followersCount: -1, // 내림차순 (많은 순)
+          },
+        },
+        {
+          $limit: 10,
+        },
+        {
+          $project: {
+            _id: "$id",
+            userId: "$userId",
+            username: "$username",
+            profileImage: "$profileImage",
+            intro: "$intro",
+            followings: "$followings",
+            followers: "$followers",
+          },
+        },
+      ]);
+
+      return users;
+    } catch (error) {
+      mongoDBErrorHandler("getUsersByKeyword", error, { keyword });
+      return [];
     }
   }
 }

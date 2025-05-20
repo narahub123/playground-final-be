@@ -4,6 +4,7 @@ import getPostByPostId from "./postByPostId";
 import getPostsWithReplies from "./postsWithRepliesByCurrentUser";
 import getPostsByKeyword from "./postsByKeyword";
 import getMediaByCurrentUser from "./mediaByCurrentUser";
+import getAutoCompleteKeywords from "./autoCompeletKeywords";
 
 const Aggregate = {
   aggregatePostsByAuthorIds,
@@ -12,6 +13,7 @@ const Aggregate = {
   getPostsWithReplies,
   getPostsByKeyword,
   getMediaByCurrentUser,
+  getAutoCompleteKeywords,
 };
 
 export default Aggregate;

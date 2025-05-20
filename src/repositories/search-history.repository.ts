@@ -1,6 +1,6 @@
 import { SearchHistory } from "@models";
 import { ISearchHistory } from "@types";
-import { mongoDBErrorHandler } from "@utils";
+import { Aggregate, mongoDBErrorHandler } from "@utils";
 import { ClientSession, Types } from "mongoose";
 
 class SearchHistoryRepository {
@@ -71,6 +71,20 @@ class SearchHistoryRepository {
       return recentSearches;
     } catch (error) {
       mongoDBErrorHandler("getRecentSearches", error, { userId });
+      return [];
+    }
+  }
+
+  async getKeywordAutoComplete(keyword: string): Promise<string[]> {
+    try {
+      const keywords = await Aggregate.getAutoCompleteKeywords(keyword);
+
+      return keywords;
+    } catch (error) {
+      mongoDBErrorHandler("getKeywordAutoComplete", error, {
+        keyword,
+      });
+
       return [];
     }
   }
