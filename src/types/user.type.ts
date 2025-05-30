@@ -155,6 +155,14 @@ interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   savedSearches: string[];
+  exploreSettings: IExploreSettings;
+}
+
+interface IExploreSettings {
+  useDeviceLocation: boolean;
+  selectedLocation: string;
+  personalizeTrends: boolean;
+  interests: string[];
 }
 
 interface IUserInput {

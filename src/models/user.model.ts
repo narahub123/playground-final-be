@@ -247,6 +247,25 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: true,
       default: [],
     },
+
+    exploreSettings: {
+      useDeviceLocation: {
+        type: Boolean,
+        default: true,
+      },
+      selectedLocation: {
+        type: String,
+        required: true,
+      },
+      personalizeTrends: {
+        type: Boolean,
+        default: true,
+      },
+      interests: {
+        type: [String],
+        default: [],
+      },
+    },
   },
   {
     timestamps: true,
