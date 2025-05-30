@@ -176,6 +176,9 @@ interface IUserInput {
   location: ILocation;
   profileImage: string;
   accountGroup: string[];
+  exploreSettings: {
+    selectedLocation: string;
+  };
 }
 
 interface UserDTO {

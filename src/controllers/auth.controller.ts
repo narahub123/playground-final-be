@@ -175,6 +175,9 @@ const signupUser = asyncWrapper(
         location,
         profileImage: uploadedProfileImage[0]?.secure_url || "",
         accountGroup: [userId],
+        exploreSettings: {
+          selectedLocation: countryInfo,
+        },
       };
 
       const pushNotificationSettings: IPushNotificationInputSettings = {
