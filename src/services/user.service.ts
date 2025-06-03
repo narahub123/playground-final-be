@@ -556,6 +556,197 @@ class UserService {
 
     return users;
   }
+
+  async updateUseDeviceLocation(userId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.getUserById(userId, session);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const result = await userRepository.updateUseDeviceLocation(
+        userId,
+        user.exploreSettings.useDeviceLocation
+      );
+
+      if (!result) {
+        throw new InternalServerError(
+          "useDeviceLocation 업데이트 중 에러 발생"
+        );
+      }
+
+      if (result.matchedCount === 0) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      if (result.modifiedCount === 0) {
+        throw new InternalServerError("useDeviceLocation 업데이트 실패");
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async updatePersonalizeTrends(userId: Types.ObjectId) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.getUserById(userId, session);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const result = await userRepository.updateUseDeviceLocation(
+        userId,
+        user.exploreSettings.personalizeTrends
+      );
+
+      if (!result) {
+        throw new InternalServerError(
+          "personalizeTrends 업데이트 중 에러 발생"
+        );
+      }
+
+      if (result.matchedCount === 0) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      if (result.modifiedCount === 0) {
+        throw new InternalServerError("personalizeTrends 업데이트 실패");
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async updateSelectedLocation(
+    userId: Types.ObjectId,
+    selectedLocation: string
+  ) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.getUserById(userId, session);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const result = await userRepository.updateSelectedLocation(
+        userId,
+        selectedLocation,
+        session
+      );
+
+      if (!result) {
+        throw new InternalServerError("selectedLocation 업데이트 중 에러 발생");
+      }
+
+      if (result.matchedCount === 0) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      if (result.modifiedCount === 0) {
+        throw new InternalServerError("selectedLocation 업데이트 실패");
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async addInterest(
+    userId: Types.ObjectId,
+    interest: string,
+    session?: ClientSession
+  ) {
+    const result = await userRepository.addInterest(userId, interest, session);
+
+    if (!result) {
+      throw new InternalServerError("interest 추가 중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("interest 추가 실패");
+    }
+  }
+
+  async removeInterest(
+    userId: Types.ObjectId,
+    interest: string,
+    session?: ClientSession
+  ) {
+    const result = await userRepository.removeInterest(
+      userId,
+      interest,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError("interest 삭제 중 에러 발생");
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자 조회 실패");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("interest 삭제 실패");
+    }
+  }
+
+  async updateInterests(userId: Types.ObjectId, interest: string) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await this.getUserById(userId, session);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const isExisting = Boolean(
+        user.exploreSettings.interests.find((i) => i === interest)
+      );
+
+      isExisting
+        ? await this.addInterest(userId, interest, session)
+        : await this.removeInterest(userId, interest, session);
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 }
 
 export default new UserService();

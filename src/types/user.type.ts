@@ -187,6 +187,10 @@ interface UserDTO {
   pinnedPost: string;
   following: string;
   keyword: string;
+  useDeviceLocation: boolean;
+  personalizeTrends: boolean;
+  selectedLocation: string;
+  interests: string;
 }
 
 interface IFollowingResponse {

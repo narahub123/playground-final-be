@@ -713,6 +713,143 @@ class UserRepository {
       return [];
     }
   }
+
+  async updateUseDeviceLocation(
+    userId: Types.ObjectId,
+    useDeviceLocation: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        {
+          $set: {
+            "exploreSettings.useDeviceLocation": !useDeviceLocation,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateUseDeviceLocation", error, {
+        userId,
+        useDeviceLocation,
+      });
+      return undefined;
+    }
+  }
+
+  async updatePersonalizeTrends(
+    userId: Types.ObjectId,
+    personalizeTrends: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        {
+          $set: {
+            "exploreSettings.personalizeTrends": !personalizeTrends,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updatePersonalizeTrends", error, {
+        userId,
+        personalizeTrends,
+      });
+      return undefined;
+    }
+  }
+
+  async updateSelectedLocation(
+    userId: Types.ObjectId,
+    selectedLocation: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        { _id: userId },
+        {
+          $set: {
+            "exploreSettings.selectedLocation": selectedLocation,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("updateSelectedLocation", error, {
+        userId,
+        selectedLocation,
+      });
+      return undefined;
+    }
+  }
+
+  async addInterest(
+    userId: Types.ObjectId,
+    interest: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        {
+          _id: userId,
+        },
+        {
+          $addToSet: {
+            "exploreSettings.interests": interest,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("addInterest", error, { userId, interest });
+      return undefined;
+    }
+  }
+  async removeInterest(
+    userId: Types.ObjectId,
+    interest: string,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await User.updateOne(
+        {
+          _id: userId,
+        },
+        {
+          $pull: {
+            "exploreSettings.interests": interest,
+          },
+        },
+        {
+          session,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("removeInterest", error, { userId, interest });
+      return undefined;
+    }
+  }
 }
 
 export default new UserRepository();

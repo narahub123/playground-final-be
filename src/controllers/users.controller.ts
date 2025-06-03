@@ -634,6 +634,22 @@ const updateMe = asyncWrapper(
       await userService.updateSavedSearches(user._id, body.keyword);
     }
 
+    if (body.useDeviceLocation) {
+      await userService.updateUseDeviceLocation(user._id);
+    }
+
+    if (body.personalizeTrends) {
+      await userService.updatePersonalizeTrends(user._id);
+    }
+
+    if (body.selectedLocation) {
+      await userService.updateSelectedLocation(user._id, body.selectedLocation);
+    }
+
+    if (body.interests) {
+      await userService.updateInterests(user._id, body.interests);
+    }
+
     type ResponseData =
       | { following: IFollowingResponse }
       | { unfollowing: Types.ObjectId }
