@@ -31,6 +31,7 @@ interface IPrivacy extends Document {
   isSensitiveMediaTagged: boolean;
   isLocationInfoIncluded: boolean;
   isSensitiveMediaDisplayed: boolean;
+  isMutesAndBlocksRemoved: boolean;
   topics: string[];
   interests: string[];
   blockedUsers: Types.ObjectId[];

@@ -24,11 +24,14 @@ const privacySchema = new mongoose.Schema<IPrivacy>(
     // 내 게시물
     // 포스트 할 때 민감한 미디어 표시하기
     isSensitiveMediaTagged: { type: Boolean, default: false },
+
     // 게시물에 위치 정보 넣기
     isLocationInfoIncluded: { type: Boolean, default: false },
     // 표시되는 콘텐츠
     // 피드에 민감한 미디어 표시하기
-    isSensitiveMediaDisplayed: { type: Boolean, default: true },
+    isSensitiveMediaDisplayed: { type: Boolean, default: false },
+    // 차단 또는 뮤트한 계정 제외하기
+    isMutesAndBlocksRemoved: { type: Boolean, default: true },
     // 토픽
     topics: { type: [String], default: [] },
     // 관심사
