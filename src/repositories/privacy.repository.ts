@@ -1,7 +1,7 @@
 import { Privacy } from "@models";
 import { IPrivacy, ReplyOptionType } from "@types";
 import { mongoDBErrorHandler } from "@utils";
-import mongoose, { Types, UpdateResult } from "mongoose";
+import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
 
 class PrivacyRepository {
   async createPrivacy(
@@ -117,6 +117,32 @@ class PrivacyRepository {
       return result;
     } catch (error) {
       mongoDBErrorHandler("removeBlockedUser", error, { userId, opponent });
+      return undefined;
+    }
+  }
+
+  async toggleIsSensitiveMediaDisplayed(
+    userId: Types.ObjectId,
+    isSensitiveMediaDisplayed: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        {
+          userId,
+        },
+        {
+          isSensitiveMediaDisplayed: !isSensitiveMediaDisplayed,
+        },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("toggleIsSensitiveMediaDisplayed", error, {
+        userId,
+        isSensitiveMediaDisplayed,
+      });
       return undefined;
     }
   }

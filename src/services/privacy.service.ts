@@ -2,7 +2,7 @@ import { InternalServerError, NotFoundError } from "@errors";
 import { Privacy } from "@models";
 import { privacyRepository } from "@repositories";
 import { IPrivacy, IPrivacyDto, ReplyOptionType } from "@types";
-import mongoose, { Types, UpdateResult } from "mongoose";
+import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
 
 class PrivacyService {
   async getPrivacyByUserId(userId: Types.ObjectId): Promise<IPrivacy> {
@@ -111,23 +111,67 @@ class PrivacyService {
     }
   }
 
+  async toggleIsSensitiveMediaDisplayed(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<void> {
+    const privacy = await this.getPrivacyByUserId(userId);
+
+    const result = await privacyRepository.toggleIsSensitiveMediaDisplayed(
+      userId,
+      privacy.isSensitiveMediaDisplayed,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError(
+        "isSensitiveMediaDisplay 업데이트 도중 에러 발생"
+      );
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자의 개인 정보 조회 실팬");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("isSensitiveMediaDisplay 업데이트 실패");
+    }
+  }
+
   async updateMyPrivacy(userId: Types.ObjectId, body: IPrivacyDto) {
-    const { replyOption, mutedUser, blockedUser } = body;
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    if (replyOption) {
-      await this.updateReplyOption(userId, replyOption);
-    }
+    try {
+      const { replyOption, mutedUser, blockedUser, isSensitiveMediaDisplayed } =
+        body;
 
-    if (mutedUser) {
-      const opponent = new mongoose.Types.ObjectId(mutedUser);
+      if (replyOption) {
+        await this.updateReplyOption(userId, replyOption);
+      }
 
-      await this.updateMutedUser(userId, opponent);
-    }
+      if (mutedUser) {
+        const opponent = new mongoose.Types.ObjectId(mutedUser);
 
-    if (blockedUser) {
-      const opponent = new mongoose.Types.ObjectId(blockedUser);
+        await this.updateMutedUser(userId, opponent);
+      }
 
-      await this.updateBlockedUser(userId, opponent)
+      if (blockedUser) {
+        const opponent = new mongoose.Types.ObjectId(blockedUser);
+
+        await this.updateBlockedUser(userId, opponent);
+      }
+
+      if (isSensitiveMediaDisplayed) {
+        await this.toggleIsSensitiveMediaDisplayed(userId, session);
+      }
+
+      await session.commitTransaction();
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
   }
 }

@@ -57,6 +57,7 @@ interface IPrivacyDto {
   replyOption: ReplyOptionType;
   mutedUser: Types.ObjectId;
   blockedUser: Types.ObjectId;
+  isSensitiveMediaDisplayed: "toggle";
 }
 
 export type {
