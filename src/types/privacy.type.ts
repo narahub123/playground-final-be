@@ -58,6 +58,7 @@ interface IPrivacyDto {
   mutedUser: Types.ObjectId;
   blockedUser: Types.ObjectId;
   isSensitiveMediaDisplayed: "toggle";
+  isMutesAndBlocksRemoved: "toggle";
 }
 
 export type {

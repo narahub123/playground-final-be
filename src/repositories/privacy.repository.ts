@@ -146,6 +146,33 @@ class PrivacyRepository {
       return undefined;
     }
   }
+
+  async toggleIsMutesAndBlocksRemoved(
+    userId: Types.ObjectId,
+    isMutesAndBlocksRemoved: boolean,
+    session?: ClientSession
+  ): Promise<UpdateResult | undefined> {
+    try {
+      const result = await Privacy.updateOne(
+        {
+          userId,
+        },
+        {
+          isMutesAndBlocksRemoved: !isMutesAndBlocksRemoved,
+        },
+        { session }
+      );
+
+      return result;
+    } catch (error) {
+      mongoDBErrorHandler("toggleIsMutesAndBlocksRemoved", error, {
+        userId,
+        isMutesAndBlocksRemoved,
+      });
+
+      return undefined;
+    }
+  }
 }
 
 export default new PrivacyRepository();

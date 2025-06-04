@@ -138,13 +138,45 @@ class PrivacyService {
     }
   }
 
+  async toggleIsMutesAndBlocksRemoved(
+    userId: Types.ObjectId,
+    session?: ClientSession
+  ): Promise<void> {
+    const privacy = await this.getPrivacyByUserId(userId);
+
+    const result = await privacyRepository.toggleIsMutesAndBlocksRemoved(
+      userId,
+      privacy.isMutesAndBlocksRemoved,
+      session
+    );
+
+    if (!result) {
+      throw new InternalServerError(
+        "isMutesandBlocksRemoved 업데이트 도중 에러 발생"
+      );
+    }
+
+    if (result.matchedCount === 0) {
+      throw new NotFoundError("사용자의 개인 정보 조회 실팬");
+    }
+
+    if (result.modifiedCount === 0) {
+      throw new InternalServerError("isMutesandBlocksRemoved 업데이트 실패");
+    }
+  }
+
   async updateMyPrivacy(userId: Types.ObjectId, body: IPrivacyDto) {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const { replyOption, mutedUser, blockedUser, isSensitiveMediaDisplayed } =
-        body;
+      const {
+        replyOption,
+        mutedUser,
+        blockedUser,
+        isSensitiveMediaDisplayed,
+        isMutesAndBlocksRemoved,
+      } = body;
 
       if (replyOption) {
         await this.updateReplyOption(userId, replyOption);
@@ -164,6 +196,10 @@ class PrivacyService {
 
       if (isSensitiveMediaDisplayed) {
         await this.toggleIsSensitiveMediaDisplayed(userId, session);
+      }
+
+      if (isMutesAndBlocksRemoved) {
+        await this.toggleIsMutesAndBlocksRemoved(userId, session);
       }
 
       await session.commitTransaction();
