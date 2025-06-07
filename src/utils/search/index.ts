@@ -1,3 +1,4 @@
-import { extractQuery, splitQuery } from "./searchUtils";
+import { extractQuery, splitToken } from "./searchUtils";
+import parseSearchKeyword from "./parseSearchKeyword";
 
-export { extractQuery, splitQuery };
+export { extractQuery, splitToken, parseSearchKeyword };

@@ -49,8 +49,8 @@ const extractQuery = (base: string, regExp: RegExp): string => {
   return joinItems(pureItems);
 };
 
-const splitQuery = (query: string) => {
+const splitToken = (query: string) => {
   return query.trim().split(/\s+/);
 };
 
-export { extractQuery, splitQuery };
+export { extractQuery, splitToken };

@@ -76,7 +76,7 @@ import {
   Extra,
 } from "./aggregations";
 
-import { extractQuery, splitQuery } from "./search";
+import { extractQuery, splitToken, parseSearchKeyword } from "./search";
 
 export {
   Aggregate,
@@ -126,7 +126,8 @@ export {
   aggregateCommentsByPostId,
   aggregatePostsByUserAndFollowings,
   extractQuery,
-  splitQuery,
+  splitToken,
+  parseSearchKeyword,
 
   // aggregatePipelines
   matchPostById,
