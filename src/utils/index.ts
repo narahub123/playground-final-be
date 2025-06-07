@@ -76,6 +76,8 @@ import {
   Extra,
 } from "./aggregations";
 
+import { extractQuery, splitQuery } from "./search";
+
 export {
   Aggregate,
   MatchStage,
@@ -123,6 +125,8 @@ export {
   aggregatePostsByUserId,
   aggregateCommentsByPostId,
   aggregatePostsByUserAndFollowings,
+  extractQuery,
+  splitQuery,
 
   // aggregatePipelines
   matchPostById,
