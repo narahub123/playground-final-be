@@ -1,9 +1,5 @@
 import { ConflictError, InternalServerError, NotFoundError } from "@errors";
-import {
-  postRepository,
-  userPostActionRepository,
-  userRepository,
-} from "@repositories";
+import { postRepository, userRepository } from "@repositories";
 import {
   ICommentRequestDto,
   IPost,
@@ -12,10 +8,10 @@ import {
   IQuoteRequestDto,
   IRepostRequestDto,
 } from "@types";
-import mongoose, { ClientSession, Types, UpdateResult } from "mongoose";
+import mongoose, { ClientSession, Types } from "mongoose";
 import userService from "./user.service";
 import userPostActionService from "./user-post-action.service";
-import { aggregatePostById, deleteMedia, uploadMedia } from "@utils";
+import { deleteMedia, uploadMedia } from "@utils";
 import searchHistoryService from "./search-history.service";
 
 class PostService {
