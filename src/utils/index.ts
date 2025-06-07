@@ -76,7 +76,16 @@ import {
   Extra,
 } from "./aggregations";
 
-import { extractQuery, splitToken, parseSearchKeyword } from "./search";
+import {
+  extractQuery,
+  splitToken,
+  parseSearchKeyword,
+  keywordsConditions,
+  accountsConditions,
+  filterConditions,
+  engagementConditions,
+  periodConditions,
+} from "./search";
 
 export {
   Aggregate,
@@ -128,6 +137,11 @@ export {
   extractQuery,
   splitToken,
   parseSearchKeyword,
+  keywordsConditions,
+  accountsConditions,
+  filterConditions,
+  engagementConditions,
+  periodConditions,
 
   // aggregatePipelines
   matchPostById,
