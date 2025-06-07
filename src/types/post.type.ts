@@ -121,6 +121,58 @@ interface IPostResponseDto {
   isRepostedByCurrentUser: boolean;
 }
 
+interface ISearchKeywords {
+  allKeywords: string;
+  phrase: string;
+  anyKeywords: string;
+  excludeKeywords: string;
+  hashtags: string;
+}
+
+interface ISearchAccounts {
+  fromAccounts: string;
+  toAccounts: string;
+  mentionsToAccounts: string;
+}
+
+interface ISearchFilter {
+  comments: {
+    isOn: boolean;
+    range: "" | "comments";
+  };
+  links: {
+    isOn: boolean;
+    range: "" | "links";
+  };
+}
+
+interface ISearchEngagement {
+  min_comments: number;
+  min_likes: number;
+  min_reposts: number;
+}
+
+interface ISearchPeriod {
+  since: {
+    year?: number;
+    month?: number;
+    date?: number;
+  };
+  until: {
+    year?: number;
+    month?: number;
+    date?: number;
+  };
+}
+
+interface IAdvancedSearch {
+  keywords: ISearchKeywords;
+  accounts: ISearchAccounts;
+  filter: ISearchFilter;
+  engagement: ISearchEngagement;
+  period: ISearchPeriod;
+}
+
 export type {
   IPost,
   IVoteOption,
@@ -133,4 +185,10 @@ export type {
   ICommentRequestDto,
   PostType,
   IQuoteRequestDto,
+  IAdvancedSearch,
+  ISearchKeywords,
+  ISearchAccounts,
+  ISearchFilter,
+  ISearchEngagement,
+  ISearchPeriod,
 };

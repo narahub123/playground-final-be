@@ -90,6 +90,12 @@ import {
   PostType,
   ICommentRequestDto,
   IQuoteRequestDto,
+  IAdvancedSearch,
+  ISearchKeywords,
+  ISearchAccounts,
+  ISearchFilter,
+  ISearchEngagement,
+  ISearchPeriod,
 } from "./post.type";
 
 import { IRepost } from "./repost.type";
@@ -205,6 +211,12 @@ export {
   PostType,
   ICommentRequestDto,
   IQuoteRequestDto,
+  IAdvancedSearch,
+  ISearchKeywords,
+  ISearchAccounts,
+  ISearchFilter,
+  ISearchEngagement,
+  ISearchPeriod,
 
   // repost
   IRepost,
