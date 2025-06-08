@@ -51,6 +51,7 @@ import {
   getMediaByCurrentUser,
   getPostsByKeyword,
   getPostsByUserId,
+  getPostsAndRepliesByUserId,
 } from "./post.controller";
 
 import privacyController from "./privacy.controller";
@@ -105,6 +106,7 @@ export {
   getMediaByCurrentUser,
   getPostsByKeyword,
   getPostsByUserId,
+  getPostsAndRepliesByUserId,
 
   // privacy
   privacyController,

@@ -724,6 +724,35 @@ const getPostsByUserId = asyncWrapper(
   }
 );
 
+const getPostsAndRepliesByUserId = asyncWrapper(
+  "getPostsAndRepliesByUserId",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { userid } = req.params;
+    const { skip } = req.query;
+
+    if (!userid || !skip) {
+      throw new BadRequestError("userid 혹은 skip 필수");
+    }
+
+    const posts = await postService.getPostsAndRepliesByUserId(
+      userid,
+      Number(skip || 0)
+    );
+
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -744,4 +773,5 @@ export {
   getMediaByCurrentUser,
   getPostsByKeyword,
   getPostsByUserId,
+  getPostsAndRepliesByUserId,
 };

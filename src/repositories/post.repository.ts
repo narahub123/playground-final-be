@@ -775,6 +775,28 @@ class PostRepository {
       return [];
     }
   }
+
+  async getPostsAndRepliesByUserId(
+    userId: Types.ObjectId,
+    skip: number,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Aggregate.getPostsWithReplies(
+        [userId],
+        skip,
+        session
+      );
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getPostsAndRepliesByUserId", error, {
+        userId,
+        skip,
+      });
+      return [];
+    }
+  }
 }
 
 export default new PostRepository();
