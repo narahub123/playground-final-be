@@ -33,7 +33,7 @@ const getPostsByKeyword = async (
 
     UnwindStage.unwind("originalPosts"),
 
-    LookupStage.author("originalPosts.authors", "originalPostAuthor"),
+    LookupStage.author("originalPosts.author", "originalPostAuthor"),
 
     AddFieldsStage.author("originalPosts.author", "originalPostAuthor"),
 
