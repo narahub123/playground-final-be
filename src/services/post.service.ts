@@ -854,6 +854,37 @@ class PostService {
       session.endSession();
     }
   }
+
+  async getPostsByUserId(
+    userid: string,
+    skip: number
+  ): Promise<IPostResponseDto[]> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await userRepository.getUserByUserId(userid);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const posts = await postRepository.getPostsByUserId(
+        user._id,
+        skip,
+        session
+      );
+
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
 }
 
 export default new PostService();

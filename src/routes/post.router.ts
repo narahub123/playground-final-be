@@ -37,10 +37,10 @@ export default (router: Router) => {
   router.get("/posts/preview", authTokenMiddleware, getPostPreview);
   router.get("/posts/:postid/comments", authTokenMiddleware, getComments);
   router.get("/posts/search", authTokenMiddleware, getPostsByKeyword);
+  router.get("/posts/:postid", authTokenMiddleware, getPostById);
 
   router.post("/posts", authTokenMiddleware, creatNewPost);
   router.post("/posts/:postid/quote", authTokenMiddleware, createQuote);
-  router.get("/posts/:postid", authTokenMiddleware, getPostById);
   router.post("/posts/:postid/repost", authTokenMiddleware, createRepost);
   router.post("/posts/:postid/comment", authTokenMiddleware, createComment);
   router.patch("/posts/:postId/likes", authTokenMiddleware, updateLikes);
