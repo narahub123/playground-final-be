@@ -2,11 +2,13 @@ import { Post } from "@models";
 import { IPostResponseDto } from "@types";
 import { ClientSession } from "mongoose";
 import {
+  accountsConditions,
   AddFieldsStage,
   Extra,
   LimitStage,
   LookupStage,
   MatchStage,
+  parseSearchKeyword,
   ProjectStage,
   SkipStage,
   SortStage,
@@ -19,9 +21,14 @@ const getPostsByKeyword = async (
   pageNum: number,
   session?: ClientSession
 ): Promise<IPostResponseDto[]> => {
+  const { accounts } = parseSearchKeyword(keyword);
+
   const posts = await Post.aggregate<IPostResponseDto>(
     [
       MatchStage.search(keyword),
+
+      // accounts 필터링
+      ...accountsConditions(accounts),
 
       LookupStage.author("author", "authorInfo"),
 

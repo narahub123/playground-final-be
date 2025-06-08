@@ -4,8 +4,8 @@ const ANYKEYWORDS_REGEXP = /\(((?![#@]|from:|to:)[^)]*?\sOR\s[^)]*?)\)/g;
 const HASHTAGS_REGEXP = /\(\s*(#[^\s()#]+(?:\s+OR\s+#[^\s()#]+)*)\s*\)/g;
 const EXCLUDEKEYWORDS_REGEXP =
   /-(?!filter:)(?!\d{2}(?:-\d{2})?)(?!\d{4}-\d{2}-\d{2})[^\s:()@#"\d]+/g;
-const FROMACCOUNTS_REGEXP = /\(([^)]*from:[^)]*?\sOR\s[^)]*?)\)/g;
-const TOACCOUNTS_REGEXP = /\(([^)]*to:[^)]*?\sOR\s[^)]*?)\)/g;
+const FROMACCOUNTS_REGEXP = /\(([^)]*from:[^)]*)\)/g;
+const TOACCOUNTS_REGEXP = /\(([^)]*to:[^)]*)\)/g;
 const MENTIONSTOACCOUNTS_REGEXP =
   /\(\s*(@[^\s()@]+(?:\s+OR\s+@[^\s()@]+)*)\s*\)/g;
 const FILTERONLY_REGEXP = /(?<!-)\bfilter:[^\s)]+/g;
