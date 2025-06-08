@@ -50,6 +50,8 @@ const extractQuery = (base: string, regExp: RegExp): string => {
 };
 
 const splitToken = (query: string) => {
+  if (!query) return [];
+
   return query.trim().split(/\s+/);
 };
 
