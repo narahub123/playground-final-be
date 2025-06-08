@@ -1,9 +1,11 @@
 import { ActionFieldType, PostType } from "@types";
 import { Types } from "mongoose";
 import {
+  engagementConditions,
   filterConditions,
   keywordsConditions,
   parseSearchKeyword,
+  periodConditions,
 } from "utils/search";
 
 class MatchStage {
@@ -82,12 +84,14 @@ class MatchStage {
 
     const keywordCond = keywordsConditions(keywords);
     const filterCond = filterConditions(filter);
+    const engagementCond = engagementConditions(engagement);
+    const periodCond = periodConditions(period);
 
-    console.log(filterCond);
+    console.log(periodCond);
 
     return {
       $match: {
-        $and: [...keywordCond, ...filterCond],
+        $and: [...keywordCond, ...filterCond, ...engagementCond],
         isDeleted: false,
       },
     };
