@@ -808,13 +808,18 @@ class PostService {
   }
 
   async getMediaByCurrentUser(
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
+    skip: number
   ): Promise<IPostResponseDto[]> {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      const posts = await postRepository.getMediaByCurrentUser(userId, session);
+      const posts = await postRepository.getMediaByCurrentUser(
+        userId,
+        skip,
+        session
+      );
       await session.commitTransaction();
 
       return posts;
@@ -906,6 +911,36 @@ class PostService {
         session
       );
 
+      await session.commitTransaction();
+
+      return posts;
+    } catch (error) {
+      session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async getMediaByUserId(
+    userId: string,
+    skip: number
+  ): Promise<IPostResponseDto[]> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const user = await userService.getUserByUserId(userId);
+
+      if (!user) {
+        throw new NotFoundError("사용자 조회 실패");
+      }
+
+      const posts = await postRepository.getMediaByUserId(
+        user._id,
+        skip,
+        session
+      );
       await session.commitTransaction();
 
       return posts;

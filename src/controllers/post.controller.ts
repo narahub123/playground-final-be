@@ -650,8 +650,16 @@ const getMediaByCurrentUser = asyncWrapper(
   "",
   async (req: Request, res: Response) => {
     const { _id: userId } = req.user;
+    const { skip } = req.query;
 
-    const posts = await postService.getMediaByCurrentUser(userId);
+    if (!skip) {
+      throw new BadRequestError("skip 필수");
+    }
+
+    const posts = await postService.getMediaByCurrentUser(
+      userId,
+      Number(skip || 0)
+    );
 
     const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
       success: true,
@@ -753,6 +761,32 @@ const getPostsAndRepliesByUserId = asyncWrapper(
   }
 );
 
+const getMediaByUserId = asyncWrapper(
+  "getMediaByUserId",
+  "",
+  "",
+  async (req: Request, res: Response) => {
+    const { userid } = req.params;
+    const { skip } = req.query;
+
+    if (!userid || !skip) {
+      throw new BadRequestError("userid와 skip 필수");
+    }
+
+    const posts = await postService.getMediaByUserId(userid, Number(skip || 0));
+
+    const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {
+      success: true,
+      message: "Posts were retrieved successfully. (포스트 목록 조회 성공)",
+      code: "POSTS_RETRIEVAL_SUCCESS",
+      data: { posts },
+      timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
+  }
+);
+
 export {
   creatNewPost,
   getPostPreview,
@@ -774,4 +808,5 @@ export {
   getPostsByKeyword,
   getPostsByUserId,
   getPostsAndRepliesByUserId,
+  getMediaByUserId,
 };

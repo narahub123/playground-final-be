@@ -694,10 +694,15 @@ class PostRepository {
 
   async getMediaByCurrentUser(
     userId: Types.ObjectId,
+    skip: number,
     session?: ClientSession
   ): Promise<IPostResponseDto[]> {
     try {
-      const posts = await Aggregate.getMediaByCurrentUser(userId, session);
+      const posts = await Aggregate.getMediaByCurrentUser(
+        userId,
+        skip,
+        session
+      );
 
       return posts;
     } catch (error) {
@@ -794,6 +799,28 @@ class PostRepository {
         userId,
         skip,
       });
+      return [];
+    }
+  }
+
+  async getMediaByUserId(
+    userId: Types.ObjectId,
+    skip: number,
+    session?: ClientSession
+  ): Promise<IPostResponseDto[]> {
+    try {
+      const posts = await Aggregate.getMediaByCurrentUser(
+        userId,
+        skip,
+        session
+      );
+
+      return posts;
+    } catch (error) {
+      mongoDBErrorHandler("getMediaByUserId", error, {
+        userId,
+      });
+
       return [];
     }
   }

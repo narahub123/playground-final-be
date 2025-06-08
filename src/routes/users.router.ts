@@ -12,6 +12,7 @@ import {
   getUserInfo,
   getPostsByUserId,
   getPostsAndRepliesByUserId,
+  getMediaByUserId,
 } from "@controllers";
 import { authTokenMiddleware } from "@middlewares";
 import { Router } from "express";
@@ -23,6 +24,7 @@ export default (router: Router) => {
     authTokenMiddleware,
     getPostsAndRepliesByUserId
   );
+  router.get("/users/:userid/media", authTokenMiddleware, getMediaByUserId);
   router.get("/users/me", authTokenMiddleware, getCurrentUser);
   router.get("/users/:userId", authTokenMiddleware, getUserInfo);
   router.post("/users/check-duplication/email", checkEmailDuplication);
