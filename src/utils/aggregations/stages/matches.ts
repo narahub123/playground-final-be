@@ -1,6 +1,10 @@
 import { ActionFieldType, PostType } from "@types";
 import { Types } from "mongoose";
-import { keywordsConditions, parseSearchKeyword } from "utils/search";
+import {
+  filterConditions,
+  keywordsConditions,
+  parseSearchKeyword,
+} from "utils/search";
 
 class MatchStage {
   static authorIds(authorIds: Types.ObjectId[]) {
@@ -73,15 +77,17 @@ class MatchStage {
   }
 
   static search(keyword: string) {
-    const { keywords } = parseSearchKeyword(keyword);
+    const { keywords, filter, engagement, period } =
+      parseSearchKeyword(keyword);
 
-    const keyCond = keywordsConditions(keywords);
+    const keywordCond = keywordsConditions(keywords);
+    const filterCond = filterConditions(filter);
 
-    console.log(keyCond);
+    console.log(filterCond);
 
     return {
       $match: {
-        $and: [...keyCond],
+        $and: [...keywordCond, ...filterCond],
         isDeleted: false,
       },
     };
