@@ -829,7 +829,8 @@ class PostService {
   async getPostsByKeyword(
     userId: Types.ObjectId,
     keyword: string,
-    pageNum: number
+    pageNum: number,
+    filter?: string
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -840,6 +841,7 @@ class PostService {
       const posts = await postRepository.getPostsByKeyword(
         keyword,
         pageNum,
+        filter,
         session
       );
       await session.commitTransaction();

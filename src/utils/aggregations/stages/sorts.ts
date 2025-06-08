@@ -7,6 +7,12 @@ class SortStage {
     };
   }
 
+  static views(order: SortOrderType) {
+    return {
+      $sort: { "actions.views": order },
+    };
+  }
+
   static repostedAt(order: SortOrderType) {
     return {
       $sort: { repostedAt: order },

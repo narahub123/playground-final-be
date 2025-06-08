@@ -78,7 +78,7 @@ class MatchStage {
     return { $match: { author: userId, isDeleted: false, media: { $ne: [] } } };
   }
 
-  static search(keyword: string) {
+  static search(keyword: string, f?: string | null) {
     const { keywords, filter, engagement, period } =
       parseSearchKeyword(keyword);
 
@@ -86,15 +86,22 @@ class MatchStage {
     const filterCond = filterConditions(filter);
     const engagementCond = engagementConditions(engagement);
     const periodCond = periodConditions(period);
+    let mediaCond: Record<string, any> | null = null;
+    if (f === "media") {
+      mediaCond = {
+        media: { $exists: true, $ne: [] },
+      };
+    }
 
     const andConditions = [
       keywordCond,
       filterCond,
       engagementCond,
       [periodCond],
+      [mediaCond],
     ]
       .flat()
-      .filter((cond) => Object.keys(cond).length > 0);
+      .filter((cond) => cond && Object.keys(cond).length > 0);
 
     return {
       $match: {

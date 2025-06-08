@@ -733,12 +733,14 @@ class PostRepository {
   async getPostsByKeyword(
     keyword: string,
     pageNum: number,
+    filter?: string,
     session?: ClientSession
   ): Promise<IPostResponseDto[]> {
     try {
       const posts = await Aggregate.getPostsByKeyword(
         keyword,
         pageNum,
+        filter,
         session
       );
 

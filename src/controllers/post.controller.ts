@@ -671,16 +671,19 @@ const getPostsByKeyword = asyncWrapper(
   "",
   async (req: Request, res: Response) => {
     const { _id: userId } = req.user;
-    const { q, skip } = req.query;
+    const { q, skip, f } = req.query;
 
     if (!q || !skip) {
       throw new NotFoundError("검색어 필수");
     }
 
+    const filter = f ? f.toString() : undefined;
+
     const posts = await postService.getPostsByKeyword(
       userId,
       q.toString(),
-      Number(skip || 0)
+      Number(skip || 0),
+      filter
     );
 
     const response: IApiSuccessResponse<{ posts: IPostResponseDto[] }> = {

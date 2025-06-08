@@ -4,8 +4,6 @@ import { splitToken } from "./searchUtils";
 const accountsConditions = (accounts: ISearchAccounts) => {
   const pipelines: any[] = [];
 
-  console.log(accounts);
-
   // fromAccounts
   const fromArr = splitToken(accounts.fromAccounts);
 
