@@ -87,11 +87,18 @@ class MatchStage {
     const engagementCond = engagementConditions(engagement);
     const periodCond = periodConditions(period);
 
-    console.log(periodCond);
+    const andConditions = [
+      keywordCond,
+      filterCond,
+      engagementCond,
+      [periodCond],
+    ]
+      .flat()
+      .filter((cond) => Object.keys(cond).length > 0);
 
     return {
       $match: {
-        $and: [...keywordCond, ...filterCond, ...engagementCond],
+        $and: andConditions,
         isDeleted: false,
       },
     };
